@@ -1,0 +1,210 @@
+(PCB "D:/hw/cadiz/waterlevel/!my/3_power_controlled_sensors_schematics.brd"
+  (parser
+    (string_quote ")
+    (space_in_quoted_tokens on)
+    (host_cad CadSoft)
+    (host_version 'EAGLE Version 6.1.0 Copyright (c) 1988-2012 CadSoft')
+  )
+  (resolution inch 254000)
+  (unit inch)
+  (structure
+    (layer "1#Top"  (type signal))
+    (layer "16#Bottom"  (type signal))
+    (boundary 
+      (rect pcb  0.000000 0.000000 6.299213 3.937008)
+    )
+    (boundary (path signal 0 0.000000 0.000000 6.299213 0.000000))
+    (boundary (path signal 0 6.299213 0.000000 6.299213 3.937008))
+    (boundary (path signal 0 6.299213 3.937008 0.000000 3.937008))
+    (boundary (path signal 0 0.000000 3.937008 0.000000 0.000000))
+    (via
+       "Round1$0.024000"
+    )
+    (rule (width 0.010000)(clearance 0.008000))
+    (control
+      (via_at_smd on)
+    )
+  )
+  (placement
+    (place_control (flip_style rotate_first))
+    (component "TO220BV$transistor-power" 
+      (place "Q1" -0.750000 1.250000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R1" -1.700000 1.350000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R2" -0.700000 1.600000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R3" -1.100000 1.600000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R4" -1.500000 1.600000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R5" -1.900000 1.600000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R6" -0.700000 1.800000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R7" -1.100000 1.800000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R8" -1.500000 1.800000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R9" -1.900000 1.800000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R10" -0.700000 2.000000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R11" -1.100000 2.000000 Front 0.000000)
+    )
+    (component "0207/7$resistor" 
+      (place "R12" -1.500000 2.000000 Front 0.000000)
+    )
+    (component "TO92$transistor" 
+      (place "T1" -1.400000 1.000000 Front 0.000000)
+    )
+    (component "TO92$transistor" 
+      (place "T2" -1.900000 1.000000 Front 0.000000)
+    )
+    (component "TO92$transistor" 
+      (place "T3" -0.900000 1.400000 Front 0.000000)
+    )
+    (component "TO92$transistor" 
+      (place "T4" -1.400000 1.400000 Front 0.000000)
+    )
+    (component "22-23-2021$con-molex" 
+      (place "WATERSENSOR1" -1.550000 0.250000 Front 0.000000)
+    )
+    (component "22-23-2021$con-molex" 
+      (place "WATERSENSOR2" -0.900000 0.700000 Front 0.000000)
+    )
+    (component "22-23-2021$con-molex" 
+      (place "WATERSENSOR3" -1.450000 0.700000 Front 0.000000)
+    )
+    (component "22-23-2031$con-molex" 
+      (place "WATER_LEVEL_OUT" -0.950000 0.250000 Front 0.000000)
+    )
+    (component "22-23-2031$con-molex" 
+      (place "X5" -1.750000 0.700000 Front 0.000000)
+    )
+  )
+  (library
+    (image "22-23-2021$con-molex"
+      (pin "Oblong1" "1" -0.050000 0.000000)
+      (pin "Oblong1" "2" 0.050000 0.000000)
+    )
+    (image "22-23-2031$con-molex"
+      (pin "Oblong1" "1" -0.100000 0.000000)
+      (pin "Oblong1" "2" 0.000000 0.000000)
+      (pin "Oblong1" "3" 0.100000 0.000000)
+    )
+    (image "0207/7$resistor"
+      (pin "Octagon1" "1" -0.150000 0.000000)
+      (pin "Octagon1" "2" 0.150000 0.000000)
+    )
+    (image "TO92$transistor"
+      (pin "Octagon1" "1" 0.050000 0.000000)
+      (pin "Octagon1" "2" 0.000000 0.075000)
+      (pin "Octagon1" "3" -0.050000 0.000000)
+    )
+    (image "TO220BV$transistor-power"
+      (outline(circ "1#Top" 0.020000 -0.177000 -0.146000))
+      (outline(rect "1#Top" -0.210000 -0.030000 0.210000 0.000000))
+      (outline(rect "1#Top" -0.210000 -0.050000 -0.135000 -0.030000))
+      (outline(rect "1#Top" -0.065000 -0.050000 -0.035000 -0.030000))
+      (outline(rect "1#Top" 0.035000 -0.050000 0.065000 -0.030000))
+      (outline(rect "1#Top" 0.135000 -0.050000 0.210000 -0.030000))
+      (pin "Oblong2" "D" 0.000000 -0.100000)
+      (pin "Oblong2" "G" -0.100000 -0.100000)
+      (pin "Oblong2" "S" 0.100000 -0.100000)
+    )
+    (padstack "ViaDefault$0.024000"
+      (shape (circle signal 0.040000 0 0))
+    )
+    (padstack "Round1$0.024000" 
+      (shape (circle "1#Top" 0.040000 0 0))
+      (shape (circle "16#Bottom" 0.040000 0 0))
+      (attach off)
+    )
+    (padstack "Oblong1" 
+      (shape (path signal 0.059370 0.000000 -0.029685 0.000000 0.029685))
+      (attach off)
+    )
+    (padstack "Octagon1" 
+      (shape (polygon "1#Top" 0 0.026000 0.010770 0.010770 0.026000 -0.010770 0.026000 -0.026000 0.010770 -0.026000 -0.010770 -0.010770 -0.026000 0.010770 -0.026000 0.026000 -0.010770 ))
+      (shape (polygon "16#Bottom" 0 0.026000 0.010770 0.010770 0.026000 -0.010770 0.026000 -0.026000 0.010770 -0.026000 -0.010770 -0.010770 -0.026000 0.010770 -0.026000 0.026000 -0.010770 ))
+      (attach off)
+    )
+    (padstack "Oblong2" 
+      (shape (path signal 0.060000 0.000000 -0.030000 0.000000 0.030000))
+      (attach off)
+    )
+  )
+  (network
+    (net "GND"
+      (pins  "Q1"-"S" "T4"-"3" "X5"-"3")
+    )
+    (net "N$2"
+      (pins  "T1"-"2" "R4"-"2" "WATERSENSOR1"-"2")
+    )
+    (net "N$3"
+      (pins  "R7"-"1" "WATERSENSOR1"-"1")
+    )
+    (net "N$4"
+      (pins  "WATERSENSOR3"-"1" "R9"-"1")
+    )
+    (net "N$5"
+      (pins  "R8"-"1" "WATERSENSOR2"-"1")
+    )
+    (net "N$6"
+      (pins  "WATERSENSOR2"-"2" "T2"-"2" "R5"-"2")
+    )
+    (net "N$7"
+      (pins  "WATERSENSOR3"-"2" "T3"-"2" "R6"-"2")
+    )
+    (net "N$8"
+      (pins  "R5"-"1" "R4"-"1" "R6"-"1" "Q1"-"D")
+    )
+    (net "N$9"
+      (pins  "R1"-"1" "T1"-"3")
+    )
+    (net "N$10"
+      (pins  "R2"-"1" "T2"-"3")
+    )
+    (net "N$11"
+      (pins  "R3"-"1" "T3"-"3")
+    )
+    (net "N$12"
+      (pins  "R2"-"2" "WATER_LEVEL_OUT"-"2")
+    )
+    (net "N$13"
+      (pins  "R3"-"2" "WATER_LEVEL_OUT"-"3")
+    )
+    (net "N$14"
+      (pins  "R1"-"2" "WATER_LEVEL_OUT"-"1")
+    )
+    (net "N$15"
+      (pins  "T4"-"2" "R11"-"2")
+    )
+    (net "N$16"
+      (pins  "T4"-"1" "R12"-"1" "R10"-"1")
+    )
+    (net "N$17"
+      (pins  "R10"-"2" "Q1"-"G")
+    )
+    (net "N$18"
+      (pins  "X5"-"1" "R12"-"2" "R7"-"2" "T1"-"1" "R8"-"2" "R9"-"2" "T3"-"1" "T2"-"1")
+    )
+    (net "N$19"
+      (pins  "R11"-"1" "X5"-"2")
+    )
+  )
+  (wiring
+  )
+)

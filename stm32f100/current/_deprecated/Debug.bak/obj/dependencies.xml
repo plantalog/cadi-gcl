@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dependencies>
+   <includePath signature="/I. /Icmsis /Icmsis_boot /Istm_lib /Istm_lib\inc /Ifreertos\Source /Ifreertos\Source\include /I. /Ifreertos\Source\portable\ARM_CM3 /Ifreertos\Source\MemMang">
+      <source file="..\..\ff9a\src\diskio.h" lastModified="13ba1a5d1f9">
+         <include file="..\..\ff9a\src\integer.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\queue.h" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\mpu_wrappers.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_it.h" lastModified="1366443f8f0">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\FreeRTOS.h" lastModified="13843cf33a8">
+         <include file="..\..\freertos\Source\include\projdefs.h"/>
+         <include file="..\..\FreeRTOSConfig.h"/>
+         <include file="..\..\freertos\Source\include\portable.h"/>
+      </source>
+      <source file="..\..\ff9a\src\integer.h" lastModified="13b8bffcbaa">
+      </source>
+      <source file="..\..\ff9a\src\diskio.c" lastModified="13ba1aed105">
+         <include file="..\..\ff9a\src\diskio.h"/>
+         <include file="..\..\ff9a\src\ffconf.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_gpio.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_spi.h"/>
+         <include file="..\..\cmsis_boot\stm32f10x_conf.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_dma.h"/>
+      </source>
+      <source file="..\..\heap_2.c" lastModified="13843cf33a8">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_rcc.c" lastModified="13843cf2fc0">
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+      </source>
+      <source file="..\..\cmsis_boot\startup\startup_stm32f10x_md_vl.c" lastModified="13843cf315e">
+      </source>
+      <source file="..\..\freertos\Source\include\list.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\freertos\Source\include\timers.h" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\portable.h"/>
+         <include file="..\..\freertos\Source\include\list.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+      </source>
+      <source file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_adc.c" lastModified="13868673a80">
+         <include file="..\..\stm_lib\inc\stm32f10x_adc.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_gpio.h" lastModified="13843cf2fc0">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\portable.h" lastModified="13843cffae0">
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\portable\ARM_CM3\portmacro.h"/>
+         <include file="..\..\freertos\Source\include\mpu_wrappers.h"/>
+      </source>
+      <source file="..\..\freertos\Source\croutine.c" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+         <include file="..\..\freertos\Source\include\croutine.h"/>
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76">
+         <include file="..\..\stm_lib\inc\stm32f10x_dma.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\croutine.h" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\list.h"/>
+      </source>
+      <source file="..\..\freertos\Source\timers.c" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+         <include file="..\..\freertos\Source\include\queue.h"/>
+         <include file="..\..\freertos\Source\include\timers.h"/>
+      </source>
+      <source file="..\..\cmsis\core_cm3.h" lastModified="13843cf3790">
+      </source>
+      <source file="..\..\cmsis_boot\stm32f10x.h" lastModified="13843cf33a8">
+         <include file="..\..\cmsis\core_cm3.h"/>
+         <include file="..\..\cmsis_boot\system_stm32f10x.h"/>
+         <include file="..\..\cmsis_boot\stm32f10x_conf.h"/>
+      </source>
+      <source file="..\..\cmsis\core_cm3.c" lastModified="13843cf33a8">
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_gpio.c" lastModified="13843cf2fc0">
+         <include file="..\..\stm_lib\inc\stm32f10x_gpio.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+      </source>
+      <source file="..\..\ff9a\src\ff.h" lastModified="13969ce2040">
+         <include file="..\..\ff9a\src\integer.h"/>
+         <include file="..\..\ff9a\src\ffconf.h"/>
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_spi.c" lastModified="1282a096b60">
+         <include file="..\..\stm_lib\inc\stm32f10x_spi.h"/>
+         <include file="..\..\stm_lib\inc\stm32f10x_rcc.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\task.h" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\portable.h"/>
+         <include file="..\..\freertos\Source\include\list.h"/>
+      </source>
+      <source file="..\..\ff9a\src\ff.c" lastModified="13b8c0960b8">
+         <include file="..\..\ff9a\src\ff.h"/>
+         <include file="..\..\ff9a\src\diskio.h"/>
+      </source>
+      <source file="..\..\cmsis_boot\system_stm32f10x.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_rcc.h" lastModified="13843cf2fc0">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_it.c" lastModified="122e5cd4980">
+         <include file="..\..\stm_lib\inc\stm32f10x_it.h"/>
+      </source>
+      <source file="..\..\cmsis_boot\system_stm32f10x.c" lastModified="13843cf31b3">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\eeprom.h" lastModified="1387d683e20">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_adc.h" lastModified="13868673a80">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\freertos\Source\include\mpu_wrappers.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\freertos\Source\queue.c" lastModified="13843cf3790">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+         <include file="..\..\freertos\Source\include\croutine.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_dma.h" lastModified="13ba1ad1b26">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\cmsis_boot\stm32f10x_conf.h" lastModified="13843cf319b">
+      </source>
+      <source file="..\..\freertos\Source\tasks.c" lastModified="13843cf3b78">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+         <include file="..\..\freertos\Source\include\timers.h"/>
+         <include file="..\..\freertos\Source\include\StackMacros.h"/>
+      </source>
+      <source file="..\..\freertos\Source\portable\ARM_CM3\port.c" lastModified="13843cf2fc0">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\task.h"/>
+      </source>
+      <source file="..\..\stm_lib\src\eeprom.c" lastModified="1387d6b2492">
+         <include file="..\..\stm_lib\inc\stm32f10x_flash.h"/>
+         <include file="..\..\stm_lib\inc\eeprom.h"/>
+      </source>
+      <source file="..\..\FreeRTOSConfig.h" lastModified="13ba26b2773">
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_flash.h" lastModified="13872df712c">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+      <source file="..\..\ff9a\src\ffconf.h" lastModified="13ba159f65d">
+      </source>
+      <source file="..\..\freertos\Source\include\projdefs.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\freertos\Source\include\StackMacros.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\freertos\Source\list.c" lastModified="13843cf33a8">
+         <include file="..\..\freertos\Source\include\FreeRTOS.h"/>
+         <include file="..\..\freertos\Source\include\list.h"/>
+      </source>
+      <source file="..\..\syscalls\syscalls.c" lastModified="13843cf3f60">
+      </source>
+      <source file="..\..\stm_lib\src\stm32f10x_flash.c" lastModified="13872df6f50">
+         <include file="..\..\stm_lib\inc\stm32f10x_flash.h"/>
+      </source>
+      <source file="..\..\stm_lib\inc\stm32f10x_spi.h" lastModified="1282a096390">
+         <include file="..\..\cmsis_boot\stm32f10x.h"/>
+      </source>
+   </includePath>
+</dependencies>

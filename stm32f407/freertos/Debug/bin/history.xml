@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -Map=freertos.map -O1 --gc-sections -LC:\CooCox\CoIDE170\configuration\ProgramData\freertos -TC:\CooCox\CoIDE170\configuration\ProgramData\freertos/arm-gcc-link.ld -g">
+      <target file="freertos.elf" lastModified="13f83970b32">
+         <source file="..\obj\unicode.o" lastModified="13e2dbabf65"/>
+         <source file="..\obj\stm32f4xx_syscfg.o" lastModified="13e2dbac36b"/>
+         <source file="..\obj\stm32f4xx_sdio.o" lastModified="13e2dbac8b7"/>
+         <source file="..\obj\stm32f4xx_hash.o" lastModified="13e2dbacc3a"/>
+         <source file="..\obj\stm32f4xx_cryp_aes.o" lastModified="13e2dbad01a"/>
+         <source file="..\obj\rtc_support.o" lastModified="13e2dbad2e5"/>
+         <source file="..\obj\stm32f4xx_hash_sha1.o" lastModified="13e2dbad58f"/>
+         <source file="..\obj\stm32f4xx_usart.o" lastModified="13e2dbad901"/>
+         <source file="..\obj\stm32f4xx_pwr.o" lastModified="13e2dbadad3"/>
+         <source file="..\obj\mmc_stm32f4.o" lastModified="13e2dbae162"/>
+         <source file="..\obj\stm32f4xx_can.o" lastModified="13e2dbae7ca"/>
+         <source file="..\obj\stm32f4xx_wwdg.o" lastModified="13e2dbaea9c"/>
+         <source file="..\obj\stm32f4xx_hash_md5.o" lastModified="13e2dbaecf2"/>
+         <source file="..\obj\stm32f4xx_dac.o" lastModified="13e2dbaf11d"/>
+         <source file="..\obj\startup_stm32f4xx.o" lastModified="13e2dbaf3da"/>
+         <source file="..\obj\stm32f4_discovery.o" lastModified="13e2dbaf67e"/>
+         <source file="..\obj\stm32f4xx_crc.o" lastModified="13e2dbaf8fd"/>
+         <source file="..\obj\stm32f4xx_iwdg.o" lastModified="13e2dbafb76"/>
+         <source file="..\obj\main.o" lastModified="13f8397047e"/>
+         <source file="..\obj\stm32f4xx_rcc.o" lastModified="13e2dbb1056"/>
+         <source file="..\obj\timers.o" lastModified="13e2dbb1213"/>
+         <source file="..\obj\hd44780_lib.o" lastModified="13f8386d41d"/>
+         <source file="..\obj\stm32f4xx_adc.o" lastModified="13e2dbb1a67"/>
+         <source file="..\obj\stm32f4xx_dcmi.o" lastModified="13e2dbb1daa"/>
+         <source file="..\obj\ff_rtc_if.o" lastModified="13e2dbb2061"/>
+         <source file="..\obj\tasks.o" lastModified="13e2dbb23ff"/>
+         <source file="..\obj\stm32f4xx_cryp_des.o" lastModified="13e2dbb27d4"/>
+         <source file="..\obj\stm32f4xx_cryp.o" lastModified="13e2dbb2a77"/>
+         <source file="..\obj\stm32f4xx_fsmc.o" lastModified="13e2dbb2e07"/>
+         <source file="..\obj\stm32f4xx_gpio.o" lastModified="13e2dbb2fe2"/>
+         <source file="..\obj\stm32f4xx_flash.o" lastModified="13e2dbb3271"/>
+         <source file="..\obj\list.o" lastModified="13e2dbb3376"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="13e2dbb352b"/>
+         <source file="..\obj\syscalls.o" lastModified="13e2dbb3674"/>
+         <source file="..\obj\stm32f4xx_dma.o" lastModified="13e2dbb3891"/>
+         <source file="..\obj\queue.o" lastModified="13e2dbb3b06"/>
+         <source file="..\obj\port.o" lastModified="13e2dbb3c2b"/>
+         <source file="..\obj\charlcd.o" lastModified="13e2dbb3fd4"/>
+         <source file="..\obj\ff.o" lastModified="13e2dbb4a74"/>
+         <source file="..\obj\croutine.o" lastModified="13e2dbb4bdf"/>
+         <source file="..\obj\stm32f4xx_spi.o" lastModified="13e2dbb4e53"/>
+         <source file="..\obj\stm32f4xx_i2c.o" lastModified="13e2dbb50d5"/>
+         <source file="..\obj\stm32f4xx_rng.o" lastModified="13e2dbb5270"/>
+         <source file="..\obj\stm32f4xx_exti.o" lastModified="13e2dbb544b"/>
+         <source file="..\obj\misc.o" lastModified="13e2dbb55d4"/>
+         <source file="..\obj\ff_support.o" lastModified="13e2dbb580b"/>
+         <source file="..\obj\stm32f4xx_rtc.o" lastModified="13e2dbb5dd4"/>
+         <source file="..\obj\heap_2.o" lastModified="13e2dbb5f5c"/>
+         <source file="..\obj\stm32f4xx_cryp_tdes.o" lastModified="13e2dbb6137"/>
+         <source file="..\obj\stm32f4xx_tim.o" lastModified="13e2dbb65f7"/>
+         <source file="..\obj\stm32f4xx_dbgmcu.o" lastModified="13e2dbb67f5"/>
+         <source file="..\obj\eeprom.o" lastModified="13e2dbb6a3e"/>
+      </target>
+   </processor>
+</history>

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G" name="freertos">
+  <Target name="freertos" isCurrent="1">
+    <Device manufacturerId="9" manufacturerName="ST" chipId="344" chipName="STM32F407VG" boardId="" boardName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="1"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="FPU" value="1"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path="cmsis_boot/stm32f4xx_stdperiph_driver/inc"/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="STM32F407VG"/>
+          <Define name="STM32F4XX"/>
+          <Define name="__FPU_USED"/>
+          <Define name="USE_STDPERIPH_DRIVER"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="1"/>
+        <Option name="DiscardUnusedSections" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x00100000" startValue="0x08000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00020000" startValue="0x20000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="0x00010000" startValue="0x10000000"/>
+        </MemoryAreas>
+        <LocateLinkFile path="c:/coocox/coide170/configuration/programdata/freertos/arm-gcc-link.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="freertos"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="ST-Link"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="SWD"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="1M"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:/CooCox/CoIDE/flash/STM32F4xx_1024.elf"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jflashtool" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.coredebugInRam" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jflashscript" value=""/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./">
+    <Component id="30" name="C Library" path="" type="2"/>
+    <Component id="54" name="M4 CMSIS Core" path="" type="2"/>
+    <Component id="500" name="CMSIS BOOT" path="" type="2"/>
+    <Component id="501" name="RCC" path="" type="2"/>
+    <Component id="504" name="GPIO" path="" type="2"/>
+  </Components>
+  <Files>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash_md5.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash_md5.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/misc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/misc.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_exti.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_exti.c" type="1"/>
+    <File name="fatfs_easyelectronics/ff.c" path="fatfs_easyelectronics/ff.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rng.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rng.c" type="1"/>
+    <File name="fatfs_easyelectronics/ffconf.h" path="fatfs_easyelectronics/ffconf.h" type="1"/>
+    <File name="cmsis_boot/stm32f4xx.h" path="cmsis_boot/stm32f4xx.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash_sha1.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash_sha1.c" type="1"/>
+    <File name="cmsis/core_cm4_simd.h" path="cmsis/core_cm4_simd.h" type="1"/>
+    <File name="cmsis/core_cmFunc.h" path="cmsis/core_cmFunc.h" type="1"/>
+    <File name="charlcd.h" path="charlcd.h" type="1"/>
+    <File name="eeprom.c" path="eeprom/eeprom.c" type="1"/>
+    <File name="fatfs_easyelectronics/integer.h" path="fatfs_easyelectronics/integer.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/misc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/misc.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rcc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rcc.h" type="1"/>
+    <File name="fatfs_easyelectronics/ff_rtc_if.c" path="fatfs_easyelectronics/ff_rtc_if.c" type="1"/>
+    <File name="fatfs_easyelectronics/ff.h" path="fatfs_easyelectronics/ff.h" type="1"/>
+    <File name="heap_2.c" path="heap_2.c" type="1"/>
+    <File name="freertos/include/FreeRTOS.h" path="freertos/include/FreeRTOS.h" type="1"/>
+    <File name="syscalls/syscalls.c" path="syscalls/syscalls.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dbgmcu.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dbgmcu.h" type="1"/>
+    <File name="freertos/timers.c" path="freertos/timers.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_pwr.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_pwr.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_exti.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_exti.h" type="1"/>
+    <File name="charlcd.c" path="charlcd.c" type="1"/>
+    <File name="fatfs_easyelectronics" path="" type="2"/>
+    <File name="eeprom.h" path="eeprom/eeprom.h" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_rcc.h" path="cmsis_lib/include/stm32f4xx_rcc.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dma.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc" path="" type="2"/>
+    <File name="cmsis_boot/stm32f4_discovery.h" path="cmsis_boot/stm32f4_discovery.h" type="1"/>
+    <File name="cmsis_boot/startup/startup_stm32f4xx.c" path="cmsis_boot/startup/startup_stm32f4xx.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_sdio.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_sdio.h" type="1"/>
+    <File name="cmsis/core_cmInstr.h" path="cmsis/core_cmInstr.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_i2c.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_i2c.h" type="1"/>
+    <File name="freertos/tasks.c" path="freertos/tasks.c" type="1"/>
+    <File name="freertos/include/semphr.h" path="freertos/include/semphr.h" type="1"/>
+    <File name="fatfs_easyelectronics/ff_rtc_if.h" path="fatfs_easyelectronics/ff_rtc_if.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_spi.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_spi.c" type="1"/>
+    <File name="fatfs_easyelectronics/rtc_support.c" path="fatfs_easyelectronics/rtc_support.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rng.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rng.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver" path="" type="2"/>
+    <File name="cmsis_boot/system_stm32f4xx.c" path="cmsis_boot/system_stm32f4xx.c" type="1"/>
+    <File name="freertos/include/projdefs.h" path="freertos/include/projdefs.h" type="1"/>
+    <File name="cmsis" path="" type="2"/>
+    <File name="cmsis_lib" path="" type="2"/>
+    <File name="port.c" path="port.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dma.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dma.h" type="1"/>
+    <File name="freertos/include/croutine.h" path="freertos/include/croutine.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_crc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_crc.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_tim.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_flash.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_flash.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_wwdg.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_wwdg.c" type="1"/>
+    <File name="freertos/queue.c" path="freertos/queue.c" type="1"/>
+    <File name="main.c" path="main.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_flash.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_flash.c" type="1"/>
+    <File name="fatfs_easyelectronics/ff_support.c" path="fatfs_easyelectronics/ff_support.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_gpio.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dbgmcu.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dbgmcu.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_adc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_adc.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_gpio.c" type="1"/>
+    <File name="cmsis_boot" path="" type="2"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_tdes.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_tdes.c" type="1"/>
+    <File name="cmsis_boot/startup" path="" type="2"/>
+    <File name="fatfs_easyelectronics/rtc_support.h" path="fatfs_easyelectronics/rtc_support.h" type="1"/>
+    <File name="cmsis/core_cm4.h" path="cmsis/core_cm4.h" type="1"/>
+    <File name="fatfs_easyelectronics/unicode.c" path="fatfs_easyelectronics/unicode.c" type="1"/>
+    <File name="freertos/include/portable.h" path="freertos/include/portable.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dac.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dac.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_aes.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_aes.c" type="1"/>
+    <File name="fatfs_easyelectronics/mmc_stm32f4.c" path="fatfs_easyelectronics/mmc_stm32f4.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_sdio.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_hash.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_hash.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_iwdg.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_iwdg.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_iwdg.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_iwdg.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_wwdg.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dcmi.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_dcmi.h" type="1"/>
+    <File name="freertos/croutine.c" path="freertos/croutine.c" type="1"/>
+    <File name="fatfs_easyelectronics/ff_support.h" path="fatfs_easyelectronics/ff_support.h" type="1"/>
+    <File name="fatfs_easyelectronics/diskio.h" path="fatfs_easyelectronics/diskio.h" type="1"/>
+    <File name="cmsis_boot/stm32f4xx_conf.h" path="cmsis_boot/stm32f4xx_conf.h" type="1"/>
+    <File name="cmsis_boot/system_stm32f4xx.h" path="cmsis_boot/system_stm32f4xx.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_hash.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_syscfg.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_syscfg.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dcmi.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dcmi.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_adc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_adc.h" type="1"/>
+    <File name="fatfs_easyelectronics/cc932.c_" path="fatfs_easyelectronics/cc932.c_" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_des.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_cryp_des.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_tim.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_tim.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_can.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_can.h" type="1"/>
+    <File name="fatfs_easyelectronics/mmc_stm32f4.h" path="fatfs_easyelectronics/mmc_stm32f4.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_usart.h" type="1"/>
+    <File name="freertos/include/mpu_wrappers.h" path="freertos/include/mpu_wrappers.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_usart.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_crc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_crc.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rtc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_rtc.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_i2c.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_i2c.c" type="1"/>
+    <File name="freertos/include/list.h" path="freertos/include/list.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_fsmc.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_fsmc.h" type="1"/>
+    <File name="cmsis_boot/stm32f4_discovery.c" path="cmsis_boot/stm32f4_discovery.c" type="1"/>
+    <File name="freertos/include/StackMacros.h" path="freertos/include/StackMacros.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dac.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_dac.c" type="1"/>
+    <File name="mylibs/hd44780_lib.c" path="mylibs/hd44780_lib.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src" path="" type="2"/>
+    <File name="freertos/include/timers.h" path="freertos/include/timers.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rcc.c" type="1"/>
+    <File name="freertos/list.c" path="freertos/list.c" type="1"/>
+    <File name="freertos/include/task.h" path="freertos/include/task.h" type="1"/>
+    <File name="portmacro.h" path="portmacro.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_syscfg.c" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_spi.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_spi.h" type="1"/>
+    <File name="freertos" path="" type="2"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rtc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_rtc.c" type="1"/>
+    <File name="mylibs/hd44780_lib.h" path="mylibs/hd44780_lib.h" type="1"/>
+    <File name="cmsis_lib/include/stm32f4xx_gpio.h" path="cmsis_lib/include/stm32f4xx_gpio.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_pwr.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_pwr.h" type="1"/>
+    <File name="syscalls" path="" type="2"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_fsmc.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_fsmc.c" type="1"/>
+    <File name="freertos/include/queue.h" path="freertos/include/queue.h" type="1"/>
+    <File name="mylibs" path="" type="2"/>
+    <File name="cmsis_lib/include" path="" type="2"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_cryp.h" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/inc/stm32f4xx_cryp.h" type="1"/>
+    <File name="FreeRTOSConfig.h" path="FreeRTOSConfig.h" type="1"/>
+    <File name="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_can.c" path="cmsis_boot/STM32F4xx_StdPeriph_Driver/src/stm32f4xx_can.c" type="1"/>
+    <File name="freertos/include" path="" type="2"/>
+  </Files>
+</Project>

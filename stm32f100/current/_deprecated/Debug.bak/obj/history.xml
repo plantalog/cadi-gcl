@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc noversion nomachine -mcpu=cortex-m3 -mthumb -Wall -ffunction-sections -O0 -g -c -DSTM32F10X_MD_VL -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -DSTM32F100RB -I. -Icmsis -Icmsis_boot -Istm_lib -Istm_lib\inc -Ifreertos\Source -Ifreertos\Source\include -I. -Ifreertos\Source\portable\ARM_CM3 -Ifreertos\Source\MemMang">
+      <target file="stm32f10x_spi.o" lastModified="13b8be86b74">
+         <source file="..\..\stm_lib\src\stm32f10x_spi.c" lastModified="1282a096b60"/>
+      </target>
+      <target file="diskio.o" lastModified="13ba1af108b">
+         <source file="..\..\ff9a\src\diskio.c" lastModified="13ba1aed105"/>
+      </target>
+      <target file="tasks.o" lastModified="13ba26b4f51">
+         <source file="..\..\freertos\Source\tasks.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_rcc.o" lastModified="13b8b93e007">
+         <source file="..\..\stm_lib\src\stm32f10x_rcc.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="core_cm3.o" lastModified="13b8b93bdae">
+         <source file="..\..\cmsis\core_cm3.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="croutine.o" lastModified="13ba26b5605">
+         <source file="..\..\freertos\Source\croutine.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="heap_2.o" lastModified="13ba26b56df">
+         <source file="..\..\heap_2.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="queue.o" lastModified="13ba26b5402">
+         <source file="..\..\freertos\Source\queue.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_flash.o" lastModified="13b8b93f8ab">
+         <source file="..\..\stm_lib\src\stm32f10x_flash.c" lastModified="13872df6f50"/>
+      </target>
+      <target file="list.o" lastModified="13ba26b520f">
+         <source file="..\..\freertos\Source\list.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="eeprom.o" lastModified="13b8b940c17">
+         <source file="..\..\stm_lib\src\eeprom.c" lastModified="1387d6b2450"/>
+      </target>
+      <target file="port.o" lastModified="13ba26b54dd">
+         <source file="..\..\freertos\Source\portable\ARM_CM3\port.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_gpio.o" lastModified="13b8b93c2bc">
+         <source file="..\..\stm_lib\src\stm32f10x_gpio.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="timers.o" lastModified="13ba26b484f">
+         <source file="..\..\freertos\Source\timers.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="system_stm32f10x.o" lastModified="13b8b93c070">
+         <source file="..\..\cmsis_boot\system_stm32f10x.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="syscalls.o" lastModified="13b8b93f5ab">
+         <source file="..\..\syscalls\syscalls.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_adc.o" lastModified="13b8b93f06f">
+         <source file="..\..\stm_lib\src\stm32f10x_adc.c" lastModified="13868673a80"/>
+      </target>
+      <target file="ff.o" lastModified="13ba1a5e7a3">
+         <source file="..\..\ff9a\src\ff.c" lastModified="13b8c095cd0"/>
+      </target>
+      <target file="stm32f10x_dma.o" lastModified="13ba1ad50e9">
+         <source file="..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76"/>
+      </target>
+      <target file="startup_stm32f10x_md_vl.o" lastModified="13b8b93ba93">
+         <source file="..\..\cmsis_boot\startup\startup_stm32f10x_md_vl.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="main.o" lastModified="13bb584c6d7">
+         <source file="..\..\main.c" lastModified="13bb5849fbd"/>
+      </target>
+   </processor>
+</history>

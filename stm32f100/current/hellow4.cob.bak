@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project>
+  <Device>
+    <Manufacturer id="ST" name="ST"/>
+    <Chip id="STM32F100RB" name="STM32F100RB"/>
+  </Device>
+  <Components>
+    <Component id="c37a9351-96ed-11df-80ae-001d7d723e56" name="C Library"/>
+    <Component id="bf7c3c91-96ed-11df-80ae-001d7d723e56" name="CMSIS core"/>
+    <Component id="bfa102a1-96ed-11df-80ae-001d7d723e56" name="RCC"/>
+    <Component id="bfe42621-96ed-11df-80ae-001d7d723e56" name="GPIO"/>
+    <Component id="bff9a9f1-96ed-11df-80ae-001d7d723e56" name="DMA"/>
+    <Component id="c05cffa2-96ed-11df-80ae-001d7d723e56" name="FLASH"/>
+    <Component id="c0725c61-96ed-11df-80ae-001d7d723e56" name="ADC"/>
+    <Component id="994b0730-4bc0-11e0-8e4a-001d7dcd0baf" name="CMSIS Boot"/>
+  </Components>
+  <ExcludedFiles>
+    <Exclude path="C:\CooCox\CoIDE\workspace\rtos_hellow\FreeRTOSV7.1.1\Source\portable\MemMang\heap_1.c"/>
+    <Exclude path="C:\CooCox\CoIDE\workspace\rtos_hellow\FreeRTOSV7.1.1\Source\portable\MemMang\heap_3.c"/>
+    <Exclude path="C:\CooCox\CoIDE\workspace\hellow4\freertos\Source\MemMang\heap_1.c"/>
+    <Exclude path="C:\CooCox\CoIDE\workspace\hellow4\freertos\Source\MemMang\heap_3.c"/>
+    <Exclude path="C:\CooCox\CoIDE\workspace\hellow4\heap_1.c"/>
+    <Exclude path="D:\hw\coocox_projects\hellow4\heap_1.c"/>
+    <Exclude path="D:\hw\coocox_projects\hellow4(rtos)+hd44780\hellow4\heap_1.c"/>
+    <Exclude path="D:\hw\coocox_projects\hellow4\eeprom_emu\src\main.c"/>
+    <Exclude path="D:\hw\coocox_projects\hellow4\stm_lib\inc\stm32f10x_it.h"/>
+    <Exclude path="D:\hw\coocox_projects\hellow4\stm_lib\src\stm32f10x_it.c"/>
+  </ExcludedFiles>
+  <Drivers/>
+</Project>
