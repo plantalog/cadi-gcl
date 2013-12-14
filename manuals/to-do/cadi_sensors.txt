@@ -1,0 +1,18 @@
+Cadi sensors
+==========
+
+Cadi firmware has a number of drivers to provide support for sensors.
+The following basic values are supported by system:
+- pH
+- EC (electrical conductivity)
+- Temperature
+- Humidity
+- CO2
+- Water presence
+
+DRIVERS
+Cadi firmware has built-in support for DHT22 sensors (for DHT11 use test function providing delays measured by PWMInput to adjust the buffer offset and if condition values to proper ones, if needed). The temperature and humidity data provided with these sensors to Cadi, if properly connected (see wiring diagram).
+The EC and pH levels measurement support based on ADC input, that is connected to pH and EC electrodes amplifiers giving voltage range 0..3.3V to convert into 10 bit value from 0 to 4095. The device has a calibration functions to adjust the proper reading for these sensors, using calibration liquids.
+Water presence measured by reading from digital input of STM32 uC, where amplifier for water presence sensors is connected.
+
+

@@ -1,0 +1,41 @@
+Cadi plug settings
+=============
+
+Plug settings mean simple plug triggering rule assignment.
+Each plug can have choosen (linked) one of 256 rules. So, rules has IDs from 0 to 255.
+Within this range there are a number of blocks of rules. Below is a list
+- 24H timers. rules[0..31]
+- Full Range timers. rules[32..63]
+- Cyclic timers. rules[64..95]
+- Chains [96..127]
+- Temperature sensor value below window 1. rule 128
+- within window 1. rule 129
+- above window 1. rule 130
+- Temperature sensor value below window 2. rule 131
+- within window 2. rule 132
+- above window 2. rule 133
+- Temperature sensor value below window 3. rule 134
+- within window 3. rule 135
+- above window 3. rule 136
+- Temperature sensor value below window 4. rule 137
+- within window 4. rule 138
+- above window 4. rule 139
+- Humidity sensor value below window . rule 131
+- within window . rule 132
+- above window . rule 133
+- EC sensor value below window. rule134
+- within window. rule135
+- above window. rule136
+- pH sensor value below window. rule137
+- within window. rule138
+- above window. rule139
+- Water sensor value below window. rule140
+- within window. rule141
+- above window. rule142
+- CO2 sensor. rules[143..145]
+- Moisture sensor. rules[146..148]   (rules for moisture sensor for soil/coco/rockwool)
+
+Each plug can have only one load, that could be turned ON or OFF (not like DC plugs, that could be PWMed). From other hand the correction operations are often need at least two loads to adjust desired value up and down (eg. heater and air conditioner for temperature stabilizing).
+
+Example: the pH stabilizer should add acid when !pH above 5.8! with (1sec every 40secs), while circulation pump mixing added acid. When !pH below 5.5! another plug should turn on for (2 secs every 30secs) to add base. This should be like that within one month, then the same liquids should be added with same timings, but based on different window settings.
+

@@ -1,0 +1,28 @@
+Cadi Firmware Architecture
+====================
+
+The Cadi system works under FreeRTOS real-time OS. There are a number of tasks, created on system startup, that maintain main functions of device.
+
+When startup happens the peripheral hardware (DHT sensor, microSD card if present and other) is being initialized and device settings are being loaded from emulated EEPROM (loadSettings() function responsible for this).
+
+The system status is represented by a number of variables, that hold sensor data and ther data like flags:
+- Plug State Flags, CTimer State Flags, Timer State Flags
+- RTC value keeping current time
+- phUnderOver, ecUnderOver, tempUnderOver
+- phValue (4 byte arr of chars - current pH), ecValue, rhValue, tempValue
+- LCDLine1, LCDLine2 - framebuffer (32 bytes both)
+- logstr - 64bytes of chars containing string to be written on SD card and/or sent to UART
+
+During startup init the valves connected to Cadi are reinitialized - opened and closed immediately then. This is needed to make sure they are on the right positions if some electrical interruption caused restart before.
+
+After the hardware initialized and loadSettings function executed the FreeRTOS tasks are being created (vTaskCreate).
+timerStateTrigger task evaluates the states of timers and cyclic timers and sets the corresponding flags. Also, this function maps stabilizer timers (from 64 and up) to normal timers, allowing normal ones to cooperate with stabilizer window settings.
+plugStateTrigger triggers the STM32s digital outputs wired to corresponding loads it just follows the flags set in plugStateFlags.
+
+Timer IDs from 64 (absolute timer id) and up are used to add a timered action functionality for stabilizer functions. This is needed when we want to adjust, for example temperature, pushing with heating fan 10secnds of hot air into room every 1 minute (to prevent inertion explained hysterezis waves of temperature rise-downs) when the current temperature dropped below window set.
+So, if the plug has linked timer 64, this actully means cyclic timer 0 working only, when the phUnderWindow event detected.
+The cyclic timers also have some kind of mapping, so when we say timer 64, we mean Cyclic timer 0, that has ID=32 (absolute) in a row of all timers and combinations. So, again, absolute timer number 32 corresponds to Cyclic timer number 0. And absolute timer ID=0 means usual Timer 0.
+
+Time is being counted in UNIXTIME format. Cadi supports human-readable format as well using two functions for conversions there and back. Human-readable format is presented by defined structure called RTC_DateTime. It has 6 main 16bit values for seconds, minutes, hours, days, months and years.
+
+

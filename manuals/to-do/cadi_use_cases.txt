@@ -1,0 +1,15 @@
+Cadi use cases
+===========
+
+The following situations could be performed with Cadi in automatic mode (STM32 has no connection to external CPUs).
+
+1. Aeroponics depending on light
+	There is a greenhouse with aeroponic system installed and it needs the pumps to work 15 seconds every 3 minutes within a daytime, and 15 seconds every 6 minutes during the night. The day and night are detected with light sensor.
+
+2. The humidity for daytime should be 80%, while during the night 60%. The day/night detected with light sensor
+
+3. The same as previous, but day/night set with timer
+
+4. The pH level should be kept 5.8 during one month, and then 5.5 during 2 months
+
+5. The temperature should be kept during the night (light sensor detecting) 18 degrees, during the day not less than 25.

@@ -9,7 +9,7 @@ android:
     - Cadi Bluetooth Monitor for Android
     
 hardware:
-    - Eagle schemtics
+    - Eagle schematics
     - Topor PCB layouts
     - ulp file to convert Eagle schematics to Topor
     - schematics image files

@@ -1,0 +1,7 @@
+Cadi DC plugs
+===========
+
+DC (Direct Current) plugs mean loads controlled with STM32's PWM-configured outputs.
+DC plugs are used to drive the dosing (perylstaltic) pumps and other motors (idea: performing window opening tasks).
+Since these outputs have controlling function only, the Cadi device should be equipped with corresponding MOSFET driver (see hardware section for examples of schematics and pcbs).
+
