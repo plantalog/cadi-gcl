@@ -1,7 +1,7 @@
 cadi-gcl
 ========
 
-Cadi grow controller and logger software and firmware (Grow Controller and Logger)
+Cadi - Grow Controller and Logger sources
 
 FOLDER STRUCTURE
 
@@ -32,3 +32,5 @@ stm32f407:
     
 win32:
     - Windows Qt Bluetooth data receiver software
+
+check http://plantalog.livejournal.com for more info
