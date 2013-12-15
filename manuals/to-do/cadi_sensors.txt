@@ -12,7 +12,41 @@ The following basic values are supported by system:
 
 DRIVERS
 Cadi firmware has built-in support for DHT22 sensors (for DHT11 use test function providing delays measured by PWMInput to adjust the buffer offset and if condition values to proper ones, if needed). The temperature and humidity data provided with these sensors to Cadi, if properly connected (see wiring diagram).
-The EC and pH levels measurement support based on ADC input, that is connected to pH and EC electrodes amplifiers giving voltage range 0..3.3V to convert into 10 bit value from 0 to 4095. The device has a calibration functions to adjust the proper reading for these sensors, using calibration liquids.
+The EC and pH levels measurement support based on ADC input, that is connected to pH and EC electrodes amplifiers giving voltage range 0..3.3V to convert into 12 bit value from 0 to 4095. The device has a calibration functions to adjust the proper reading for these sensors, using calibration liquids.
 Water presence measured by reading from digital input of STM32 uC, where amplifier for water presence sensors is connected.
+Each sensor driver provide the reading into Cadi system for further processing. The values have different types. So the driver should provide universal API mechanism to access the sensor data from other parts of software. Below is a list of sensor types that have different drivers:
+- DHT22 (temp, humidity)
+- pH, EC, CO2 (ADC)
+- water level (digital read)
 
+So, at least, we have 3 kinds of data, that should be read different ways.
+Let's see at these values ranges we need to store then as user settings:
+- DHT22 temp, values:[0..999] (0..99.9 degrees Celsius), DHT22 humidity, values:[0..999] (0..99.9% rH) - 10bits
+- pH, EC, CO2. values:[0..4095] - 12 bits
+- water level. values[0..1] - 1bit
+
+Each driver has capability to serve multiple sensors of this type. For example, DHT22 driver can bring up to 4 devices of this type.Compiler defines are used to adjust the number of sensors and their GPIOs to be used with firmware version to be compiled. 
+
+
+
+SENSOR VALUE CONVERSIONS
+To display those values they should be properly transformed into readable format to show them on HD44780. And, possibly, transmitted through UART.
+Functions that adjust windows have built-in format conversion tools to display human-understandable values during window setup. The same tools are used to display current sensor values in Monitor Mode and other display modes.
+Each type has it's own conversion toolkit.
+Examples:
+	DHT22 provides a value in a range from 0 to 999, representing the temperature in a range from 0 to 99.9 degrees. Conversion tool accepts a uint16_t value and returns a reference to 4 byte char array having something like "23.0" in it. Adjustment of temperature is done through a 16bit value inc/dec redisplaying its conversion function every change. So user adjust 230 to 231 but sees "23.0" changes to "23.1" on display.
+	For ADC values converted into pH, EC and other Cadi firmware optionally (in test/advanced modes) shows user the true value due to possible precision loses due to conversion.
+	Water presence if needed to be set up done through universal 1 bit adjuster.
+	
+
+
+
+WINDOWS
+
+Each sensor can have up to 4 windows linked to it. Window - is a set of two values MIN and MAX. They represent the gap, within which system works in "default" mode. If sensor reads a value over this gap, the Cadi could perform attempts to get the value back into this gap (turn heater/cooler on/off).
+	To represent the current reading position relatively to window there is a variable storing a number, meaning the position. 1 - under window (means, below MIN value), 2 - within window (within the gap), 3 - above window.
+	Each window is associated with corresponding sensor ID.
+
+SENSORS
+	Each sensor has an ID. Beside that it also has a type value. For example, DHT22 sensor has a type of 
 

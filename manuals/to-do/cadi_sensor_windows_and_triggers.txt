@@ -3,3 +3,5 @@ Cadi sensor windows and triggers
 
 
 One of the Cadi system loops called sensorRules() evaluates the rules applied to plugs.
+
+

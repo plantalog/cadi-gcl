@@ -30,6 +30,8 @@ Structure of CHAIN timer is below:
 	- TIM4ID[19..23]
 	- TIM5EN[24]
 	- TIM5ID[25..29]. 5th timer ID in chain
+	- WCE[30..31]. Shows if window conditioning enabled. 0 - disabled, 1- under window, 2 - within window, 3 - over window
+If WCE differs from 00, then TIM1ID interpreted as Sensor Window ID (0..31)
 
 TIMER MEMORY AND CPU USAGE
 During the system startup timers are loaded with function loadSettings(). Only these timers, which have ENABLED are loaded to process (if dynamic queue length selected). Timer loading suppose loading the timer IDs into timers2process array. This array size is predefined to 33 (count of timers at 0 position, and 32 timers from 1 to 32) and being filled with ID of timers to process. The first byte (timers2process[0]) shows the number of timers to process. The timer processing loop timerStateSet() makes timers2process[0] iterations (if dynamic queue defined) loading each timer once from emulated EEPROM. If memory available gives a possibility, then timer data (up to 32x10=320bytes are preloaded) and no emilated EEPROM cycles needed to process each timer each loop iteration.

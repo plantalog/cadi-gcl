@@ -25,4 +25,9 @@ The cyclic timers also have some kind of mapping, so when we say timer 64, we me
 
 Time is being counted in UNIXTIME format. Cadi supports human-readable format as well using two functions for conversions there and back. Human-readable format is presented by defined structure called RTC_DateTime. It has 6 main 16bit values for seconds, minutes, hours, days, months and years.
 
+BUTTONS
+The readButtons function makes an ADC value to button code conversion, returning the button pressed number.
+
+VALVES
+Currently spherical valves with position feedback are supported. One wire used to ONOFF valve motor, another wire used to read the valve position state feedback. 
 

@@ -1,0 +1,9 @@
+Cadi adjusters
+==========
+
+These functions intended to give universal UI to adjust some values.
+Many adjustable values in system are of same type, so Cadi uses the universal adjustment functions to adjust:
+- 8 bit values in a range from 0 to 255
+- 16 bit values in a range from 0 to 65535
+- UNIXTIME adjuster to provide time and (optional) date adjustment
+- bit adjuster to provide flag/bit adjusting. Displays TRUE and FALSE value to 1 and 0 correspondingly.
