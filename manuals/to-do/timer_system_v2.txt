@@ -18,24 +18,28 @@ Each timer has 80bits of data (10bytes):
 	
 
 Chains - are 32bit sequences linking the SIMPLE timers together to get more complex timer programs. For instance, when we would like some cyclic timer would work within 24H timer ON window.
-	Chain could have up to 5 timers united with AND operand. The first bit, showing if chain is enabled, could be a flag to process or not the chain in timer trigger cycle.
-Structure of CHAIN timer is below:
+Chains could also be used to associate plugs with Windows and combinations of windows and timers. Every chain loaded for processing has a number of conditions (timers, window) to check. This is so called "length" of chain. If chain has a window and 3 timers attached together in a chain, its length is 4. 5 timers chained together give length equals 5.
+	If only timers used, chain could have up to 5 timers united with AND operand (in case if chain has window setting enabled, the maximum number of timers could be used is 4). The first bit, showing if chain is enabled, is a flag showing to process or not the chain in timer trigger loop. Next 5 bits are used as Timer ID or Sensor Window ID, depending on WCE. TIMnEN bits showing if we AND next Timer or not. The actual chain length is a number of bits going to the first 0 from one of TIMnEN bits:
+Structure of CHAIN is below:
 	- ENABLED [0]. Main flag for enabling chain timer
-	- TIM1ID[1..5]. 5 bits for first timer ID (1..32 or 0..31) in chain.
-	- TIM2EN[6]. If set to 1, the second timer will be ANDed to first one.
+	- TIM1ID[1..5]. 5 bits for first timer ID (1..32 or 0..31) in chain. Or Window ID if WCE>0
+	- TIM2EN[6]. If set to 1, the second timer will be ANDed to first one. If this bit set to 0, chain length is 1.
 	- TIM2ID[7..11]. The second timer ID.
-	- TIM3EN[12]. Flag showing if we want to AND 3rd timer
+	- TIM3EN[12]. Flag showing if we want to AND 3rd timer.
 	- TIM3ID[13..17].
 	- TIM4EN[18]
 	- TIM4ID[19..23]
 	- TIM5EN[24]
 	- TIM5ID[25..29]. 5th timer ID in chain
 	- WCE[30..31]. Shows if window conditioning enabled. 0 - disabled, 1- under window, 2 - within window, 3 - over window
-If WCE differs from 00, then TIM1ID interpreted as Sensor Window ID (0..31)
+If WCE differs from 00, then TIM1ID interpreted as Sensor Window ID (0..31). And the rest of chain could fit 4 members only then.
 
 TIMER MEMORY AND CPU USAGE
 During the system startup timers are loaded with function loadSettings(). Only these timers, which have ENABLED are loaded to process (if dynamic queue length selected). Timer loading suppose loading the timer IDs into timers2process array. This array size is predefined to 33 (count of timers at 0 position, and 32 timers from 1 to 32) and being filled with ID of timers to process. The first byte (timers2process[0]) shows the number of timers to process. The timer processing loop timerStateSet() makes timers2process[0] iterations (if dynamic queue defined) loading each timer once from emulated EEPROM. If memory available gives a possibility, then timer data (up to 32x10=320bytes are preloaded) and no emilated EEPROM cycles needed to process each timer each loop iteration.
 To make cyclic timer start precisely Cadi timer system v2 introduce using complex timer to combine cyclic type with full-range type to adjust exactly the first run of cyclic timer. So, if cyclic timer met in the chain first, then second timer could be used (depending on TIM2EN flag) as additional condition, where TIM2[TimerOn] used as initial point of first start of cyclic timer TIM1. The second start of this cyclic timer (TIM1) happens TIM2[TimerOn]+TIM1[Interval]. The rest 3 timers in the chain are discarded then.
+
+The chains are processed beside the timer loop or after main timer evaluations.
+Chain processor called chainTrigger() is a function that traverses an array of chains. Only the chains that have ENABLED flag set to 1 are loaded into this array. The first array element is a number of chains loaded to say the loop how many iterations should be done. 
 
 
 

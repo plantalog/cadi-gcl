@@ -1,0 +1,12 @@
+Cadi2 Settings Processing
+===================
+
+During startup, after hardware init, the loadSettings() function run to load user defined device settings and make few stamps into log.
+
+Settings to be loaded:
+
+- Timers (enabled only)
+- Chains (enabled only)
+- Windows (if WCE>0 for loaded chain)
+- Plug settings
+- Calibration settings

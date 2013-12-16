@@ -25,8 +25,17 @@ Let's see at these values ranges we need to store then as user settings:
 - pH, EC, CO2. values:[0..4095] - 12 bits
 - water level. values[0..1] - 1bit
 
-Each driver has capability to serve multiple sensors of this type. For example, DHT22 driver can bring up to 4 devices of this type.Compiler defines are used to adjust the number of sensors and their GPIOs to be used with firmware version to be compiled. 
+Each driver has capability to serve multiple sensors of this type. For example, DHT22 driver can bring up to 4 devices of this type.Compiler defines are used to adjust the number of sensors and their GPIOs to be used with firmware version to be compiled.
 
+SDP - Sensor Data Provider
+The sensor driver provided data stored into variable array of corresponding type. Sensor driver arrays have prefix sdp_ (Sensor Data Provider (or Pool))
+Examples:
+	- sdp_ph	-	data variables for pH readings. Array of uint16_t,, where first 4 bits are the sensor ID, and rest 12 - value
+	- sdp_t	-	temperature data. uint16_t
+	- sdp_ws	-	one uint8_t for 8 sensors
+
+Functions, reading from SDP should care about data types they read.
+The sensor IDs are defined with #define directive of compiler for exact hardware config. Another #define gives a possibility to compile the firmware with user-defineable Sensor IDs and STM32 hardware pins for sensor.
 
 
 SENSOR VALUE CONVERSIONS
@@ -43,9 +52,14 @@ Examples:
 
 WINDOWS
 
-Each sensor can have up to 4 windows linked to it. Window - is a set of two values MIN and MAX. They represent the gap, within which system works in "default" mode. If sensor reads a value over this gap, the Cadi could perform attempts to get the value back into this gap (turn heater/cooler on/off).
+Cadi could have up to 32 windows. Window - is a set of two values MIN and MAX. They represent the gap, within which system works in "default" mode. If sensor reads a value over this gap, the Cadi could perform attempts to get the value back into this gap (turn heater/cooler on/off).
 	To represent the current reading position relatively to window there is a variable storing a number, meaning the position. 1 - under window (means, below MIN value), 2 - within window (within the gap), 3 - above window.
 	Each window is associated with corresponding sensor ID.
+	Sensor ID list is predefined during firmware compilation. Window settings are loaded for each Sensor ID from this list within loadSettings() function.
+	Window settings are loaded into Window Settings Registers. Chains could be linked to plugs. Chains could represent multiple timers ANDed with Window Position (current sensor value position relatively to window). So they will trigger ON, only when chain of timers is ON and the window position equals to desired (WCE value of Chain. See Timer System v2).
+	Cadi could store up to 32 Windows. Each window is associated with corresponding SDP value. Window Position Trigger (WPT) triggers the window position values. Window settings are kept in array. They store the reference to SDP value and last evalueated position for this window. The WPT loop has an array of Window IDs to evaluate, and first element of this array shows the number of elements to process during the loop. This array is preloaded within loadSettings() function for all the chains processed if WCE>0.
+	
+
 
 SENSORS
 	Each sensor has an ID. Beside that it also has a type value. For example, DHT22 sensor has a type of 
