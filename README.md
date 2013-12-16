@@ -20,6 +20,7 @@ history:
     
 manuals:
     - Cadi manuals
+    - Cadi firmware code descriptions and architecture
     
 raspberry:
     - Raspberry Pi software

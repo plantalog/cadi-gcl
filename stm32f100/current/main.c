@@ -1,7 +1,7 @@
 /*
- *  Use this code free of charge, but leave this text box
+ *  Use this code free of charge, but leave this text box here, 
  *  This code is distributed as is with no warranties.
- *  For any questions regarding this code you can send to my skype: mitya942
+ *  https://github.com/plantalog/ is main repository hub for Cadi project.
  *
  *	27.08.2013 changed the virtaddvartab usage to copying the whole row or variables 0x05C0-0x0679
  *
@@ -29,12 +29,10 @@
 #include "ff9a/src/ff.h"
 
 
-#define VERSION_BUILD	"130914"
-
 // enabling test mode adds some test functionality
 #define	TEST_MODE
 
-// enabling USE_VALVES turns on the valve control processing
+// enabling USE_VALVES turns on the valve control processing. Disable USART if using this define
 // #define USE_VALVES
 
 #define BT_USART	USART1
@@ -111,7 +109,7 @@ uint16_t RxCounter = 0;
 #define WP_OFFSET					0x0613	// watering program settings offset
 #define TOP_WATER_SENSOR_SHIFT		1		// water sensor address offset inside watering program
 #define BOTTOM_WATER_SENSOR_SHIFT	2		// water sensor address offset inside watering program
-#define WATER_FILL_TIMEOUT_SHIFT	3		// if no sensor reached timout for water tank fill walve
+#define WATER_FILL_TIMEOUT_SHIFT	3		// if no sensor reached timout for water tank fill valve
 #define WP_DURATION_SHIFT			4		// ready solution watering duration
 #define WP_INTERVAL_SHIFT			5		// 2x16bit variables for program execution interval
 #define WP_START_TIME_SHIFT			7		// 2x16bit variables for program start time
