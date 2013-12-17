@@ -4726,7 +4726,7 @@ void loadSettings(void){	// function loads the predefined data
 	string2log(" build time: ", 12);
 	string2log(__TIME__, 8);
 	string2log(" build ver.: ", 12);
-	string2log(VERSION_BUILD, 6);
+//	string2log(VERSION_BUILD, 6);
 
 	for (i=0;i<8;i++) {
 		int32str(button_ranges[i],&tmpstr);
