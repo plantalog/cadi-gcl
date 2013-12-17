@@ -205,13 +205,6 @@ uint16_t RxCounter = 0;
 #define rw_1	port->ODR |=  pin_rw
 #define rw_0	port->ODR &=~ pin_rw
 u32 del;
-/*const unsigned char russian[]={ 0x41, 0xA0, 0x42, 0xA1, 0xE0, 0x45,
-0xA3, 0xA4, 0xA5,0xA6, 0x4B, 0xA7, 0x4D, 0x48, 0x4F, 0xA8, 0x50,0x43,
-0x54, 0xA9, 0xAA, 0x58, 0xE1, 0xAB, 0xAC, 0xE2, 0xAD,0xAE, 0x62,
-0xAF, 0xB0, 0xB1, 0x61, 0xB2, 0xB3, 0xB4, 0xE3, 0x65, 0xB6, 0xB7,
-0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0x6F, 0xBE, 0x70, 0x63,0xBF,
-0x79, 0xE4, 0x78, 0xE5, 0xC0, 0xC1, 0xE6, 0xC2,0xC3, 0xC4, 0xC5,
-0xC6, 0xC7 }; */
 
 typedef struct
 {
@@ -536,26 +529,19 @@ void USART1_IRQHandler(void)
 
 void DMA1_Channel4_IRQHandler (void)
 {
-  //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¾Ã�Â±Ã�Â¼Ã�ÂµÃ�Â½ Ã�Â·Ã�Â°Ã�Â²Ã�ÂµÃ‘â‚¬Ã‘Ë†Ã�ÂµÃ�Â½
-  if(DMA1->ISR & DMA_ISR_TCIF4) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
+  if(DMA1->ISR & DMA_ISR_TCIF4) { }  
+//  if(DMA1->ISR & DMA_ISR_HTIF4) { }      //
 
-  //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¿Ã�ÂµÃ‘â‚¬Ã�ÂµÃ�Â´Ã�Â°Ã�Â½Ã�Â° Ã�Â¿Ã�Â¾Ã�Â»Ã�Â¾Ã�Â²Ã�Â¸Ã�Â½Ã�Â° Ã�Â±Ã‘Æ’Ã‘â€žÃ�ÂµÃ‘â‚¬Ã�Â°
-//  if(DMA1->ISR & DMA_ISR_HTIF4) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
 
-  //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¿Ã‘â‚¬Ã�Â¾Ã�Â¸Ã�Â·Ã�Â¾Ã‘Ë†Ã�Â»Ã�Â° Ã�Â¾Ã‘Ë†Ã�Â¸Ã�Â±Ã�ÂºÃ�Â° Ã�Â¿Ã‘â‚¬Ã�Â¸ Ã�Â¾Ã�Â±Ã�Â¼Ã�ÂµÃ�Â½Ã�Âµ
-//  if(DMA1->ISR & DMA_ISR_TEIF4) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
+//  if(DMA1->ISR & DMA_ISR_TEIF4) { }      
 }
 
 void DMA1_Channel5_IRQHandler (void)
 {
- //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¾Ã�Â±Ã�Â¼Ã�ÂµÃ�Â½ Ã�Â·Ã�Â°Ã�Â²Ã�ÂµÃ‘â‚¬Ã‘Ë†Ã�ÂµÃ�Â½
- if(DMA1->ISR & DMA_ISR_TCIF5) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
 
- //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¿Ã�ÂµÃ‘â‚¬Ã�ÂµÃ�Â´Ã�Â°Ã�Â½Ã�Â° Ã�Â¿Ã�Â¾Ã�Â»Ã�Â¾Ã�Â²Ã�Â¸Ã�Â½Ã�Â° Ã�Â±Ã‘Æ’Ã‘â€žÃ�ÂµÃ‘â‚¬Ã�Â°
-// if(DMA1->ISR & DMA_ISR_HTIF5) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
-
- //Ã�â€¢Ã‘ï¿½Ã�Â»Ã�Â¸ Ã�Â¿Ã‘â‚¬Ã�Â¾Ã�Â¸Ã�Â·Ã�Â¾Ã‘Ë†Ã�Â»Ã�Â° Ã�Â¾Ã‘Ë†Ã�Â¸Ã�Â±Ã�ÂºÃ�Â° Ã�Â¿Ã‘â‚¬Ã�Â¸ Ã�Â¾Ã�Â±Ã�Â¼Ã�ÂµÃ�Â½Ã�Âµ
-// if(DMA1->ISR & DMA_ISR_TEIF5) { }      //Ã‘â€¡Ã‘â€šÃ�Â¾-Ã‘â€šÃ�Â¾ Ã�Â´Ã�ÂµÃ�Â»Ã�Â°Ã�ÂµÃ�Â¼
+ if(DMA1->ISR & DMA_ISR_TCIF5) { }
+// if(DMA1->ISR & DMA_ISR_HTIF5) { }
+// if(DMA1->ISR & DMA_ISR_TEIF5) { }
 }
 
 #ifdef KOSTYLI_MODE
@@ -669,10 +655,9 @@ void bluetooth_init(void){
   USART1->CR1  |= USART_CR1_RXNEIE;
   USART1->CR1  |= USART_CR1_TCIE;
   USART_Cmd(USART1, ENABLE);
-  NVIC_EnableIRQ(USART1_IRQn);           //Ã‘â‚¬Ã�Â°Ã�Â·Ã‘â‚¬Ã�ÂµÃ‘Ë†Ã�Â¸Ã‘â€šÃ‘Å’ Ã�Â¿Ã‘â‚¬Ã�ÂµÃ‘â‚¬Ã‘â€¹Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã‘ï¿½ Ã�Â¾Ã‘â€š USART1
-
+  NVIC_EnableIRQ(USART1_IRQn);     
 /*
-  //Ã�â€™Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ DMA1
+  
   if ((RCC->AHBENR & RCC_AHBENR_DMA1EN) != RCC_AHBENR_DMA1EN)
   RCC->AHBENR |= RCC_AHBENR_DMA1EN;
   // set source and target addresses and data amount to be transferred
@@ -683,10 +668,10 @@ void bluetooth_init(void){
   DMA1_Channel4->CCR   =  0;                       //reset config register
   DMA1_Channel4->CCR   = ~DMA_CCR4_CIRC;           //disable cyclic mode
   DMA1_Channel4->CCR  |=  DMA_CCR4_DIR;            //direction: read FROM memory
-  //Ã�ï¿½Ã�Â°Ã‘ï¿½Ã‘â€šÃ‘â‚¬Ã�Â¾Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â‚¬Ã�Â°Ã�Â±Ã�Â¾Ã‘â€šÃ‘Æ’ Ã‘ï¿½ Ã�Â¿Ã�ÂµÃ‘â‚¬Ã�ÂµÃ‘â€žÃ�ÂµÃ‘â‚¬Ã�Â¸Ã�Â¹Ã�Â½Ã‘â€¹Ã�Â¼ Ã‘Æ’Ã‘ï¿½Ã‘â€šÃ‘â‚¬Ã�Â¾Ã�Â¹Ã‘ï¿½Ã‘â€šÃ�Â²Ã�Â¾Ã�Â¼
+  
   DMA1_Channel4->CCR   = ~DMA_CCR4_PSIZE;          //data size 8 bit
   DMA1_Channel4->CCR   = ~DMA_CCR4_PINC;           //do not use increment of pointer
-  //Ã�ï¿½Ã�Â°Ã‘ï¿½Ã‘â€šÃ‘â‚¬Ã�Â¾Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â‚¬Ã�Â°Ã�Â±Ã�Â¾Ã‘â€šÃ‘Æ’ Ã‘ï¿½ Ã�Â¿Ã�Â°Ã�Â¼Ã‘ï¿½Ã‘â€šÃ‘Å’Ã‘Å½
+  
   DMA1_Channel4->CCR   = ~DMA_CCR4_MSIZE;          //data size 8 bit
   DMA1_Channel4->CCR  |=  DMA_CCR4_MINC;           //use pointer increment
   USART1->CR3 |= USART_CR3_DMAT;                    //enable transfer USART1 through DMA */
@@ -3602,6 +3587,7 @@ uint16_t adjust16bit(uint16_t val){
 		}
 		if (button==BUTTON_FWD) {
 			if (val>65534) {
+
 				val=0;
 			}
 			else {
@@ -4324,6 +4310,7 @@ void displayClock(void *pvParameters)
 	    	vTaskDelay(14);
 	    	button=readButtons();
 	    	vTaskDelay(3);
+
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
