@@ -1,0 +1,7 @@
+Project: Cadi v1
+Date: 16.12.2013
+Description:
+
+Cadi should have a possibility to send and load back user settings stored in Flash memory (emulated EEPROM). Loading back - means, Cadi could receive the settings packet using UART from another serial-port enabled device and write them back into array of SMT32 emulated EEPROM cells intended for storing user-defined settings.
+
+DMA used during transmission to minimize the latency.
