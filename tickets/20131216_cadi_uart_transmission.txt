@@ -5,3 +5,50 @@ Description:
 Cadi should have a possibility to send and load back user settings stored in Flash memory (emulated EEPROM). Loading back - means, Cadi could receive the settings packet using UART from another serial-port enabled device and write them back into array of SMT32 emulated EEPROM cells intended for storing user-defined settings.
 
 DMA used during transmission to minimize the latency.
+
+The other side should be Linux device like Raspberry Pi.
+
+
+RESEARCH
+=========
+
+Since no Raspberry board found yet, I try to connect Desktop Linux PC with Bluetooth module to HC-06 which is connected to Cadi and sends the data via SPP (Serial Port Profile) of Bluetooth.
+
+Ubuntu 12.04 is up and running
+Plug in the USB dongle and it is discovered by system
+comp@comp:~$ lsusb
+Bus 003 Device 002: ID 0a5c:2121 Broadcom Corp. BCM2210 Bluetooth
+
+then scan the range for HC-06 device around
+dt@widelap:~$ hcitool scan
+Scanning ...
+11:22:33:44:55:66		HC-06
+
+Good, we have devide found. Now we have at least two options. OPTION 1: bind the device like this
+
+rfcomm bind /dev/rfcomm0 11:22:33:44:55:66 1
+
+where "1" at the end is a channel number. How to get to know the channel number?
+
+sdptool records 11:22:33:44:55:66
+
+After that you can connect with putty to /dev/rfcomm0 and see the Cadi output.
+
+OPTION2:
+http://www.heatxsink.com/entry/how-to-pair-a-bluetooth-device-from-command-line-on-linux
+describes how to edit the /etc/bluetooth/rfcomm.conf file to have working the following line:
+
+$ sudo rfcomm connect rfcomm0
+
+this line opens port somehow and... maybe will get to know what is going next and how to read this opened port.
+
+
+
+
+Aditional links
+http://www.thinkwiki.org/wiki/How_to_setup_Bluetooth
+
+
+PYTHON WEB SERVER WITH CADI OUTPUT
+http://habrahabr.ru/post/205944/
+
