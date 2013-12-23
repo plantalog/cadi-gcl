@@ -477,6 +477,8 @@ void USART1_IRQHandler(void)
 
 		  if(USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET)
 		  {
+			//RxBuffer[RxCounter++] = (USART_ReceiveData(BT_USART) & 0x7F);
+
 			  RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
 			  RxDataReady=1;
 			  if (RxByte>47 && RxByte<51) {
@@ -507,7 +509,7 @@ void USART1_IRQHandler(void)
 	  if(USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET)
 	  {
 		// Read one byte from the receive data register
-		// RxBuffer[RxCounter++] = (USART_ReceiveData(BT_USART) & 0x7F);
+		RxBuffer[RxCounter++] = (USART_ReceiveData(BT_USART) & 0x7F);
 		RxByte = (USART_ReceiveData(BT_USART) & 0x7F);
 		RxDataReady=1;
 		USART1->SR &= ~USART_FLAG_RXNE;
@@ -1098,11 +1100,11 @@ void valve_test(void){
 		}
 #endif
 
-//		Lcd_write_str("W");
+		Lcd_write_str("W");
 
 //		Lcd_write_digit(wsl_buff[0]/100);
 //		Lcd_write_digit(wsl_buff[0]);
-		Lcd_write_digit(waterSensorStateFlags);
+//		Lcd_write_digit(waterSensorStateFlags);
 //		Lcd_write_digit(GPIOB->IDR/100);
 //		Lcd_write_digit(GPIOB->IDR);
 

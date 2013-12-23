@@ -89,9 +89,9 @@
     <Component id="464" name="CMSIS Boot" path="" type="2"/>
   </Components>
   <Files>
+    <File name="heap_1.c" path="heap_1.c" type="1"/>
     <File name="cmsis_boot/startup/startup_stm32f10x_md_vl.c" path="cmsis_boot/startup/startup_stm32f10x_md_vl.c" type="1"/>
     <File name="ff9a/src/integer.h" path="ff9a/src/integer.h" type="1"/>
-    <File name="heap_1.c" path="heap_1.c" type="1"/>
     <File name="ff9a" path="" type="2"/>
     <File name="freertos/Source/portable/ARM_CM3" path="" type="2"/>
     <File name="freertos/Source" path="" type="2"/>
@@ -103,17 +103,17 @@
     <File name="cmsis_boot/startup" path="" type="2"/>
     <File name="freertos/Source/timers.c" path="freertos/Source/timers.c" type="1"/>
     <File name="stm_lib/src/misc.c" path="stm_lib/src/misc.c" type="1"/>
-    <File name="stm_lib/src/stm32f10x_spi.c" path="stm_lib/src/stm32f10x_spi.c" type="1"/>
-    <File name="freertos/Source/include" path="" type="2"/>
     <File name="ff9a/src/ff.c" path="ff9a/src/ff.c" type="1"/>
+    <File name="freertos/Source/include" path="" type="2"/>
+    <File name="stm_lib/src/stm32f10x_spi.c" path="stm_lib/src/stm32f10x_spi.c" type="1"/>
     <File name="cmsis_boot/stm32f10x.h" path="cmsis_boot/stm32f10x.h" type="1"/>
     <File name="cmsis_boot/stm32f10x_conf.h" path="cmsis_boot/stm32f10x_conf.h" type="1"/>
     <File name="ff9a/src/diskio.c" path="ff9a/src/diskio.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_flash.h" path="stm_lib/inc/stm32f10x_flash.h" type="1"/>
-    <File name="syscalls/syscalls.c" path="syscalls/syscalls.c" type="1"/>
     <File name="heap_2.c" path="heap_2.c" type="1"/>
-    <File name="ff9a/src/diskio.h" path="ff9a/src/diskio.h" type="1"/>
+    <File name="syscalls/syscalls.c" path="syscalls/syscalls.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_spi.h" path="stm_lib/inc/stm32f10x_spi.h" type="1"/>
+    <File name="ff9a/src/diskio.h" path="ff9a/src/diskio.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_dma.h" path="stm_lib/inc/stm32f10x_dma.h" type="1"/>
     <File name="stm_lib/src/stm32f10x_adc.c" path="stm_lib/src/stm32f10x_adc.c" type="1"/>
     <File name="freertos/Source/include/task.h" path="freertos/Source/include/task.h" type="1"/>
@@ -123,8 +123,8 @@
     <File name="stm_lib/src/stm32f10x_pwr.c" path="stm_lib/src/stm32f10x_pwr.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_gpio.c" path="stm_lib/src/stm32f10x_gpio.c" type="1"/>
     <File name="stm_lib/inc/stm32f10x_gpio.h" path="stm_lib/inc/stm32f10x_gpio.h" type="1"/>
-    <File name="stm_lib/inc/stm32f10x_usart.h" path="stm_lib/inc/stm32f10x_usart.h" type="1"/>
     <File name="freertos/Source/include/queue.h" path="freertos/Source/include/queue.h" type="1"/>
+    <File name="stm_lib/inc/stm32f10x_usart.h" path="stm_lib/inc/stm32f10x_usart.h" type="1"/>
     <File name="stm_lib/inc/stm32f10x_conf.h" path="stm_lib/inc/stm32f10x_conf.h" type="1"/>
     <File name="cmsis_boot/system_stm32f10x.c" path="cmsis_boot/system_stm32f10x.c" type="1"/>
     <File name="stm_lib/src/eeprom.c" path="stm_lib/src/eeprom.c" type="1"/>
@@ -157,9 +157,9 @@
     <File name="syscalls" path="" type="2"/>
     <File name="ff9a/src/ff.h" path="ff9a/src/ff.h" type="1"/>
     <File name="freertos/Source/croutine.c" path="freertos/Source/croutine.c" type="1"/>
-    <File name="stm_lib/src/stm32f10x_it.c" path="stm_lib/src/stm32f10x_it.c" type="1"/>
-    <File name="stm_lib/inc" path="" type="2"/>
     <File name="FreeRTOSConfig.h" path="FreeRTOSConfig.h" type="1"/>
+    <File name="stm_lib/inc" path="" type="2"/>
+    <File name="stm_lib/src/stm32f10x_it.c" path="stm_lib/src/stm32f10x_it.c" type="1"/>
     <File name="freertos/Source/include/mpu_wrappers.h" path="freertos/Source/include/mpu_wrappers.h" type="1"/>
     <File name="freertos/Source/queue.c" path="freertos/Source/queue.c" type="1"/>
     <File name="main.c" path="main.c" type="1"/>
