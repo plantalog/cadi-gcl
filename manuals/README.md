@@ -13,7 +13,7 @@ https://github.com/plantalog/cadi-gcl/blob/master/hardware/kai_wiring_diagram_v1
 Суть работы: когда ни одна кнопка не нажата, сопротивление между выводами всего бока кнопок стремится к бесконечности. Нажатие первой кнопки даёт сопротивление N. Нажатие второй кнопки (первая уже отпущена) даст сопротивление 2N и так далее. Для примера возьмём N=2.2кОм. Тогда четвёртая нажатая кнопка блока даст сопротивление 8.8кОм.
 
 Подключим кнопки к контроллеру через делитель напряжения вроде такого 
-https://github.com/plantalog/cadi-gcl/blob/master/hardware/4_analog_buttons_witing.png
+https://github.com/plantalog/cadi-gcl/blob/master/hardware/4_analog_buttons_wiring.png
 
 Далее необходимо подключить дисплей. Для ориентира возьмём такую схему
 https://github.com/plantalog/cadi-gcl/blob/master/hardware/kai_wiring_diagram_v0.png
