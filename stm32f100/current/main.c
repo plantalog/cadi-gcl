@@ -139,6 +139,7 @@ uint16_t RxCounter = 0;
 #define COMM_MONITOR_MODE		48
 #define COMM_GET_SETTINGS		49
 #define COMM_SET_SETTINGS		50
+#define COMM_DIRECT_DRIVE		51
 #define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
 #define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
 
@@ -379,6 +380,7 @@ void run_fertilizer_mixer(progId);
 // void calibratEc(void);
 void startWp(void);
 
+
 static void prvSetupHardware( void );
 // static void prvLedBlink( void *pvParameters );
 // static void prvLedBlink2( void *pvParameters );
@@ -439,6 +441,30 @@ void comm_manager(void){
 		}
 		comm_state = COMM_MONITOR_MODE;
 	}
+
+	if (comm_state==COMM_DIRECT_DRIVE) {
+		switch (RxByte) {
+		case 49:
+			plugStateSet(0, 0);	// enable plug for ph up pump
+			break;
+		case 50:
+			plugStateSet(0, 1);	// enable plug for ph up pump
+			break;
+		case 51:
+			plugStateSet(1, 0);	// enable plug for ph up pump
+			break;
+		case 52:
+			plugStateSet(1, 1);	// enable plug for ph up pump
+			break;
+		case 53:
+			plugStateSet(2, 0);	// enable plug for ph up pump
+			break;
+		case 54:
+			plugStateSet(2, 1);	// enable plug for ph up pump
+			break;
+		}
+	}
+
 	if (comm_state==COMM_GET_SETTINGS) {
 
 
@@ -472,7 +498,6 @@ void comm_manager(void){
 
 void USART1_IRQHandler(void)
 {
-
 	if (comm_state==48) {
 
 		  if(USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET)
@@ -481,7 +506,7 @@ void USART1_IRQHandler(void)
 
 			  RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
 			  RxDataReady=1;
-			  if (RxByte>47 && RxByte<51) {
+			  if (RxByte>47 && RxByte<52) {
 				  comm_state=RxByte;
 			  }
 			  USART1->SR &= ~USART_FLAG_RXNE;
@@ -489,13 +514,13 @@ void USART1_IRQHandler(void)
 		  }
 			  // count xor crc
 		  if (TxCounter==62) {
-				  log_str[62] = logstr_crc;
+//				  log_str[62] = logstr_crc;
 		  }
 		  logstr_crc ^= log_str[TxCounter];
 		  USART1->DR=log_str[TxCounter++];
 		  if(TxCounter == 64) {
-				USART_ITConfig(BT_USART, USART_IT_RXNE, ENABLE);
-				log_str[62] = logstr_crc;
+//				USART_ITConfig(BT_USART, USART_IT_RXNE, ENABLE);
+//				log_str[62] = logstr_crc;
 				TxCounter = 0;
 				logstr_crc = 0;
 		  }
@@ -510,19 +535,32 @@ void USART1_IRQHandler(void)
 	  {
 		// Read one byte from the receive data register
 		RxBuffer[RxCounter++] = (USART_ReceiveData(BT_USART) & 0x7F);
+		if (RxCounter>10) {
+			  RxCounter=0;
+		}
 		RxByte = (USART_ReceiveData(BT_USART) & 0x7F);
 		RxDataReady=1;
 		USART1->SR &= ~USART_FLAG_RXNE;
-		  if (comm_state==COMM_MONITOR_MODE && RxByte>47 && RxByte<51) {
-			  comm_state=RxByte;
-		  }
+		if (comm_state==COMM_DIRECT_DRIVE && RxByte==48) {
+		  comm_state=48;	// exit direct drive mode
+		}
 	  }
 
-	  if(TxDataReady==1){
+	  if(TxDataReady==1 && comm_state!=COMM_DIRECT_DRIVE){
 		  USART1->DR = TxByte;
 		  TxDataReady=0;
 	  }
+	  else {
+		  USART1->DR=log_str[TxCounter++];
+		  if(TxCounter == 64) {
+//				USART_ITConfig(BT_USART, USART_IT_RXNE, ENABLE);
+//				log_str[62] = logstr_crc;
+				TxCounter = 0;
+				logstr_crc = 0;
+		  }
+	  }
 	  USART1->SR &= ~USART_SR_TC;
+
 	}
 }
 
@@ -2665,13 +2703,13 @@ static void sdLog(void *pvParameters){	// store current device data into log
 
 
 //	    	str[41]=44;	// ascii comma
-	    	log_str[62]=0;		// CRC
+	    	log_str[62]=13;		// CRC
 
 	    	//for (i=0;i<62;i++) {
 	    	//	log_str[62] ^= log_str[i];
 	    	//}
 
-	    	log_str[63]=85;		// U
+	    	log_str[63]=10;		// U
 	    	logstr_crc=0;
 
 			string2log(&log_str, 64);
@@ -3149,74 +3187,76 @@ void plugStateTrigger(void  *pvParameters){
 	uint8_t plugStateFlag, plugTimerId, plugType;
 	uint8_t i;
 	while (1) {
-		for (i=0; i<PLUG_AMOUNT; i++){		// PC0 to PC2
-			plugType=0;
-			plugTimerId = plugSettings[i];	// get the ID of timer for this plug
-			if (plugTimerId>=0 && plugTimerId<=31) {
-//				plugType=0;
-				// Timer
-				plugStateFlag=timerStateFlags&(1<<plugTimerId);	// check if timer active now
-				plugStateFlag>>=plugTimerId;	// ostavit' toka flag
-			}
-			if (plugTimerId>63 && plugTimerId<67){	// ph up
-				plugType=2;
-				plugTimerId-=32;
-			}
-			if (plugTimerId>66 && plugTimerId<69){	// ph up
-				plugType=3;
-				plugTimerId-=35;
-			}
+		if (comm_state!=COMM_DIRECT_DRIVE) {
+			for (i=0; i<PLUG_AMOUNT; i++){		// PC0 to PC2
+				plugType=0;
+				plugTimerId = plugSettings[i];	// get the ID of timer for this plug
+				if (plugTimerId>=0 && plugTimerId<=31) {
+	//				plugType=0;
+					// Timer
+					plugStateFlag=timerStateFlags&(1<<plugTimerId);	// check if timer active now
+					plugStateFlag>>=plugTimerId;	// ostavit' toka flag
+				}
+				if (plugTimerId>63 && plugTimerId<67){	// ph up
+					plugType=2;
+					plugTimerId-=32;
+				}
+				if (plugTimerId>66 && plugTimerId<69){	// ph up
+					plugType=3;
+					plugTimerId-=35;
+				}
 
-			if (plugTimerId>69 && plugTimerId<72){	// ph up
-				plugType=4;
-//				plugTimerId-=35;
-			}
+				if (plugTimerId>69 && plugTimerId<72){	// ph up
+					plugType=4;
+	//				plugTimerId-=35;
+				}
 
-			if (plugTimerId>31 && plugTimerId<64) {
-			//	plugType=1;
-				// CTimer
-				plugTimerId-=32;
-				plugStateFlag=cTimerStateFlags&(1<<plugTimerId);	// check if timer active now
-				plugStateFlag>>=plugTimerId;	// ostavit' toka flag
-			}
+				if (plugTimerId>31 && plugTimerId<64) {
+				//	plugType=1;
+					// CTimer
+					plugTimerId-=32;
+					plugStateFlag=cTimerStateFlags&(1<<plugTimerId);	// check if timer active now
+					plugStateFlag>>=plugTimerId;	// ostavit' toka flag
+				}
 
-			if (plugType==2) {
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && phUnderOver==1) {
-					plugStateSet(i, 1);	// enable plug for ph up pump
+				if (plugType==2) {
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && phUnderOver==1) {
+						plugStateSet(i, 1);	// enable plug for ph up pump
+					}
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==1 && phUnderOver==2) {
+						plugStateSet(i, 1);	// enable plug for ph down pump
+					}
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==2 && phUnderOver>0) {
+						plugStateSet(i, 1);	// enable plug for mixing pump
+					}
+					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
+						plugStateSet(i, 0);	// disable plug
+					}
 				}
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==1 && phUnderOver==2) {
-					plugStateSet(i, 1);	// enable plug for ph down pump
+				else if (plugType==3) {	// mister (or another humidity "upper")
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==1) {
+						plugStateSet(i, 1);	// enable mister for underwindow
+					}
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==0) {
+						plugStateSet(i, 1);	// enable mister for in-window
+					}
+					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
+						plugStateSet(i, 0);	// disable plug
+					}
 				}
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==2 && phUnderOver>0) {
-					plugStateSet(i, 1);	// enable plug for mixing pump
+				else if (plugType==4) {
+					// watering and circulation pumps for watering controller
 				}
-				if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
-					plugStateSet(i, 0);	// disable plug
+				else {
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0) {
+						plugStateSet(i, 1);	// enable plug
+					}
+					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
+						plugStateSet(i, 0);	// disable plug
+					}
 				}
-			}
-			else if (plugType==3) {	// mister (or another humidity "upper")
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==1) {
-					plugStateSet(i, 1);	// enable mister for underwindow
-				}
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==0) {
-					plugStateSet(i, 1);	// enable mister for in-window
-				}
-				if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
-					plugStateSet(i, 0);	// disable plug
-				}
-			}
-			else if (plugType==4) {
-				// watering and circulation pumps for watering controller
-			}
-			else {
-				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0) {
-					plugStateSet(i, 1);	// enable plug
-				}
-				if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
-					plugStateSet(i, 0);	// disable plug
-				}
-			}
 
+			}
 		}
 		vTaskDelay(1);
 #ifdef USE_VALVES
