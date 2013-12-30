@@ -1,0 +1,91 @@
+http://www.wikihow.com/Compile-a-C/C%2B%2B-Program-on-Ubuntu-Linux
+
+Grabli - zapuskat' na NTFS/FAT razdele ne poluchitsja!
+
+Linux serial port read AND BLOCKING MODE!!!
+http://stackoverflow.com/questions/6947413/how-to-open-read-and-write-from-serial-port-in-c
+
+and...
+http://stackoverflow.com/questions/18070731/linux-serial-port-blocking-read-with-timeout
+
+http://www.tldp.org/HOWTO/Serial-Programming-HOWTO/x56.html (BLOCKING DETECTED in 2.3)
+
+Python Serial to TCP/IP bridge
+http://pyserial.sourceforge.net/examples.html#unit-tests
+
+python helloworld.py iz terminala
+
+python miniterm.py
+com port name /dev/rfcomm1 (test device)
+
+
+How to run sudo-needed command in bash script http://askubuntu.com/questions/155791/how-do-i-sudo-a-command-in-a-script-without-being-asked-for-a-password
+
+
+READ FILE PYTHON TEST
+
+Then create a file:
+echo "123456" > /opt/input.test
+and create file into opt with name test_readfile.py:
+put inside the following content:
+------
+with open(fname) as f:
+    content = f.readlines()
+------
+where fname - path to your /opt/input.test
+
+run the script using following code:
+python test_readfile.py
+
+Links: http://stackoverflow.com/questions/3277503/python-read-file-line-by-line-into-array
+
+
+FIRST CADI SERIAL READ WITH PYTHON
+Finally I red this http://playground.arduino.cc/interfacing/python
+And I found the proper code
+-------
+ import serial
+ ser = serial.Serial('/dev/rfcomm0', 9600)
+ while True:
+     print ser.readline()
+------
+Обучение - это копипаста переходящая в кастомщину.
+
+
+so, after binding rfcomm0 I ran this script and it got me first data... and halted. Yes, it's blocking.
+So, let's read about Python threading system.
+This sems to be interesting: http://www.ibm.com/developerworks/ru/library/l-python_part_9/
+
+
+
+
+
+PYTHON WEB SERVER FOR RASPBERRY PI
+Writing CGI scripts in Python - http://raspberrywebserver.com/cgiscripting/writing-cgi-scripts-in-python.html
+
+Web server side scription Python - http://www.raspberrypi.org/phpBB3/viewtopic.php?f=32&t=8429
+
+Running Apache with Python not under root - http://www.g7smy.co.uk/?p=27
+
+Okay, enough with Python for now, let's see, what can we do with already familiar (to me) PHP.
+
+the bash commands could be executed in PHP using exec() function.
+$out = array();
+$out = exec('ls -la');
+the line above assigns the output of "ls -la" run in shell. Actually, the variable $out should be array type, because each line of output is going to a new array element. So printing out the array contents in PHP would be like following:
+for ($i=1; $i<sizeof($out); $i++) {
+    echo $out[$i].'</br>';
+}
+
+Then we put 'hcitool scan' into exec() and parse the output with PHP to show user <select> element to choose the Cadi bluetooth adapter to bind.
+I use jQuery lib to manipulate objects on web-page easier. There is a main page and _processor.php, where requests are done from this main page.
+
+Then we have a python script, that could be started with PHP and it will create an output file, that PHP will read with fread(). http://www.ibm.com/developerworks/opensource/library/os-php-readfiles/
+
+Use following to set file read pointer 100 bytes back from the tail:
+fseek($fh, -100, SEEK_END);
+
+
+
+
+
