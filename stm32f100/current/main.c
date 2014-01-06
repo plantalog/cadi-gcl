@@ -27,23 +27,62 @@
 #include "eeprom.h"
 #include "ff9a/src/diskio.h"
 #include "ff9a/src/ff.h"
+#include "driver_sonar.h"
 
 
 // enabling test mode adds some test functionality
 #define	TEST_MODE
 
-// enabling USE_VALVES turns on the valve control processing. Disable USART if using this define
-// #define USE_VALVES
 
+// SENSOR AND CONTROL DEVICES DRIVERS
+/*
+ * Peripherals used with Cadi should be properly initialized before use.
+ * Typical init has:
+ * - Pin config (except integrated peripherals like RTC or Flash)
+ * - Driver variable's pool definitions
+ * - #defines for names used
+ * Some drivers need interfacing and/or data processing functions to
+ * be implemented
+ */
+
+
+// DRIVER: WATER FLOW METER
+#define USE_WFM
+#ifdef USE_WFM		//	START WFM DEFINITIONS
+#define WFM_AMOUNT	2	// number of meters to work with
+uint16_t water_counter[WFM_AMOUNT];
+#define WFM_PINS_PB0_1	// WFM assigned to pins PB0 and PB1
+#endif				//	EOF WFM DEFINITIONS
+
+
+// DRIVER: Spherical valves with feedback
+#define USE_VALVES
+#ifdef USE_VALVES	// START VALVES DEFINITIONS
+#define VALVE_DISABLE	GPIOA->BSRR
+#define VALVE_ENABLE	GPIOA->BRR
+#define VALVE_SENSOR_GPIO_SHIFT		10		// valve position sensor GPIO shift
+#define VALVE_AMOUNT				3		// number of valves to process
+#define VALVE_MOTOR_GPIO_SHIFT		11		// valve control motor GPIO out shift
+#define VALVE_MOTOR_PORT			GPIOA
+#define VALVE_SENSOR_PORT			GPIOA
+#define VALVE_SENSOR_PORT_SOURCE	GPIO_PortSourceGPIOA
+#define V1_SENSOR_PIN				GPIO_Pin_5
+#define V2_SENSOR_PIN				GPIO_Pin_6
+#define V3_SENSOR_PIN				GPIO_Pin_7
+#define	VALVE_FAILURE_TIMEOUT		4000	// timeout for valve open/close function to avoid hanging if valve broken
+#define DRAIN_VALVE_ID				1
+// Valve variables
+uint8_t valveFlags;
+#endif	// EOF VALVES DEFINITIONS
+
+
+// DRIVER: Bluetooth module HC-06 USART
+#define USE_BLUETOOTH
+#ifdef USE_BLUETOOTH		// START BLUETOOTH USART DEFINITIONS
 #define BT_USART	USART1
-#define BLUETOOTH_ON
-
-#ifdef BLUETOOTH_ON
-
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define USARTx_IRQHandler   USART1_IRQHandler
-
 //#define TxBufferSize   (countof(TxBuffer) - 1)
 //#define RxBufferSize   0x10
 
@@ -63,28 +102,157 @@ uint8_t RxDataReady;
 //uint8_t NbrOfDataToRead = RxBufferSize;
 uint8_t TxCounter = 0;
 uint16_t RxCounter = 0;
+uint8_t logstr_crc=0;
+#endif				// EOF BLUETOOTH USART DEFINITIONS
 
 
-#endif
+// DRIVER: Digital Temperature and Humidity sensor DHT22
+#define USE_DHT
+#ifdef USE_DHT			// START DHT DEFINITIONS
+#define DHT_TRIG_PLUG			15		// PB15
+#define DHT_DATA_START_POINTER	4		// DHT22 = 4, DHT11 = ?; sets the first bit number in captured sequence of DHT response bits
+#define DHT_0					(GPIOB->BRR = (1<<DHT_TRIG_PLUG))
+#define DHT_1					(GPIOB->BSRR = (1<<DHT_TRIG_PLUG))
+typedef struct
+{
+  uint16_t 			DHT_Temperature;        // temperature
+  uint16_t 			DHT_Humidity;  // from 0 (0%) to 1000 (100%)
+  uint8_t 			DHT_CRC;  // from 0 (0%) to 1000 (100%)
+}DHT_data;
+__IO uint16_t IC2Value = 0;
+__IO uint16_t DutyCycle = 0;
+__IO uint32_t Frequency = 0;
+TIM_ICInitTypeDef  TIM_ICInitStructure;
+// digital humidity and temperature data
+uint16_t dht_bit_array[50];
+DHT_data DHTValue;
+uint8_t		dht_data[5];
+uint8_t dht_bit_position = 0;
+uint8_t dht_bit_ready = 0;
+uint8_t		dht_data_ready = 0;
+uint8_t 	dht_rh_str[4], dht_t_str[4];
+uint16_t	capture1=0, capture2=0;
+volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
+uint16_t rhWindowTop, rhWindowBottom;
+uint8_t rhUnderOver = 0;
+#endif						// EOF DHT DEFINITIONS
+
+
+// DRIVER: HD44780/1602 LCD module
+#define USE_LCD
+#ifdef USE_LCD				// START LCD DEFINITIONS
+#define lcd_shift	11				// seems to be not used here anymore?
+#define use_gpio	GPIO_Pin_13		// last data pin number
+#define pin_d7		use_gpio		// define pins from last
+#define pin_d6		use_gpio>>1
+#define pin_d5		use_gpio>>2
+#define pin_d4		use_gpio>>3		// to d4 of 4bit bus of 1602 LCD
+
+
+#define lcd_init_port_data			RCC_APB2Periph_GPIOB
+#define lcd_init_port_cmd			RCC_APB2Periph_GPIOC
+#define pin_e 					GPIO_Pin_10
+#define pin_rw					GPIO_Pin_11
+#define pin_rs					GPIO_Pin_12
+#define lcd_port_data			GPIOB
+#define lcd_port_cmd			GPIOC
+
+#define Function_set 				0b00100000//4-bit,2 - line mode, 5*8 dots
+#define Display_on_off_control		0b00001100/// display on,cursor off,blink off
+#define Display_clear				0b00000001
+#define Entry_mode_set				0b00000100//
+
+#define rs_1	lcd_port_cmd->ODR |=  pin_rs
+#define rs_0	lcd_port_cmd->ODR &=~ pin_rs
+#define e_1 	lcd_port_cmd->ODR |=  pin_e
+#define e_0		lcd_port_cmd->ODR &=~ pin_e
+#define rw_1	lcd_port_cmd->ODR |=  pin_rw
+#define rw_0	lcd_port_cmd->ODR &=~ pin_rw
+u32 del;
+static uint8_t		LCDLine1[16], LCDLine2[16];		// lcd frame buffer
+uint8_t lcd_pointerx=0, lcd_pointery=0;
+#endif 						// EOF LCD DEFINITIONS
+
+
+// DRIVER: Analog buttons
+#define USE_BUTTONS
+#ifdef USE_BUTTONS			// START BUTTONS DEFINITIONS
+#define BUTTON_OK				2
+#define BUTTON_CNL				3
+#define BUTTON_BCK				1
+#define BUTTON_FWD				4
+#define BUTTON_RANGE_SHRINKER	0
+#define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
+uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
+uint8_t buttonReverse=0;
+#endif						// EOF BUTTONS DEFINITIONS
 
 
 
-// define eeprom cells for keeping settings
+// DRIVER:  RTC
+#define USE_RTC
+#ifdef USE_RTC				// START RTC DEFINITIONS
+#define YEAR12SECS		1325462400	// vse raschety vedjom ot 01.01.2012
+typedef struct
+{
+  unsigned char  hour;
+  unsigned char  min;
+  unsigned char  sec;
+} RTC_Time;
 
+typedef struct
+{
+  uint16_t  hour;
+  uint16_t  min;
+  uint16_t  sec;
+  uint16_t  day;
+  uint16_t  month;
+  uint16_t  year;
+  uint16_t  doy;	   //day of year
+
+} RTC_DateTime;
+
+RTC_Time toAdjust;
+uint32_t timerStateFlags, cTimerStateFlags;
+#endif						// EOF RTC DEFINITIONS
+
+
+// DRIVER: LOAD TRIGGERING
+#define USE_LOADS
+#ifdef USE_LOADS			// START LOADS DEFINITIONS
 #define PLUG_DISABLE	GPIOC->BSRR
 #define PLUG_ENABLE		GPIOC->BRR
+#define	PLUG_INVERT		0		// enable reverse plugStateSet
+#define PLUG_AMOUNT		3
+uint32_t plugStateFlags;
+uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs HARDCODE
+// elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
+// 0 element - pervyj plug, 1 element - plug no 2, etc
+#endif						// EOF LOADS DEFINITIONS
 
-#define VALVE_DISABLE	GPIOA->BSRR
-#define VALVE_ENABLE	GPIOA->BRR
 
-#define	PLUG_INVERT			0		// enable reverse plugStateSet
+// DRIVER: SD-card on SPI interface with FatFS
+#define USE_SD
+#ifdef USE_SD
+	int no_sd;
+	FATFS   fs;       // file system variable to mount SD card
+	uint16_t logInterval=0;
+#endif
+
+/*
+ *   =====  END OF DRIVER SECTION =====
+ */
+
+
+
+
+// define eeprom cells for keeping user settings. memory map
 #define EE_PLUG_SETTINGS	0x05FF	//	each plug one value (16 plugs in total, range 7FF-809)
 #define EE_TIMER1_ON		0x05DA	// for 4 timers 36 (hex=24) values (range: 7DA-7FF)
 #define EE_CTIMER_DURATION	0x05C0	// 2 values for duration of cTimer.
 #define EE_CTIMER_INTERVAL	0x05C2	// and 2 for interval. For 5 timers 25 (hex=19) values 7C0-7D9
 #define EE_TIMER_SIZE		9
 #define EE_CTIMER_SIZE		5
-#define PLUG_AMOUNT			3		// this links to number of pins on PORTC, so not more then 16
 #define PH4_ADDR			0x0600
 #define PH7_ADDR			0x0601
 #define PH_INTERVAL			0x0602		// pH measurement interval in milliseconds
@@ -143,125 +311,27 @@ uint16_t RxCounter = 0;
 #define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
 #define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
 
-
-
-
-#define YEAR12SECS				1325462400	// vse raschety vedjom ot 01.01.2012
-#define BUTTON_OK				2
-#define BUTTON_CNL				3
-#define BUTTON_BCK				1
-#define BUTTON_FWD				4
-#define BUTTON_RANGE_SHRINKER	0
 #define DAY						1
 #define NIGHT					0
-#define port    				GPIOB
-#define init_port 				RCC_APB2Periph_GPIOB
-#define pin_e 					GPIO_Pin_7
-#define pin_rw					GPIO_Pin_8
-#define pin_rs					GPIO_Pin_9
-#define lcd_port				GPIOB
+
 #define BSRRL					BSRR
 #define BSRRH					BRR
-#define DHT_TRIG_PLUG			15		// PB15
 
-#define DHT_DATA_START_POINTER	4		// DHT22 = 4, DHT11 = ?; sets the first bit number in captured sequence of DHT response bits
-#define DHT_0					(GPIOB->BRR = (1<<DHT_TRIG_PLUG))
-#define DHT_1					(GPIOB->BSRR = (1<<DHT_TRIG_PLUG))
+
 #define LOG_SHIFT	1
 
-// Valves
-#define VALVE_SENSOR_GPIO_SHIFT		10		// valve position sensor GPIO shift
-#define VALVE_AMOUNT				3		// number of valves to process
-#define VALVE_MOTOR_GPIO_SHIFT		8		// valve control motor GPIO out shift
-#define VALVE_MOTOR_PORT			GPIOA
-#define VALVE_SENSOR_PORT			GPIOC
-#define V1_SENSOR_PIN				GPIO_Pin_10
-#define V2_SENSOR_PIN				GPIO_Pin_11
-#define V3_SENSOR_PIN				GPIO_Pin_12
-
-#define DRAIN_VALVE_ID				1
-
 // analog inputs
-#define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
 #define JDR_EC		ADC1->JDR3		// continuous ADC channel for EC
 #define JDR_PH		ADC1->JDR2		// continuous ADC channel for pH
 
-// lcd 1602 or 44780 defines
-#define lcd_shift	11				// seems to be not used here anymore?
-#define use_gpio	GPIO_Pin_13		// last data pin number
-#define pin_d7		use_gpio		// define pins from last
-#define pin_d6		use_gpio>>1
-#define pin_d5		use_gpio>>2
-#define pin_d4		use_gpio>>3		// to d4 of 4bit bus of 1602 LCD
-
-#define Function_set 				0b00100000//4-bit,2 - line mode, 5*8 dots
-#define Display_on_off_control		0b00001100/// display on,cursor off,blink off
-#define Display_clear				0b00000001
-#define Entry_mode_set				0b00000100//
-
-#define rs_1	port->ODR |=  pin_rs
-#define rs_0	port->ODR &=~ pin_rs
-#define e_1 	port->ODR |=  pin_e
-#define e_0		port->ODR &=~ pin_e
-#define rw_1	port->ODR |=  pin_rw
-#define rw_0	port->ODR &=~ pin_rw
-u32 del;
-
-typedef struct
-{
-  unsigned char  hour;
-  unsigned char  min;
-  unsigned char  sec;
-} RTC_Time;
-
-typedef struct
-{
-  uint16_t  hour;
-  uint16_t  min;
-  uint16_t  sec;
-  uint16_t  day;
-  uint16_t  month;
-  uint16_t  year;
-  uint16_t  doy;	   //day of year
-
-} RTC_DateTime;
-
-typedef struct
-{
-  uint16_t 			DHT_Temperature;        // temperature
-  uint16_t 			DHT_Humidity;  // from 0 (0%) to 1000 (100%)
-  uint8_t 			DHT_CRC;  // from 0 (0%) to 1000 (100%)
-}DHT_data;
 
 uint8_t log_inc=0;
 char log_str[64];
-uint8_t logstr_crc=0;
 
-__IO uint16_t IC2Value = 0;
-__IO uint16_t DutyCycle = 0;
-__IO uint32_t Frequency = 0;
-TIM_ICInitTypeDef  TIM_ICInitStructure;
-// digital humidity and temperature data
-uint16_t dht_bit_array[50];
-DHT_data DHTValue;
-uint8_t		dht_data[5];
-uint8_t dht_bit_position = 0;
-uint8_t dht_bit_ready = 0;
-uint8_t		dht_data_ready = 0;
-uint8_t 	dht_rh_str[4], dht_t_str[4];
-
-uint16_t	capture1=0, capture2=0;
-volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
 
 uint8_t circulationPumpId;
-static uint8_t		LCDLine1[16], LCDLine2[16];		// lcd frame buffer
-uint8_t lcd_pointerx=0, lcd_pointery=0;
-uint16_t logInterval=0;
-RTC_Time toAdjust;
 ErrorStatus  HSEStartUpStatus;
 FLASH_Status FlashStatus;
-int no_sd;
-FATFS   fs;       // file system variable to mount SD card
 uint16_t VarValue = 0;
 uint16_t ph_seven=0;
 uint32_t ph0=0;
@@ -280,25 +350,11 @@ uint8_t phUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 -
 uint8_t ecUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 - over window
 uint16_t phWindowTop, phWindowBottom;
 uint16_t ecWindowTop, ecWindowBottom;
-uint16_t rhWindowTop, rhWindowBottom;
-uint8_t rhUnderOver = 0;
 uint32_t lastWriteTime=0;
 uint8_t lightSensor;
 uint16_t lightRange;
-uint32_t timerStateFlags, cTimerStateFlags;
 uint8_t wpStateFlags;
 uint8_t dosingPumpStateFlags;
-uint32_t plugStateFlags;
-uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs HARDCODE
-// elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
-// 0 element - pervyj plug, 1 element - plug no 2, etc
-uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
-uint8_t buttonReverse=0;
-#ifdef USE_VALVES
-uint8_t valve_state;
-uint8_t valveFlags;
-uint8_t valveMotorStateFlags=0;
-#endif
 uint8_t waterSensorStateFlags;
 uint8_t wsl_buff[3];
 uint8_t curculationPumpId;
@@ -382,8 +438,6 @@ void startWp(void);
 
 
 static void prvSetupHardware( void );
-// static void prvLedBlink( void *pvParameters );
-// static void prvLedBlink2( void *pvParameters );
 static void displayClock( void *pvParameters );
 static void timerStateTrigger(void *pvParameters);
 static void plugStateTrigger(void  *pvParameters);
@@ -397,7 +451,7 @@ void bluetooth_init(void);
 void display_usart_rx(void);
 
 void open_valve(uint8_t valveId);
-void close_valve(uint8_t valveId, uint8_t forced);
+void close_valve(uint8_t valveId);
 void run_valve_motor(uint8_t valveId);
 void stop_valve_motor(uint8_t valveId);
 void valve_test(void);
@@ -405,7 +459,7 @@ void valve_feedback_init(void);
 void dosing_motor_control_init(void);
 void valve_motor_control_init(void);
 void EXTI15_10_IRQHandler(void);
-void water_sensor_input_init(void);
+void water_level_input_init(void);
 void fertilizer_mixing_program_setup(progId);
 uint16_t adjust16bit(uint16_t val);
 void enable_dosing_pump(uint8_t pumpId, uint8_t state);
@@ -414,6 +468,8 @@ void USART1_IRQHandler(void);
 void StartDMAChannel4(unsigned int LengthBufer);
 unsigned char GetStateDMAChannel4(void);
 void comm_manager(void);
+void TIM1_TRG_COM_TIM17_IRQHandler(void);
+void TIM4_IRQHandler(void);
 
 
 void comm_manager(void){
@@ -746,45 +802,51 @@ void StartDMAChannel4(unsigned int LengthBufer)
 
 
 void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control output
-		 GPIOA->CRH      &= ~GPIO_CRH_CNF8;
-	     GPIOA->CRH   |= GPIO_CRH_MODE8_0;
-		 GPIOA->CRH      &= ~GPIO_CRH_CNF9;
-	     GPIOA->CRH   |= GPIO_CRH_MODE9_0;
-		 GPIOA->CRH      &= ~GPIO_CRH_CNF10;
-	     GPIOA->CRH   |= GPIO_CRH_MODE10_0;
+	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
+	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF13;
+	     GPIOA->CRH   |= GPIO_CRH_MODE13_0;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF12;
+	     GPIOA->CRH   |= GPIO_CRH_MODE12_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF11;
 	     GPIOA->CRH   |= GPIO_CRH_MODE11_0;
 }
 
-void valve_feedback_init(void){		// init PC10-PC12 as input for 3V valve feedback
+void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
+
+	// v1.4 config assumes PA5-7 pins as feedback, implement init function
+
+
+// PA5-7 setup
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
 
-	  /* Enable GPIOB clock */
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE);
+	  // Enable GPIOA clock
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
-	  /* Configure PC.10-12 pin as input pull-down */
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
+	  // Configure PA5-7 pin as input pull-down
+	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 
-	  /* Enable AFIO clock */
+	  // Enable AFIO clock
 //	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	  /* Connect EXTI10 Line to PC10 pin */
-	  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource10);
+	  // Connect EXTI10 Line to PC10 pin
+	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource5);
 
-	  /* Configure EXTI10 line */
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line10;
+	  // Configure EXTI5 line
+	  EXTI_InitStructure.EXTI_Line = EXTI_Line5;
 	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	  EXTI_Init(&EXTI_InitStructure);
 
-	  // Configure EXTI11 line
+	  // Configure EXTI6 line
 
-	  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource11);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line11;
+	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource6);
+	  EXTI_InitStructure.EXTI_Line = EXTI_Line6;
 	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
@@ -792,15 +854,15 @@ void valve_feedback_init(void){		// init PC10-PC12 as input for 3V valve feedbac
 
 	  // Configure EXTI12 line
 
-	  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource12);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line12;
+	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource7);
+	  EXTI_InitStructure.EXTI_Line = EXTI_Line7;
 	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
 	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
 	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 	  EXTI_Init(&EXTI_InitStructure);
 
 	  // Enable and set EXTI15_10 Interrupt to the lowest priority
-	  NVIC_InitStructure.NVIC_IRQChannel = EXTI15_10_IRQn;
+	  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
 	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
 	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
 	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
@@ -809,7 +871,9 @@ void valve_feedback_init(void){		// init PC10-PC12 as input for 3V valve feedbac
 }
 
 
-void water_sensor_input_init(void){		// init PC15, PD0, PD1 as water sensor inputs
+
+void water_level_input_init(void){
+#ifdef WFM_PINS_PB0_1
 		GPIO_InitTypeDef GPIO_InitStructure;
 		EXTI_InitTypeDef EXTI_InitStructure;
 		NVIC_InitTypeDef NVIC_InitStructure;
@@ -839,13 +903,6 @@ void water_sensor_input_init(void){		// init PC15, PD0, PD1 as water sensor inpu
 		  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
 		  EXTI_Init(&EXTI_InitStructure);
 
-		  GPIO_EXTILineConfig(GPIO_PortSourceGPIOB, GPIO_PinSource2);
-		  EXTI_InitStructure.EXTI_Line = EXTI_Line2;
-		  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-		  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-		  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-		  EXTI_Init(&EXTI_InitStructure);
-
 		  NVIC_InitStructure.NVIC_IRQChannel = EXTI0_IRQn;
 		  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
 		  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
@@ -858,11 +915,7 @@ void water_sensor_input_init(void){		// init PC15, PD0, PD1 as water sensor inpu
 		  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 		  NVIC_Init(&NVIC_InitStructure);
 
-		  NVIC_InitStructure.NVIC_IRQChannel = EXTI2_IRQn;
-		  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-		  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-		  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-		  NVIC_Init(&NVIC_InitStructure);
+#endif
 }
 
 void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing pump control
@@ -947,71 +1000,38 @@ void open_valve(uint8_t valveId){
 	vTaskDelay(1);
 #ifdef USE_VALVES
 	uint8_t curstatus=0;
-	curstatus=valve_state&(1<<valveId);	// check if valve flag active now
-	curstatus>>=valveId;	// ostavit' toka flag
+	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
+	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
 	if (curstatus==0) {
-		valveMotorStateSet(valveId, 1);
-		while (curstatus==0) {
-//		while ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==0) {
-//			curstatus=0;
-			curstatus=valve_state&(1<<valveId);	// check if timer active now
-			curstatus>>=valveId;	// ostavit' toka flag
-			vTaskDelay(10);
+		run_valve_motor(valveId);
+		uint8_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
+		while (((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==0) && timeout>0) {
+			vTaskDelay(2);
+			timeout--;
 		}
-		valveMotorStateSet(valveId, 0);
+		stop_valve_motor(valveId);
 	}
 	valveFlags |= (1<<valveId);
 	vTaskDelay(5);
 #endif
 }
 
-void close_valve(uint8_t valveId, uint8_t forced){
-	vTaskDelay(5);
-#ifdef USE_VALVES
-	uint8_t curstatus=1;
-	curstatus=valve_state&(1<<valveId);	// check if valve open now
-	curstatus>>=valveId;	// ostavit' toka flag
-	if (forced==1) {
-		curstatus=1;
+void close_valve(uint8_t valveId){
+	run_valve_motor(valveId);
+	uint8_t timeout=VALVE_FAILURE_TIMEOUT;
+	while (((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==1) && timeout>0) {
+				vTaskDelay(2);
+				timeout--;
 	}
-	if (curstatus==1) {
-
-		valveMotorStateSet(valveId, 1);
-		valveMotorStateSet(valveId, curstatus);
-//		run_valve_motor(valveId);
-//		while (curstatus==1) {
-		while (curstatus==1) {
-			vTaskDelay(5);
-//			curstatus=1;
-			curstatus=valve_state&(1<<valveId);	// check if valve open now
-			curstatus>>=valveId;	// ostavit' toka flag
-		}
-		valveMotorStateSet(valveId, 0);
-		valveMotorStateSet(valveId, curstatus);
-	}
+	stop_valve_motor(valveId);
 	valveFlags &= ~(1<<valveId); // sbrosit' flag
-	vTaskDelay(5);
-#endif
 }
 
-/*void valveManager(void){	// tracks the valve flags and adjusts valves accordingly
-	uint8_t i, curstate=0;
-	while (1) {
-		for (i=0; i<(VALVE_AMOUNT); i++) {
-			curstate=valve_state&(1<<i);	// check if valve open now
-			curstate>>=i;	// ostavit' toka flag
-			if (((valveFlags>>i)&1) && curstate==0){
-				open_valve(i);
-			}
-			if (!((valveFlags>>i)&1) && curstate == 1){
-				close_valve(i,0);
-			}
-			vTaskDelay(1);
-		}
-		vTaskDelay(2);
-	}
-} */
 
+
+
+// updates valve_state variable
+/*
 void valve_status_updater(void){
 #ifdef USE_VALVES
 	uint8_t i=0;
@@ -1030,6 +1050,7 @@ void valve_status_updater(void){
 
 #endif
 }
+*/
 
 void run_valve_motor(uint8_t valveId){
 
@@ -1048,34 +1069,26 @@ void stop_valve_motor(uint8_t valveId){
 	VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 }
 
-void EXTI9_5_IRQHandler(void)
-{
-//  if(EXTI_GetITStatus(EXTI_Line10) != RESET)
-//  {
-    /* Toggle LED2 */
-//     STM_EVAL_LEDToggle(LED2);
-
-    /* Clear the  EXTI line 9 pending bit */
-	EXTI_ClearITPendingBit(EXTI_Line5);
-	EXTI_ClearITPendingBit(EXTI_Line6);
-    EXTI_ClearITPendingBit(EXTI_Line7);
-//    valve_status_updater();
-//  }
-}
 
 
 void EXTI0_IRQHandler(void) {
 	EXTI_ClearITPendingBit(EXTI_Line0);
-
+#ifdef WFM_PINS_PB0_1	// water flow meter (WFM) driver actions
+	water_counter[0]++;
+#endif
 }
 
 void EXTI1_IRQHandler(void) {
 	EXTI_ClearITPendingBit(EXTI_Line1);
+#ifdef WFM_PINS_PB0_1
+	water_counter[1]++;
+#endif
 
 }
 
 void EXTI2_IRQHandler(void) {
 	EXTI_ClearITPendingBit(EXTI_Line2);
+//	water_counter++;
 
 }
 
@@ -1088,41 +1101,74 @@ void EXTI15_10_IRQHandler(void)
 //    valve_status_updater();
 }
 
+void EXTI9_5_IRQHandler(void)
+{
+    // Clear the  EXTI line 10-12 pending bit
+	EXTI_ClearITPendingBit(EXTI_Line5);
+	EXTI_ClearITPendingBit(EXTI_Line6);
+	EXTI_ClearITPendingBit(EXTI_Line7);
+//    valve_status_updater();
+}
+
+
 
 void valve_test(void){
 	uint8_t button=0, curState=0, i=0;
+	uint16_t tmp=0;
 	Lcd_clear();
 #ifdef USE_VALVES
-	Lcd_write_str("Open/close valve");
+
+	//Lcd_write_str("Open/close valve");
 #endif
 	while (button!=BUTTON_OK) {
 		vTaskDelay(20);
 		button=readButtons();
 #ifdef USE_VALVES
-		for (i=0; i<3; i++) {
-			curState = valve_state&(1<<i);	// check if water level reached top sensor
-			curState>>=i;	// ostavit' toka flag
+		Lcd_goto(0,0);
+		tmp=water_counter[0];
+		Lcd_write_digit(tmp/10000);
+		Lcd_write_digit(tmp/100);
+		Lcd_write_digit(tmp);
 
-			if (i==0 && button==BUTTON_FWD){
-					if (curState==1){
-						valveFlags=0;
-					}
-					else {
-						valveFlags=1;
-					}
-			}
-			if (i==1 && button==BUTTON_BCK){
-				if (curState==1){
-					valveFlags=2;
-				}
-				else {
-					valveFlags=3;
-				}
-			}
-		}
+		tmp=sonar_read[0];
+		Lcd_write_digit(tmp/100);
+		Lcd_write_digit(tmp);
 
+		tmp=TIM17->CNT;
+		Lcd_write_digit(tmp/10000);
+		Lcd_write_digit(tmp/100);
+		Lcd_write_digit(tmp);
+
+//		for (i=0; i<3; i++) {
+//			curState = valveFlags&(1<<i);
+//			curState>>=i;	// ostavit' toka flag
+
+			if (button==BUTTON_FWD){
+					//if (curState==1){
+						//close_valve(0);
+					//}
+					//else {
+					//	run_valve_motor(0);
+					//	run_valve_motor(1);
+						open_valve(1);
+					//	run_valve_motor(2);
+					//}
+			}
+			if (button==BUTTON_BCK){
+				//if (curState==1){
+					//stop_valve_motor(0);
+					stop_valve_motor(1);
+					close_valve(1);
+					//stop_valve_motor(2);
+				//}
+				//else {
+				//	open_valve(1);
+				//}
+			}
+//		}
+		vTaskDelay(1);
 		Lcd_goto(1,0);
-		Lcd_write_digit(valve_state);
+		Lcd_write_digit(valveFlags);
 		Lcd_write_str("VS");
 		uint16_t val=0;
 		val = VALVE_SENSOR_PORT->IDR>>10;
@@ -1130,6 +1176,8 @@ void valve_test(void){
 		Lcd_write_digit(val/100);
 		Lcd_write_digit(val);
 		Lcd_write_str(" ");
+
+		vTaskDelay(1);
 		if (VALVE_SENSOR_PORT->IDR>>10 & 1) {
 			Lcd_write_str("1");
 		}
@@ -1389,7 +1437,7 @@ void startWp(void){
 
 void run_watering_program(progId){
 	wpStateFlags|=(1<<progId);	// set active flag for this program
-	close_valve(DRAIN_VALVE_ID,0);	// close drain valve
+	close_valve(DRAIN_VALVE_ID);	// close drain valve
 //	valveFlags=0;	// all valves to off;
 	uint16_t addr, sensorId, fmpLink, wateringPlugId=0;
 	uint8_t i, waterSensorFlag=0;
@@ -1415,7 +1463,7 @@ void run_watering_program(progId){
 		waterSensorFlag>>=sensorId;	// ostavit' toka flag
 		vTaskDelay(25);
 	}
-	close_valve(0,0);
+	close_valve(0);
 //	valveFlags=0;
 	//close_valve(0, 0);		// HARDCODE
 	vTaskDelay(1000);
@@ -1575,7 +1623,7 @@ void watering_program_trigger(void *pvParameters){
 	uint8_t wpStateFlag=0, progId, enabled;
 	// reinit valves
 	open_valve(DRAIN_VALVE_ID);
-	close_valve(0,0);
+	close_valve(0);
 
 	while (1) {
 //
@@ -1607,79 +1655,17 @@ void watering_program_trigger(void *pvParameters){
 }
 
 
-void dht_init2(){
 
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);
-
-	  // GPIO Config
-	  GPIO_InitTypeDef GPIO_InitStructure;
-
-	  /* TIM3 channel 2 pin (PA.07) configuration */
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-	  GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-	// NVIC Config
-
-	  GPIO_PinRemapConfig(GPIO_Remap_TIM15, ENABLE);
-	  NVIC_InitTypeDef NVIC_InitStructure;
-
-	   /* Enable the TIM3 global Interrupt */
-
-//	  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM15_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-	  NVIC_Init(&NVIC_InitStructure);
-
-
-	// TIMER3 config for PWM
-	  /* TIM3 configuration: PWM Input mode ------------------------
-	      The external signal is connected to TIM3 CH2 pin (PA.07),
-	      The Rising edge is used as active edge,
-	      The TIM3 CCR2 is used to compute the frequency value
-	      The TIM3 CCR1 is used to compute the duty cycle value
-	   ------------------------------------------------------------ */
-
-	   TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
-	   TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
-	   TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
-	   TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
-	   TIM_ICInitStructure.TIM_ICFilter = 0x0;
-
-//	   TIM_PWMIConfig(TIM3, &TIM_ICInitStructure);
-	   TIM_ICInit(TIM15, &TIM_ICInitStructure);
-
-	   /* Select the TIM3 Input Trigger: TI2FP2 */
-	   TIM_SelectInputTrigger(TIM15, TIM_TS_TI2FP2);
-
-	   /* Select the slave Mode: Reset Mode */
-	   TIM_SelectSlaveMode(TIM15, TIM_SlaveMode_Reset);
-
-	   /* Enable the Master/Slave Mode */
-	   TIM_SelectMasterSlaveMode(TIM15, TIM_MasterSlaveMode_Enable);
-
-	   /* TIM enable counter */
-	   TIM_Cmd(TIM15, ENABLE);
-
-	   /* Enable the CC2 Interrupt Request */
-	   TIM_ITConfig(TIM15, TIM_IT_CC2, ENABLE);
-}
 
 void dht_init(void){
 	// RCC Config
-	  /* TIM3 clock enable */
-//	  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
+	  /* TIM15 clock enable */
 	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM15, ENABLE);
 
 	  // GPIO Config
 	  GPIO_InitTypeDef GPIO_InitStructure;
 
-	  /* TIM3 channel 2 pin (PA.07) configuration */
+	  /* TIM15 channel 2 pin (PB15) configuration */
 	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_15;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
 	  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
@@ -1691,23 +1677,13 @@ void dht_init(void){
 	  GPIO_PinRemapConfig(GPIO_Remap_TIM15, ENABLE);
 	  NVIC_InitTypeDef NVIC_InitStructure;
 
-	   /* Enable the TIM3 global Interrupt */
+	   /* Enable the TIM15 global Interrupt */
 
-//	  NVIC_InitStructure.NVIC_IRQChannel = TIM3_IRQn;
 	  NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM15_IRQn;
 	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
 	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
 	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 	  NVIC_Init(&NVIC_InitStructure);
-
-
-	// TIMER3 config for PWM
-	  /* TIM3 configuration: PWM Input mode ------------------------
-	      The external signal is connected to TIM3 CH2 pin (PA.07),
-	      The Rising edge is used as active edge,
-	      The TIM3 CCR2 is used to compute the frequency value
-	      The TIM3 CCR1 is used to compute the duty cycle value
-	   ------------------------------------------------------------ */
 
 	   TIM_ICInitStructure.TIM_Channel = TIM_Channel_2;
 	   TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;
@@ -1715,10 +1691,9 @@ void dht_init(void){
 	   TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 	   TIM_ICInitStructure.TIM_ICFilter = 0x0;
 
-//	   TIM_PWMIConfig(TIM3, &TIM_ICInitStructure);
 	   TIM_PWMIConfig(TIM15, &TIM_ICInitStructure);
 
-	   /* Select the TIM3 Input Trigger: TI2FP2 */
+	   /* Select the TIM15 Input Trigger: TI2FP2 */
 	   TIM_SelectInputTrigger(TIM15, TIM_TS_TI2FP2);
 
 	   /* Select the slave Mode: Reset Mode */
@@ -1803,18 +1778,38 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   dht_bit_position++;
 //  dht_bit_array[dht_bit_position]=TIM15->CCR2;
 //  dht_bit_position++;
+}
 
 
+void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
+{
+  /* Clear TIM16 Capture compare interrupt pending bit */
+  TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
+
+  /* Get the Input Capture value */
+//  sonar_read[0] = TIM16->CNT;
+}
+
+void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
+{
+  /* Clear TIM16 Capture compare interrupt pending bit */
+  TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
+//  TIM17->SR &= ~TIM_SR_CC1IF;
+  /* Get the Input Capture value */
+  if (!(GPIOB->IDR & (1<<9))) {
+	  sonar_read[0]=SONAR1_TIM->CNT;
+  }
+  SONAR1_TIM->CNT = 0;
 }
 
 
 void dht_get_data(void){	// function starts getting data from DHT22 sensor
-	  vTaskDelay(25);
+//	SONAR1_TIM->EGR |= TIM_EGR_CC1G;
+	vTaskDelay(25);
 	  uint8_t i;
 	  for (i=0;i<50;i++) {
 		dht_bit_array[i]=0;
 	  }
-
 	  dht_bit_ready = 0;
 	  dht_bit_position = 0;
 	  dht_init_out();
@@ -2646,7 +2641,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 
 #ifdef USE_VALVES
 	    	for (i=0; i<3; i++) {
-	    		flg=valve_state&(1<<i);	// valves sensors flags
+	    		flg=valveFlags&(1<<i);	// valves sensors flags
 	    		flg>>=i;
 	    		log_str[i+43]=flg+48;
 	    	}
@@ -2671,7 +2666,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 	    	log_str[50]=44;	// ascii comma
 #ifdef USE_VALVES
 	    	for (i=0; i<3; i++) {
-	    		flg = valveMotorStateFlags & (1<<i); // valve motor state flags
+	    		flg = valveFlags & (1<<i); // valve motor state flags
 	    		flg>>=i;
 	    		log_str[i+51]=flg+48;
 	    	}
@@ -2717,6 +2712,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 		}//
 		vTaskDelay(2);
 		dht_get_data();
+		sonar_ping();
 	}
 }
 
@@ -3262,14 +3258,14 @@ void plugStateTrigger(void  *pvParameters){
 #ifdef USE_VALVES
 		uint8_t valveId=0, valveMotorStateFlag=0;
 		for (valveId=0; valveId<3; valveId++) {
-			valveMotorStateFlag=valveMotorStateFlags&(1<<valveId);	// check if timer active now
-			valveMotorStateFlag>>=valveId;	// ostavit' toka flag
-			if (valveMotorStateFlag==1) {
-				valveMotorStateSet(valveId,1);
-			}
-			else {
-				valveMotorStateSet(valveId,2);
-			}
+//			valveMotorStateFlag=valveMotorStateFlags&(1<<valveId);	// check if timer active now
+//			valveMotorStateFlag>>=valveId;	// ostavit' toka flag
+//			if (valveMotorStateFlag==1) {
+//				valveMotorStateSet(valveId,1);
+//			}
+//			else {
+//				valveMotorStateSet(valveId,2);
+//			}
 		}
 #endif
 //		vTaskDelay(1);
@@ -3294,7 +3290,7 @@ void plugStateSet(uint8_t plug, uint8_t state){
 
 void valveMotorStateSet(uint8_t valveId, uint8_t state){
 #ifdef USE_VALVES
-	if (state==1) {
+/*	if (state==1) {
 //		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT); // valve enable 146%
 			valveMotorStateFlags |= (1<<valveId);
 			VALVE_ENABLE = (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
@@ -3302,7 +3298,7 @@ void valveMotorStateSet(uint8_t valveId, uint8_t state){
 		else {
 			valveMotorStateFlags &= ~(1<<valveId);
 			VALVE_DISABLE = (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-		}
+		} */
 #endif
 }
 
@@ -4260,7 +4256,7 @@ void phMonitor(void *pvParameters){
  		vTaskDelay(1);
 		waterSensorStateTrigger();
 		vTaskDelay(1);
-		valve_status_updater();
+//		valve_status_updater();
 		vTaskDelay(1);
   //  	comm_manager();
 //		vTaskDelay(1);
@@ -4291,7 +4287,7 @@ void displayClock(void *pvParameters)
 //    		}
 
 	    	vTaskDelay(10);
-	    	setPwmDc(20);
+//	    	setPwmDc(20);
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
 	    	LCDLine1[0]= (DateTime.day / 10) + 48;
@@ -4327,7 +4323,7 @@ void displayClock(void *pvParameters)
 	    	vTaskDelay(9);
 			copy_arr(&curecstr, LCDLine1, 4, 12);
 #endif
-			setPwmDc(90);
+//			setPwmDc(90);
 #ifndef	TEST_MODE
 	    	uint16_t flg;
 	    	// vyvod flagov dozirujushih nasosov
@@ -4482,19 +4478,6 @@ void prvSetupHardware()
 	        GPIOC->CRL   |= GPIO_CRL_MODE3_0;
 }
 
-/* void prvLedBlink( void *pvParameters )
-{
-//	uint32_t i;
-
-    while(1) {
-        GPIOC->BRR = GPIO_BRR_BR8;
-        vTaskDelay(1000);
-        GPIOC->BSRR = GPIO_BSRR_BS8;
-        vTaskDelay(1500);
-//        Init_lcd();
-//        Init_lcd();
-    }
-} */
 
 void vTaskLCDdraw(void *pvParameters) {	// draws lcd
 //	uint32_t tmp=0;
@@ -4513,19 +4496,6 @@ void vTaskLCDdraw(void *pvParameters) {	// draws lcd
 		vTaskDelay(17);
 	}
 }
-
-
-/* void prvLedBlink2( void *pvParameters )
-{
-//	uint32_t i;
-
-    while(1) {
-        GPIOC->BSRR = GPIO_BSRR_BS9;
-        vTaskDelay(400);
-        GPIOC->BRR = GPIO_BRR_BR9;
-        vTaskDelay(400);
-    }
-} */
 
 
 void int32str(uint32_t d, char *out)
@@ -4627,7 +4597,6 @@ int main(void)
 	enable_dosing_pump(2, 0);
 	enable_dosing_pump(3, 0);
 //	close_valve(0,1);
-	water_sensor_input_init();
 	/* Unlock the Flash Program Erase controller */
 	FLASH_Unlock();
 	/* EEPROM Init */
@@ -4642,82 +4611,34 @@ int main(void)
 	for (i=0; i<40000; i++) {}
 	Init_lcd();
 
+	water_level_input_init();
+
+
+
 #ifdef USE_VALVES
 	valve_feedback_init();
 #endif
+
+	sonar_init();
 
 	bluetooth_init();
 
 	buttonCalibration();
 	Lcd_clear();
 
-//	setPwmDc(100);
-
-
-//	Lcd_goto(1,0);
-//	Lcd_write_str(value);
-//	for (i=0; i<400000; i++) {}
-
-//	DSTATUS resp=0;
-//	  ......
-//	  disk_initialize(0);
-//	  f_mount(0, &fs);
-//	  resp = create_file("0:proba.txt");
-//	  create_file("0:proba2.txt");
-//	  f_mount(0, NULL);
-
-//	  ......
-
-//		Lcd_clear();
-//		Lcd_goto(1,0);
-//		Lcd_write_digit(resp);
-
 
 
 	prvSetupHardware();		// setup gpio for load triggering and led indication
 // reinit valves HARDCODE
 #ifdef USE_VALVES
-	run_valve_motor(0);
-	while (!(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT)&1)) {
 
-	}
-//	stop_valve_motor(0);
-//	run_valve_motor(0);
-	while (((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT) & 1) {
 
-	}
-	stop_valve_motor(0);
-
-// drain valve
-	run_valve_motor(1);
-	while (((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+1) & 1) {
-
-	}
-//	stop_valve_motor(1);
-//	run_valve_motor(1);
-	while (!(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+1) & 1)) {
-
-	}
-	stop_valve_motor(1);
 #endif
 
-//	plugStateSet(3, 1);
-//	plugStateSet(2, 1);		// does not work at all. led rojo
-//	for (i=0; i<200000; i++) {}
-//	plugStateSet(1, 1);
-//	for (i=0; i<200000; i++) {}
-//	plugStateSet(0, 1);
-//	for (i=0; i<400000; i++) {}
-//	uint32_t temptime=0;
-//	temptime = RTC_GetCounter();
-//	if (temptime<10000000 || temptime>20000000) {
-//		RTC_SetCounter(YEAR12SECS+(212+20)*86400+10*3600+9*60);	// possibly there are another ways to determine if the clock is already running or not
-//	}
 	RtcInit();		//init real time clock
 
 	DSTATUS resp=0;		// variable for status response from sd card init function
 	no_sd = disk_initialize(0);		// init card
-//	loadSettings();
 	if (no_sd==0){
 		no_sd = f_mount(0, &fs);
 		no_sd = string2log("System started\n", 15);
@@ -4725,16 +4646,8 @@ int main(void)
 
 
 	Lcd_clear();
-//	valveFlags=2;
-//	Lcd_goto(1,0);
-//	Lcd_write_digit(no_sd);
 	loadSettings();
 	flush_lcd_buffer();	// fills the LCD frame buffer with spaces
-//    		for (i=0; i<4000000; i++) {}
-//    xTaskCreate(prvLedBlink,(signed char*)"LED",configMINIMAL_STACK_SIZE,
-//            NULL, tskIDLE_PRIORITY + 1, NULL);
-//    xTaskCreate(prvLedBlink2,(signed char*)"LED2",configMINIMAL_STACK_SIZE,
-//            NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
             NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(timerStateTrigger,(signed char*)"TIMERS",configMINIMAL_STACK_SIZE,
@@ -5018,14 +4931,14 @@ void loadSettings(void){	// function loads the predefined data
 }
 
 void set4highBits(uint8_t dta){		// setting higher 4 bits of word on corresponding GPIO pins
-	if (dta&16) lcd_port->BSRRL |= (pin_d4);
-	else lcd_port->BSRRH |= (pin_d4);
-	if (dta&32) lcd_port->BSRRL |= (pin_d5);
-	else lcd_port->BSRRH |= (pin_d5);
-	if (dta&64) lcd_port->BSRRL |= (pin_d6);
-	else lcd_port->BSRRH |= (pin_d6);
-	if (dta&128) lcd_port->BSRRL |= (pin_d7);
-	else lcd_port->BSRRH |= (pin_d7);
+	if (dta&16) lcd_port_data->BSRRL |= (pin_d4);
+	else lcd_port_data->BSRRH |= (pin_d4);
+	if (dta&32) lcd_port_data->BSRRL |= (pin_d5);
+	else lcd_port_data->BSRRH |= (pin_d5);
+	if (dta&64) lcd_port_data->BSRRL |= (pin_d6);
+	else lcd_port_data->BSRRH |= (pin_d6);
+	if (dta&128) lcd_port_data->BSRRL |= (pin_d7);
+	else lcd_port_data->BSRRH |= (pin_d7);
 }
 
 
@@ -5059,22 +4972,26 @@ void Lcd_goto(uc8 x,uc8 y)
 
 void Init_pin_out()
 {
-	RCC_APB2PeriphClockCmd(init_port, ENABLE);
+	RCC_APB2PeriphClockCmd(lcd_init_port_data | lcd_init_port_cmd, ENABLE);
 	GPIO_InitTypeDef init_pin;
-	init_pin.GPIO_Pin  = pin_e | pin_rs | pin_rw | pin_d7 | pin_d6 | pin_d5 | pin_d4;
+	init_pin.GPIO_Pin  = pin_d7 | pin_d6 | pin_d5 | pin_d4;
 	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
 	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init (port, &init_pin);
+	GPIO_Init(lcd_port_data, &init_pin);
+	init_pin.GPIO_Pin  = pin_e | pin_rs | pin_rw;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(lcd_port_cmd, &init_pin);
 }
 
 void Init_pin_in()
 {
-	RCC_APB2PeriphClockCmd(init_port, ENABLE);
+	RCC_APB2PeriphClockCmd(lcd_init_port_data, ENABLE);
 	GPIO_InitTypeDef init_pin;
 	init_pin.GPIO_Pin  =  pin_d7 | pin_d6 | pin_d5 | pin_d4 ;
 	init_pin.GPIO_Mode = GPIO_Mode_IPD;
 	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init (port, &init_pin);
+	GPIO_Init (lcd_port_data, &init_pin);
 }
 
 void Lcd_write_cmd(uc8 cmd )
@@ -5112,14 +5029,14 @@ void Lcd_write_data(uint8_t data)
 }
 
 void set4lowBits(uint8_t dta){
-	if (dta&1) lcd_port->BSRRL |= (pin_d4);
-	else lcd_port->BSRRH |= (pin_d4);
-	if (dta&2) lcd_port->BSRRL |= (pin_d5);
-	else lcd_port->BSRRH |= (pin_d5);
-	if (dta&4) lcd_port->BSRRL |= (pin_d6);
-	else lcd_port->BSRRH |= (pin_d6);
-	if (dta&8) lcd_port->BSRRL |= (pin_d7);
-	else lcd_port->BSRRH |= (pin_d7);
+	if (dta&1) lcd_port_data->BSRRL |= (pin_d4);
+	else lcd_port_data->BSRRH |= (pin_d4);
+	if (dta&2) lcd_port_data->BSRRL |= (pin_d5);
+	else lcd_port_data->BSRRH |= (pin_d5);
+	if (dta&4) lcd_port_data->BSRRL |= (pin_d6);
+	else lcd_port_data->BSRRH |= (pin_d6);
+	if (dta&8) lcd_port_data->BSRRL |= (pin_d7);
+	else lcd_port_data->BSRRH |= (pin_d7);
 
 }
 

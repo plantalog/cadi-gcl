@@ -1,0 +1,10 @@
+01:12:06.657 [Worker-374] ERROR org.coocox.codb.common.log.ErrorLog - getExamplesOfCompByCompId API failed 
+GET API FAILED
+org.coocox.codb.client.core.api.ClientBaseApi.getCheckByResponse(ClientBaseApi.java:94)
+org.coocox.codb.client.core.api.impl.ExampleApiImpl.getExamplesOfCompByCompId(ExampleApiImpl.java:329)
+org.coocox.codb.client.core.api.impl.ExampleApiImpl.freshExamplesByCompId(ExampleApiImpl.java:223)
+org.coocox.example.core.impl.ExampleDBCmdHandler.freshExamplesByCompId(ExampleDBCmdHandler.java:51)
+org.coocox.integrate.component.views.ComponentView$4$1.run(ComponentView.java:346)
+org.eclipse.core.internal.jobs.Worker.run(Worker.java:54)
+
+

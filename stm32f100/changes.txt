@@ -1,0 +1,6 @@
+v1.4
+- LCD data pins changed to PC10-12
+- PB9 configured as sonar echo input
+- PA5-7 for valve feedback
+- introduced sonar driver
+- introduced water flow meter driver
