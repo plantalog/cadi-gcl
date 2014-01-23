@@ -1,3 +1,10 @@
+v1.5
+- fixed valve feedback init
+- tank level stabilizer function and UI
+- valve failure timeout
+- valve feedback filter, to avoid unnecessary valve triggering
+
+
 v1.4
 - LCD data pins changed to PC10-12
 - PB9 configured as sonar echo input

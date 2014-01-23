@@ -33,6 +33,7 @@
 // enabling test mode adds some test functionality
 #define	TEST_MODE
 
+#define TANK_STAB_ENABLE
 
 // SENSOR AND CONTROL DEVICES DRIVERS
 /*
@@ -60,7 +61,7 @@ uint16_t water_counter[WFM_AMOUNT];
 #ifdef USE_VALVES	// START VALVES DEFINITIONS
 #define VALVE_DISABLE	GPIOA->BSRR
 #define VALVE_ENABLE	GPIOA->BRR
-#define VALVE_SENSOR_GPIO_SHIFT		10		// valve position sensor GPIO shift
+#define VALVE_SENSOR_GPIO_SHIFT		5		// valve position sensor GPIO shift
 #define VALVE_AMOUNT				3		// number of valves to process
 #define VALVE_MOTOR_GPIO_SHIFT		11		// valve control motor GPIO out shift
 #define VALVE_MOTOR_PORT			GPIOA
@@ -69,10 +70,11 @@ uint16_t water_counter[WFM_AMOUNT];
 #define V1_SENSOR_PIN				GPIO_Pin_5
 #define V2_SENSOR_PIN				GPIO_Pin_6
 #define V3_SENSOR_PIN				GPIO_Pin_7
-#define	VALVE_FAILURE_TIMEOUT		4000	// timeout for valve open/close function to avoid hanging if valve broken
+#define	VALVE_FAILURE_TIMEOUT		600	// timeout for valve open/close function to avoid hanging if valve broken
 #define DRAIN_VALVE_ID				1
 // Valve variables
 uint8_t valveFlags;
+uint8_t valve_failed;
 #endif	// EOF VALVES DEFINITIONS
 
 
@@ -260,7 +262,7 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 #define PH_WINDOW_TOP		0x0604		// pH window top adc value
 #define PH_WINDOW_BOTTOM	0x0605	// pH window bottom adc value
 #define SD_LOG_INTERVAL		0x0609		// sd logging interval, seconds
-#define BUTTON_RANGES_START_ADDR	0x060A	// button ranges (8 values in a row) 60A-612
+#define BUTTON_RANGES_START_ADDR	0x060A	// button ranges (8 values in a row) [60A-611]
 
 #define EC1413_ADDR			0x0606
 #define EC0_ADDR			0x067E	// after FMPs
@@ -311,6 +313,10 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 #define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
 #define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
 
+#define WATER_TANK_TOP			0x0622
+#define WATER_TANK_BOTTOM		0x0632
+
+
 #define DAY						1
 #define NIGHT					0
 
@@ -324,6 +330,9 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 #define JDR_EC		ADC1->JDR3		// continuous ADC channel for EC
 #define JDR_PH		ADC1->JDR2		// continuous ADC channel for pH
 
+
+uint16_t tank_windows_top[1];
+uint16_t tank_windows_bottom[1];
 
 uint8_t log_inc=0;
 char log_str[64];
@@ -470,6 +479,8 @@ unsigned char GetStateDMAChannel4(void);
 void comm_manager(void);
 void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM4_IRQHandler(void);
+void tankLevelStabSetup(void);
+void tankLevelStab(void);
 
 
 void comm_manager(void){
@@ -517,6 +528,28 @@ void comm_manager(void){
 			break;
 		case 54:
 			plugStateSet(2, 1);	// enable plug for ph up pump
+			break;
+		case 97:	// a
+			open_valve(0);	// open valve
+			break;
+		case 98:	// b
+			close_valve(0);	// close valve
+			break;
+		case 99:	// c
+			open_valve(1);	// open valve
+			break;
+		case 100:	// d
+			close_valve(1);	// close valve
+			break;
+		case 101:	// e
+			open_valve(2);	// open valve
+			break;
+		case 102:	// f
+			close_valve(2);	// close valve
+			break;
+		case 103:	// g
+			break;
+		case 104:	// h
 			break;
 		}
 	}
@@ -828,9 +861,10 @@ void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
 
 	  // Configure PA5-7 pin as input pull-down
 	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
-
+/*
 	  // Enable AFIO clock
 //	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
 	  // Connect EXTI10 Line to PC10 pin
@@ -867,7 +901,7 @@ void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
 	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
 	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 
-	  NVIC_Init(&NVIC_InitStructure);
+	  NVIC_Init(&NVIC_InitStructure); */
 }
 
 
@@ -996,18 +1030,81 @@ void waterSensorStateTrigger(void){
 	}
 }
 
+
+
+void tankLevelStabSetup(void){
+	Lcd_clear();
+	uint16_t curlevel=0;
+	uint8_t button=0;
+	Lcd_clear();
+	Lcd_write_str("Set tank top lvl");
+	while (button!=BUTTON_OK) {
+		button = readButtons();
+		curlevel = sonar_read[0];
+		vTaskDelay(5);
+		Lcd_goto(1,0);
+		Lcd_write_digit(curlevel/100);
+		Lcd_write_digit(curlevel);
+	}
+	vTaskDelay(10);
+	EE_WriteVariable(WATER_TANK_TOP, curlevel);
+	Lcd_clear();
+	Lcd_write_str("OK");
+	vTaskDelay(2000);
+	Lcd_write_str("Set btm lvl");
+	while (button!=BUTTON_OK) {
+		button = readButtons();
+		curlevel = sonar_read[0];
+		vTaskDelay(5);
+		Lcd_goto(1,0);
+		Lcd_write_digit(curlevel/100);
+		Lcd_write_digit(curlevel);
+	}
+	button=0;
+	vTaskDelay(10);
+	EE_WriteVariable(WATER_TANK_BOTTOM, curlevel);
+	Lcd_clear();
+	Lcd_write_str("OK");
+	vTaskDelay(2000);
+	Lcd_clear();
+	loadSettings();
+}
+
+void tankLevelStab(void){
+#ifdef TANK_STAB_ENABLE
+	if (sonar_read[0]>(tank_windows_top[0]+2)) {
+		open_valve(1);
+	}
+	if (sonar_read[0]<tank_windows_top[0]) {
+		close_valve(1);
+	}
+#endif
+}
+
+
 void open_valve(uint8_t valveId){
 	vTaskDelay(1);
 #ifdef USE_VALVES
-	uint8_t curstatus=0;
+	uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
 	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
 	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
-	if (curstatus==0) {
+	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
+	cur_valve_failed>>=valveId;	// ostavit' toka flag
+	if (curstatus==0 && cur_valve_failed==0) {	// if no failure detected and current status is ok
 		run_valve_motor(valveId);
-		uint8_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
-		while (((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==0) && timeout>0) {
-			vTaskDelay(2);
+		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
+		while (duration<3 && timeout>0) {
+			if ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==1) {
+				duration++;
+			}
+			else {
+				duration=0;
+			}
+			vTaskDelay(1);
 			timeout--;
+		}
+		if (timeout==0) {
+			valve_failed |= (1<<valveId);
 		}
 		stop_valve_motor(valveId);
 	}
@@ -1018,11 +1115,27 @@ void open_valve(uint8_t valveId){
 
 void close_valve(uint8_t valveId){
 	run_valve_motor(valveId);
-	uint8_t timeout=VALVE_FAILURE_TIMEOUT;
-	while (((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==1) && timeout>0) {
-				vTaskDelay(2);
-				timeout--;
+	uint8_t duration=0, curstatus=0, cur_valve_failed=0;
+	uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
+	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
+	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
+	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
+	cur_valve_failed>>=valveId;	// ostavit' toka flag
+	if (curstatus==1 && cur_valve_failed==0) {	// if no failure detected and current status is ok
+		while (duration<3 && timeout>0) {
+					// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
+					if ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==0) {
+						duration++;
+					}
+					else {
+						duration=0;
+					}
+					vTaskDelay(1);
+					timeout--;
+		}
 	}
+
+
 	stop_valve_motor(valveId);
 	valveFlags &= ~(1<<valveId); // sbrosit' flag
 }
@@ -1131,8 +1244,9 @@ void valve_test(void){
 		Lcd_write_digit(tmp);
 
 		tmp=sonar_read[0];
-		Lcd_write_digit(tmp/100);
+//		Lcd_write_digit(tmp/100);
 		Lcd_write_digit(tmp);
+		Lcd_write_str("cm");
 
 		tmp=TIM17->CNT;
 		Lcd_write_digit(tmp/10000);
@@ -1171,14 +1285,28 @@ void valve_test(void){
 		Lcd_write_digit(valveFlags);
 		Lcd_write_str("VS");
 		uint16_t val=0;
-		val = VALVE_SENSOR_PORT->IDR>>10;
+		val = VALVE_SENSOR_PORT->IDR>>5;
 		Lcd_write_digit(val/10000);
 		Lcd_write_digit(val/100);
 		Lcd_write_digit(val);
 		Lcd_write_str(" ");
 
 		vTaskDelay(1);
-		if (VALVE_SENSOR_PORT->IDR>>10 & 1) {
+		if (VALVE_SENSOR_PORT->IDR>>5 & 1) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+
+		if (VALVE_SENSOR_PORT->IDR>>6 & 1) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+
+		if (VALVE_SENSOR_PORT->IDR>>7 & 1) {
 			Lcd_write_str("1");
 		}
 		else {
@@ -2225,9 +2353,9 @@ const char menuItemArray[MENURECS][18]=
 		{"EC-stabilizer"},	// 19
 
 		{"DAYLIGHT SENSOR"},// 20
-		{"COMBI TIMERS"},	// 21
-		{"LS+2CT"},	// 22
-		{"T+2CT"},	// 23
+		{"Tank lvl. keeper"},	// 21
+		{"Keeping window"},	// 22
+		{"Tank tests"},	// 23
 		{"Add Light"},	// 24
 		{"Temp. & humidity"},	// 25
 		{"Hygrostat"},	// 26
@@ -2271,7 +2399,7 @@ const int fatArray[MENURECS][7]=
 
 		{20,20,	17,	21,	14,	17,	1},	// daylight sensor
 		{21,21,	20,	25,	22,	18,	0},	// combi timers
-		{22,22,	24,	23,	15,	22,	1},	// LS+2CT
+		{22,22,	24,	23,	15,	22,	1},	// Tank level Keeping window setup
 		{23,23,	22,	24,	16,	23,	1},	// t+2ct
 		{24,24,	23,	22,	17,	24,	1},	// add light
 		{25,25,	21,	26,	17,	25,	1},	// temp and humidity
@@ -2315,9 +2443,9 @@ const char menuItemArray[MENURECS][18]=
 		{"EC-stabilizer"},	// 19
 
 		{"DAYLIGHT SENSOR"},// 20
-		{"COMBI TIMERS"},	// 21
-		{"LS+2CT"},	// 22
-		{"T+2CT"},	// 23
+		{"Tank lvl keeper"},	// 21
+		{"Keeper window"},	// 22
+		{"Tank tests"},	// 23
 		{"Add Light"},	// 24
 		{"Temp. & humidity"},	// 25
 		{"Hygrostat"},	// 26
@@ -2360,8 +2488,8 @@ const int fatArray[MENURECS][7]=
 
 
 		{20,20,	17,	21,	14,	17,	1},	// daylight sensor
-		{21,21,	20,	25,	22,	18,	0},	// combi timers
-		{22,22,	24,	23,	15,	22,	1},	// LS+2CT
+		{21,21,	20,	25,	22,	18,	0},	// keepers
+		{22,22,	24,	23,	28,	22,	1},	// tank keeper level window setup
 		{23,23,	22,	24,	16,	23,	1},	// t+2ct
 		{24,24,	23,	22,	17,	24,	1},	// add light
 		{25,25,	21,	26,	17,	25,	1},	// temp and humidity
@@ -2712,6 +2840,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 		}//
 		vTaskDelay(2);
 		dht_get_data();
+		tankLevelStab();
 		sonar_ping();
 	}
 }
@@ -3505,6 +3634,9 @@ void programRunner(uint8_t programId){
 		break;
 	case 27:
 		startWp();
+		break;
+	case 28:
+		tankLevelStabSetup();
 		break;
 	}
 }
@@ -4683,6 +4815,10 @@ void loadSettings(void){	// function loads the predefined data
 	string2log(" build ver.: ", 12);
 //	string2log(VERSION_BUILD, 6);
 
+
+
+
+
 	for (i=0;i<8;i++) {
 		int32str(button_ranges[i],&tmpstr);
 		tmpstr[10] = 0x0A;
@@ -4703,6 +4839,9 @@ void loadSettings(void){	// function loads the predefined data
 			string2log(tmpstr, 11);
 		}
 	}
+
+	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
+	EE_ReadVariable(WATER_TANK_BOTTOM, &tank_windows_bottom[0]);
 
 
 
