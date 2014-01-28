@@ -1,0 +1,5 @@
+v0.1	(29.01.2014)
+- fixed lcd framebuffer issue (freertos enabled suspendall definition in freertosconfig.h)
+- optimization none successfully compiles and runs now
+- added SPI init for NRF module
+- fixed Lcd_init() function

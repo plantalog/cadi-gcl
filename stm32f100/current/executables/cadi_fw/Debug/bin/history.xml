@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m3 -mthumb -g -nostartfiles -Map=hellow4.map -O0 --gc-sections -LC:\CooCox\CoIDE170\configuration\ProgramData\hellow4 -TC:\CooCox\CoIDE170\configuration\ProgramData\hellow4/arm-gcc-link.ld -g">
+      <target file="hellow4.elf" lastModified="143d666a638">
+         <source file="..\obj\stm32f10x_tim.o" lastModified="143c0e65d0f"/>
+         <source file="..\obj\startup_stm32f10x_md_vl.o" lastModified="143c0e65dc3"/>
+         <source file="..\obj\system_stm32f10x.o" lastModified="143c0e65f18"/>
+         <source file="..\obj\stm32f10x_pwr.o" lastModified="143c0e6600b"/>
+         <source file="..\obj\diskio.o" lastModified="143c0e6627f"/>
+         <source file="..\obj\stm32f10x_gpio.o" lastModified="143c0e6645f"/>
+         <source file="..\obj\main.o" lastModified="143d666a109"/>
+         <source file="..\obj\timers.o" lastModified="143c0e6739b"/>
+         <source file="..\obj\stm32f10x_rcc.o" lastModified="143c0e675da"/>
+         <source file="..\obj\stm32f10x_exti.o" lastModified="143c0e677ea"/>
+         <source file="..\obj\tasks.o" lastModified="143c0e67b72"/>
+         <source file="..\obj\stm32f10x_adc.o" lastModified="143c0e67d1b"/>
+         <source file="..\obj\stm32f10x_usart.o" lastModified="143c0e67f55"/>
+         <source file="..\obj\list.o" lastModified="143c0e680d6"/>
+         <source file="..\obj\syscalls.o" lastModified="143c0e68258"/>
+         <source file="..\obj\stm32f10x_flash.o" lastModified="143c0e6846c"/>
+         <source file="..\obj\queue.o" lastModified="143c0e68739"/>
+         <source file="..\obj\port.o" lastModified="143c0e688a4"/>
+         <source file="..\obj\ff.o" lastModified="143c0e68e0f"/>
+         <source file="..\obj\stm32f10x_dma.o" lastModified="143c0e6900c"/>
+         <source file="..\obj\croutine.o" lastModified="143c0e690f7"/>
+         <source file="..\obj\misc.o" lastModified="143c0e69295"/>
+         <source file="..\obj\stm32f10x_spi.o" lastModified="143c0e694a6"/>
+         <source file="..\obj\heap_2.o" lastModified="143c0e69693"/>
+         <source file="..\obj\eeprom.o" lastModified="143c0e698ed"/>
+         <source file="..\obj\driver_sonar.o" lastModified="143c0e69a7c"/>
+      </target>
+   </processor>
+</history>

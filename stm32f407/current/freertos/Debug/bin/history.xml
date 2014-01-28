@@ -1,0 +1,60 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g -nostartfiles -Map=freertos.map -O0 --gc-sections -LC:\CooCox\CoIDE170\configuration\ProgramData\Chloe -TC:\CooCox\CoIDE170\configuration\ProgramData\Chloe/arm-gcc-link.ld -g">
+      <target file="freertos.elf" lastModified="143d129fd4d">
+         <source file="..\obj\unicode.o" lastModified="143d12904f1"/>
+         <source file="..\obj\stm32f4xx_syscfg.o" lastModified="143d12908d2"/>
+         <source file="..\obj\stm32f4xx_sdio.o" lastModified="143d1290c20"/>
+         <source file="..\obj\stm32f4xx_hash.o" lastModified="143d1290df8"/>
+         <source file="..\obj\stm32f4xx_cryp_aes.o" lastModified="143d12910c1"/>
+         <source file="..\obj\rtc_support.o" lastModified="143d12912fa"/>
+         <source file="..\obj\stm32f4xx_hash_sha1.o" lastModified="143d12915d3"/>
+         <source file="..\obj\stm32f4xx_usart.o" lastModified="143d1291a83"/>
+         <source file="..\obj\stm32f4xx_pwr.o" lastModified="143d1291e2c"/>
+         <source file="..\obj\mmc_stm32f4.o" lastModified="143d1292554"/>
+         <source file="..\obj\stm32f4xx_can.o" lastModified="143d1292b80"/>
+         <source file="..\obj\stm32f4xx_wwdg.o" lastModified="143d1292e38"/>
+         <source file="..\obj\stm32f4xx_hash_md5.o" lastModified="143d12932bd"/>
+         <source file="..\obj\stm32f4xx_dac.o" lastModified="143d129384c"/>
+         <source file="..\obj\startup_stm32f4xx.o" lastModified="143d1293a76"/>
+         <source file="..\obj\stm32f4_discovery.o" lastModified="143d1293e90"/>
+         <source file="..\obj\stm32f4xx_crc.o" lastModified="143d12942b0"/>
+         <source file="..\obj\stm32f4xx_iwdg.o" lastModified="143d1294543"/>
+         <source file="..\obj\main.o" lastModified="143d1295365"/>
+         <source file="..\obj\stm32f4xx_rcc.o" lastModified="143d12959b9"/>
+         <source file="..\obj\timers.o" lastModified="143d12962dc"/>
+         <source file="..\obj\hd44780_lib.o" lastModified="143d1296935"/>
+         <source file="..\obj\stm32f4xx_adc.o" lastModified="143d1296fea"/>
+         <source file="..\obj\stm32f4xx_dcmi.o" lastModified="143d129730e"/>
+         <source file="..\obj\ff_rtc_if.o" lastModified="143d1297797"/>
+         <source file="..\obj\tasks.o" lastModified="143d1297ca2"/>
+         <source file="..\obj\stm32f4xx_cryp_des.o" lastModified="143d1298145"/>
+         <source file="..\obj\stm32f4xx_cryp.o" lastModified="143d129848c"/>
+         <source file="..\obj\stm32f4xx_fsmc.o" lastModified="143d1298919"/>
+         <source file="..\obj\stm32f4xx_gpio.o" lastModified="143d1298c78"/>
+         <source file="..\obj\stm32f4xx_flash.o" lastModified="143d1299013"/>
+         <source file="..\obj\list.o" lastModified="143d129932b"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="143d12996ee"/>
+         <source file="..\obj\syscalls.o" lastModified="143d1299970"/>
+         <source file="..\obj\stm32f4xx_dma.o" lastModified="143d1299d7a"/>
+         <source file="..\obj\queue.o" lastModified="143d129a143"/>
+         <source file="..\obj\port.o" lastModified="143d129a60c"/>
+         <source file="..\obj\charlcd.o" lastModified="143d129ab5f"/>
+         <source file="..\obj\nrf24_lib.o" lastModified="143d129b1d7"/>
+         <source file="..\obj\ff.o" lastModified="143d129bdbe"/>
+         <source file="..\obj\croutine.o" lastModified="143d129c262"/>
+         <source file="..\obj\stm32f4xx_spi.o" lastModified="143d129c600"/>
+         <source file="..\obj\stm32f4xx_i2c.o" lastModified="143d129ca64"/>
+         <source file="..\obj\stm32f4xx_rng.o" lastModified="143d129cf30"/>
+         <source file="..\obj\stm32f4xx_exti.o" lastModified="143d129d2b0"/>
+         <source file="..\obj\misc.o" lastModified="143d129d5e4"/>
+         <source file="..\obj\ff_support.o" lastModified="143d129daf0"/>
+         <source file="..\obj\stm32f4xx_rtc.o" lastModified="143d129e1d7"/>
+         <source file="..\obj\heap_2.o" lastModified="143d129e465"/>
+         <source file="..\obj\stm32f4xx_cryp_tdes.o" lastModified="143d129e7c3"/>
+         <source file="..\obj\stm32f4xx_tim.o" lastModified="143d129ef18"/>
+         <source file="..\obj\stm32f4xx_dbgmcu.o" lastModified="143d129f259"/>
+         <source file="..\obj\eeprom.o" lastModified="143d129f55c"/>
+      </target>
+   </processor>
+</history>

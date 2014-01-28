@@ -1,0 +1,83 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc noversion nomachine -mcpu=cortex-m3 -mthumb -Wall -ffunction-sections -g -O0 -DUSE_STDPERIPH_DRIVER -c -DSTM32F100RB -DSTM32F10X_MD_VL -ID:\repos\cadi-gcl\stm32f100\current\freertos\Source\include -ID:\repos\cadi-gcl\stm32f100\current -ID:\repos\cadi-gcl\stm32f100\current\cmsis_boot -ID:\repos\cadi-gcl\stm32f100\current\freertos\Source -ID:\repos\cadi-gcl\stm32f100\current\cadi_libs\inc -ID:\repos\cadi-gcl\stm32f100\current\cmsis -ID:\repos\cadi-gcl -ID:\repos\cadi-gcl\stm32f100\current\stm_lib\inc -ID:\repos\cadi-gcl\stm32f100 -ID:\repos\cadi-gcl\stm32f100\current\freertos\Source\portable\ARM_CM3 -ID:\repos\cadi-gcl\stm32f100\current\ff9a -ID:\repos\cadi-gcl\stm32f100\current\freertos\Source\portable -ID:\repos\cadi-gcl\stm32f100\current\cadi_libs -ID:\repos\cadi-gcl\stm32f100\current\ff9a\src -ID:\repos\cadi-gcl\stm32f100\current\freertos -ID:\repos\cadi-gcl\stm32f100\current\stm_lib">
+      <target file="stm32f10x_spi.o" lastModified="143c0e694a6">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_spi.c" lastModified="12e9ef2ce20"/>
+      </target>
+      <target file="diskio.o" lastModified="143c0e6627f">
+         <source file="..\..\..\..\ff9a\src\diskio.c" lastModified="13e3f062b97"/>
+      </target>
+      <target file="tasks.o" lastModified="143c0e67b72">
+         <source file="..\..\..\..\freertos\Source\tasks.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_rcc.o" lastModified="143c0e675da">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_rcc.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_pwr.o" lastModified="143c0e6600b">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_pwr.c" lastModified="13e3ef2c2cd"/>
+      </target>
+      <target file="croutine.o" lastModified="143c0e690f7">
+         <source file="..\..\..\..\freertos\Source\croutine.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="misc.o" lastModified="143c0e69295">
+         <source file="..\..\..\..\stm_lib\src\misc.c" lastModified="12e9ef2ce20"/>
+      </target>
+      <target file="heap_2.o" lastModified="143c0e69693">
+         <source file="..\..\..\..\heap_2.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="driver_sonar.o" lastModified="143c0e69a7c">
+         <source file="..\..\..\..\cadi_libs\scr\driver_sonar.c" lastModified="14365a7fa5f"/>
+      </target>
+      <target file="queue.o" lastModified="143c0e68739">
+         <source file="..\..\..\..\freertos\Source\queue.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_flash.o" lastModified="143c0e6846c">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_flash.c" lastModified="13872df6f50"/>
+      </target>
+      <target file="list.o" lastModified="143c0e680d6">
+         <source file="..\..\..\..\freertos\Source\list.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="eeprom.o" lastModified="143c0e698ed">
+         <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="141f0f92cb8"/>
+      </target>
+      <target file="port.o" lastModified="143c0e688a4">
+         <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\port.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_gpio.o" lastModified="143c0e6645f">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_gpio.c" lastModified="12ea5964c70"/>
+      </target>
+      <target file="timers.o" lastModified="143c0e6739b">
+         <source file="..\..\..\..\freertos\Source\timers.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_exti.o" lastModified="143c0e677ea">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_exti.c" lastModified="12e9ef2ce20"/>
+      </target>
+      <target file="system_stm32f10x.o" lastModified="143c0e65f18">
+         <source file="..\..\..\..\cmsis_boot\system_stm32f10x.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="syscalls.o" lastModified="143c0e68258">
+         <source file="..\..\..\..\syscalls\syscalls.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="stm32f10x_tim.o" lastModified="143c0e65d0f">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_tim.c" lastModified="12e9ef2ce20"/>
+      </target>
+      <target file="stm32f10x_adc.o" lastModified="143c0e67d1b">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_adc.c" lastModified="13868673a80"/>
+      </target>
+      <target file="stm32f10x_dma.o" lastModified="143c0e6900c">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76"/>
+      </target>
+      <target file="ff.o" lastModified="143c0e68e0f">
+         <source file="..\..\..\..\ff9a\src\ff.c" lastModified="13b8c095cd0"/>
+      </target>
+      <target file="startup_stm32f10x_md_vl.o" lastModified="143c0e65dc3">
+         <source file="..\..\..\..\cmsis_boot\startup\startup_stm32f10x_md_vl.c" lastModified="13843cf2fc0"/>
+      </target>
+      <target file="main.o" lastModified="143d666a109">
+         <source file="..\..\..\..\main.c" lastModified="143d6667401"/>
+      </target>
+      <target file="stm32f10x_usart.o" lastModified="143c0e67f55">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_usart.c" lastModified="12e9ef2ce20"/>
+      </target>
+   </processor>
+</history>

@@ -1,0 +1,164 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc noversion nomachine -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=softfp -mthumb -Wall -ffunction-sections -g -O0 -c -DSTM32F407VG -DSTM32F4XX -D__FPU_USED -DUSE_STDPERIPH_DRIVER -ID:\repos\cadi-gcl\stm32f407\cmsis_boot\STM32F4xx_StdPeriph_Driver -ID:\repos\cadi-gcl\stm32f407\cmsis_boot\STM32F4xx_StdPeriph_Driver\inc -ID:\repos\cadi-gcl\stm32f407\cmsis -ID:\repos\cadi-gcl\stm32f407\wireless_nrf24 -ID:\repos\cadi-gcl -ID:\repos\cadi-gcl\stm32f407\cmsis_lib -ID:\repos\cadi-gcl\stm32f407 -ID:\repos -ID:\repos\cadi-gcl\stm32f407\eeprom -ID:\repos\cadi-gcl\stm32f407\cmsis_lib\include -ID:\repos\cadi-gcl\stm32f407\cmsis_boot -ID:\repos\cadi-gcl\stm32f407\freertos -ID:\repos\cadi-gcl\stm32f407\fatfs_easyelectronics -ID:\repos\cadi-gcl\stm32f407\freertos\include -ID:\repos\cadi-gcl\stm32f407\mylibs">
+      <target file="stm32f4xx_fsmc.o" lastModified="143d1298919">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_fsmc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_cryp_aes.o" lastModified="143d12910c1">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_aes.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="syscalls.o" lastModified="143d1299970">
+         <source file="..\..\..\syscalls\syscalls.c" lastModified="1387242e900"/>
+      </target>
+      <target file="stm32f4_discovery.o" lastModified="143d1293e90">
+         <source file="..\..\..\cmsis_boot\stm32f4_discovery.c" lastModified="13d9a495582"/>
+      </target>
+      <target file="misc.o" lastModified="143d129d5e4">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\misc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_cryp.o" lastModified="143d129848c">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="queue.o" lastModified="143d129a143">
+         <source file="..\..\queue.c" lastModified="13cf34a43a0"/>
+      </target>
+      <target file="stm32f4xx_cryp_des.o" lastModified="143d1298145">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_des.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="hd44780_lib.o" lastModified="143d1296935">
+         <source file="..\..\..\mylibs\hd44780_lib.c" lastModified="143cbd9d162"/>
+      </target>
+      <target file="stm32f4xx_tim.o" lastModified="143d129ef18">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_tim.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="nrf24_lib.o" lastModified="143d129b1d7">
+         <source file="..\..\..\wireless_nrf24\nrf24_lib.c" lastModified="143d0e9c13e"/>
+      </target>
+      <target file="timers.o" lastModified="143d12962dc">
+         <source file="..\..\timers.c" lastModified="13cf34a4b70"/>
+      </target>
+      <target file="ff_support.o" lastModified="143d129daf0">
+         <source file="..\..\..\fatfs_easyelectronics\ff_support.c" lastModified="13afa23735a"/>
+      </target>
+      <target file="stm32f4xx_exti.o" lastModified="143d129d2b0">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_exti.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="tasks.o" lastModified="143d1297ca2">
+         <source file="..\..\tasks.c" lastModified="13cf34a4b70"/>
+      </target>
+      <target file="stm32f4xx_iwdg.o" lastModified="143d1294543">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_iwdg.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_gpio.o" lastModified="143d1298c78">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_gpio.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="rtc_support.o" lastModified="143d12912fa">
+         <source file="..\..\..\fatfs_easyelectronics\rtc_support.c" lastModified="1308345aec0"/>
+      </target>
+      <target file="stm32f4xx_usart.o" lastModified="143d1291a83">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_usart.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_rtc.o" lastModified="143d129e1d7">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rtc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_hash_sha1.o" lastModified="143d12915d3">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash_sha1.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_rcc.o" lastModified="143d12959b9">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rcc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_dac.o" lastModified="143d129384c">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dac.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_can.o" lastModified="143d1292b80">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_can.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_pwr.o" lastModified="143d1291e2c">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_pwr.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="eeprom.o" lastModified="143d129f55c">
+         <source file="..\..\..\eeprom\eeprom.c" lastModified="13dec39fe2a"/>
+      </target>
+      <target file="croutine.o" lastModified="143d129c262">
+         <source file="..\..\croutine.c" lastModified="13cf3441980"/>
+      </target>
+      <target file="stm32f4xx_wwdg.o" lastModified="143d1292e38">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_wwdg.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_rng.o" lastModified="143d129cf30">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_rng.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_adc.o" lastModified="143d1296fea">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_adc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="list.o" lastModified="143d129932b">
+         <source file="..\..\list.c" lastModified="13cf34a0cf0"/>
+      </target>
+      <target file="stm32f4xx_flash.o" lastModified="143d1299013">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_flash.c" lastModified="13dec3be0f7"/>
+      </target>
+      <target file="port.o" lastModified="143d129a60c">
+         <source file="..\..\..\port.c" lastModified="13cf34a1c90"/>
+      </target>
+      <target file="unicode.o" lastModified="143d12904f1">
+         <source file="..\..\..\fatfs_easyelectronics\unicode.c" lastModified="13aff8b8fb8"/>
+      </target>
+      <target file="stm32f4xx_cryp_tdes.o" lastModified="143d129e7c3">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_cryp_tdes.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="ff_rtc_if.o" lastModified="143d1297797">
+         <source file="..\..\..\fatfs_easyelectronics\ff_rtc_if.c" lastModified="13946398b60"/>
+      </target>
+      <target file="startup_stm32f4xx.o" lastModified="143d1293a76">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f4xx.c" lastModified="13db3ed6ad9"/>
+      </target>
+      <target file="stm32f4xx_dma.o" lastModified="143d1299d7a">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dma.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_dcmi.o" lastModified="143d129730e">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dcmi.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="charlcd.o" lastModified="143d129ab5f">
+         <source file="..\..\..\charlcd.c" lastModified="13d8f399b30"/>
+      </target>
+      <target file="mmc_stm32f4.o" lastModified="143d1292554">
+         <source file="..\..\..\fatfs_easyelectronics\mmc_stm32f4.c" lastModified="13b1d3d040a"/>
+      </target>
+      <target file="stm32f4xx_crc.o" lastModified="143d12942b0">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_crc.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_sdio.o" lastModified="143d1290c20">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_sdio.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_hash_md5.o" lastModified="143d12932bd">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash_md5.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_dbgmcu.o" lastModified="143d129f259">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_dbgmcu.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="heap_2.o" lastModified="143d129e465">
+         <source file="..\..\..\heap_2.c" lastModified="13cf34a3400"/>
+      </target>
+      <target file="stm32f4xx_i2c.o" lastModified="143d129ca64">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_i2c.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_syscfg.o" lastModified="143d12908d2">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_syscfg.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_hash.o" lastModified="143d1290df8">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_hash.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="stm32f4xx_spi.o" lastModified="143d129c600">
+         <source file="..\..\..\cmsis_boot\STM32F4xx_StdPeriph_Driver\src\stm32f4xx_spi.c" lastModified="1387253b9b0"/>
+      </target>
+      <target file="ff.o" lastModified="143d129bdbe">
+         <source file="..\..\..\fatfs_easyelectronics\ff.c" lastModified="13afa9c5e6e"/>
+      </target>
+      <target file="main.o" lastModified="143d1295365">
+         <source file="..\..\..\main.c" lastModified="143d1266560"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="143d12996ee">
+         <source file="..\..\..\cmsis_boot\system_stm32f4xx.c" lastModified="1387253b9b0"/>
+      </target>
+   </processor>
+</history>
