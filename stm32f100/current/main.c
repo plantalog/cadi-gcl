@@ -50,8 +50,8 @@
 // DRIVER: WATER FLOW METER
 #define USE_WFM
 #ifdef USE_WFM		//	START WFM DEFINITIONS
-#define WFM_AMOUNT	2	// number of meters to work with
-uint16_t water_counter[WFM_AMOUNT];
+#define WFM_AMOUNT	4	// number of meters to work with
+uint32_t water_counter[WFM_AMOUNT];
 #define WFM_PINS_PB0_1	// WFM assigned to pins PB0 and PB1
 #endif				//	EOF WFM DEFINITIONS
 
@@ -316,6 +316,8 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 #define WATER_TANK_TOP			0x0622
 #define WATER_TANK_BOTTOM		0x0632
 
+#define WFM_CAL_OFFSET			0x0642
+
 
 #define DAY						1
 #define NIGHT					0
@@ -367,6 +369,7 @@ uint8_t dosingPumpStateFlags;
 uint8_t waterSensorStateFlags;
 uint8_t wsl_buff[3];
 uint8_t curculationPumpId;
+uint16_t wfCalArray[WFM_AMOUNT];
 
 void hygroStatSettings(void);
 uint8_t readPercentVal(uint8_t value);
@@ -444,7 +447,8 @@ void run_watering_program(progId);
 void run_fertilizer_mixer(progId);
 // void calibratEc(void);
 void startWp(void);
-
+uint16_t adjust16bit_fast(uint16_t val, uint8_t speed);
+char * utoa_fast_div(uint32_t value, char *buffer);
 
 static void prvSetupHardware( void );
 static void displayClock( void *pvParameters );
@@ -481,7 +485,162 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM4_IRQHandler(void);
 void tankLevelStabSetup(void);
 void tankLevelStab(void);
+void Lcd_write_16b(uint16_t);
 
+void calibrateFlowMeter(void){
+	uint8_t button=0, valve=0, counter_id=0, volume=0;
+	uint16_t ticks_in_10cl=0;
+	uint32_t cnt_val1=0, cnt_val2=0;
+	Lcd_clear();
+	Lcd_write_str("Choose one:");
+	vTaskDelay(500);
+	while (button==0) {
+		button = readButtons();
+		Lcd_goto(0,0);
+		Lcd_write_str("1:");
+		Lcd_write_16b(water_counter[0]);
+		Lcd_write_str("2:");
+		Lcd_write_16b(water_counter[1]);
+		Lcd_goto(1,0);
+		vTaskDelay(10);
+		Lcd_write_str("3:");
+		Lcd_write_16b(water_counter[2]);
+		Lcd_write_str("4:");
+		Lcd_write_16b(water_counter[3]);
+	}
+	Lcd_clear();
+	counter_id = button-1;
+	button=0;
+	Lcd_write_str("Choose valve");
+	valve = adjust8bit(valve);
+	close_valve(valve);
+	Lcd_clear();
+	Lcd_write_str("How much x10CL?");
+	volume = adjust8bit(volume);
+	cnt_val1 = water_counter[counter_id];
+	Lcd_clear();
+	Lcd_write_str("OK to finish");
+	open_valve(valve);
+	button=0;
+	while (button!=BUTTON_OK) {
+		vTaskDelay(10);
+		button=readButtons();
+		Lcd_clear();
+		Lcd_write_str("Current value:");
+		Lcd_goto(1,0);
+		Lcd_write_16b(water_counter[counter_id]);
+	}
+	cnt_val2 = water_counter[counter_id];
+	close_valve(valve);
+	vTaskDelay(200);
+
+	ticks_in_10cl=(uint16_t)(cnt_val2-cnt_val1)/(uint16_t)volume;	// how much ticks for 10 CL?
+	wfCalArray[counter_id] = ticks_in_10cl;	// ticks in 10cl
+	Lcd_clear();
+	Lcd_write_str("Ticks:");
+	Lcd_write_16b(cnt_val2);
+	Lcd_goto(1,0);
+	Lcd_write_str("10CL=");
+	Lcd_write_16b(ticks_in_10cl);
+	EE_WriteVariable(WFM_CAL_OFFSET, ticks_in_10cl);
+	button=0;
+	while (button!=BUTTON_OK) {
+		vTaskDelay(10);
+		button=readButtons();
+	}
+	Lcd_clear();
+	vTaskDelay(200);
+}
+
+void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
+{
+	cnt_to_reach = ((uint32_t)amount*(uint32_t)wfCalArray[0])/10;
+	button=0;
+	open_valve(0);		// HARDCODE
+	water_counter[counter_id] = 0;
+	while (water_counter[0]<cnt_to_reach) {
+		vTaskDelay(10);
+	}
+	close_valve(0);		// HARDCODE
+}
+
+void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
+{
+	button=0;
+	open_valve(0);		// HARDCODE
+	water_counter[counter_id] = 0;
+	while (water_counter[0]<ticks) {
+		vTaskDelay(10);
+	}
+	close_valve(0);		// HARDCODE
+}
+
+void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount){	// amount in CL (10ml) max 65535x10=650L
+	uint32_t cnt_to_reach=0, cnt1=0, cnt2=0;
+	uint16_t volume=0;
+	uint8_t button=0;
+	Lcd_clear();
+	Lcd_write_str("Calibrate WFM?");
+	while (button==0) {
+		vTaskDelay(10);
+		button=readButtons();
+	}
+	if (button==BUTTON_OK) {
+		calibrateFlowMeter();
+	}
+
+
+//	vTaskDelay(10000);
+	uint8_t repeat=1;
+	while (repeat==1) {
+		Lcd_clear();
+		Lcd_write_str("CL amount:");
+		Lcd_write_16b(wfCalArray[0]);
+		volume = adjust16bit_fast(volume, 5);
+	//	cnt1=water_counter[0];
+	//	cnt_to_reach = water_counter[0]+(volume*wfCalArray[0])/10;
+		cnt_to_reach = ((uint32_t)volume*(uint32_t)wfCalArray[0])/10;
+
+		Lcd_clear();
+		Lcd_write_str("Adding");
+		Lcd_write_16b((uint16_t)cnt_to_reach);
+		Lcd_goto(1,0);
+		Lcd_write_str("to ");
+		Lcd_write_16b((uint16_t)water_counter[water_counter[counter_id]]);
+		button=0;
+		open_valve(0);		// HARDCODE
+		water_counter[counter_id] = 0;
+		while (water_counter[0]<cnt_to_reach) {
+			vTaskDelay(10);
+			Lcd_clear();
+			Lcd_write_str("Cur:");
+			Lcd_write_16b((uint16_t)water_counter[counter_id]);
+			Lcd_goto(1,0);
+			Lcd_write_str("of:");
+			Lcd_write_16b(cnt_to_reach);
+		}
+		close_valve(0);		// HARDCODE
+		Lcd_clear();
+		Lcd_write_str("Repeat?");
+		while (button==0) {
+				vTaskDelay(10);
+				button=readButtons();
+		}
+		if (button==BUTTON_OK) {
+			repeat=1;
+			water_counter[0]=0;
+		}
+		else {
+			repeat=0;
+		}
+	}
+}
+
+void Lcd_write_16b(uint16_t tmp) {
+	Lcd_write_digit((uint16_t)tmp/10000);
+	Lcd_write_digit((uint16_t)(tmp%10000)/100);
+	Lcd_write_digit((uint16_t)tmp%100);
+}
 
 void comm_manager(void){
 	int transferred=0;
@@ -1223,10 +1382,75 @@ void EXTI9_5_IRQHandler(void)
 //    valve_status_updater();
 }
 
+void valve_test2(void){
+	uint8_t button=0, curvalve=0, i=0;
+	Lcd_clear();
+#ifdef USE_VALVES
+
+	//Lcd_write_str("Open/close valve");
+#endif
+	while (button!=BUTTON_OK) {
+		vTaskDelay(20);
+		button=readButtons();
+#ifdef USE_VALVES
+		Lcd_goto(0,0);
+		Lcd_write_str("curvalve:");
+		Lcd_write_digit(curvalve);
+/*		tmp=water_counter[0];
+		Lcd_write_16b(tmp);
+
+		tmp=sonar_read[0];
+//		Lcd_write_digit(tmp/100);
+		Lcd_write_digit(tmp);
+		Lcd_write_str("cm"); */
+
+
+
+		if (button==BUTTON_FWD){
+			open_valve(curvalve);
+		}
+		if (button==BUTTON_CNL){
+			close_valve(curvalve);
+		}
+		if (button==BUTTON_BCK){
+			if (curvalve<2) {
+				curvalve++;
+			}
+			else {
+				curvalve=0;
+			}
+		}
+		vTaskDelay(1);
+		Lcd_goto(1,0);
+		Lcd_write_str("VF");
+		Lcd_write_digit(valveFlags);
+//		uint16_t val=0;
+/*		val = VALVE_SENSOR_PORT->IDR>>5;
+		Lcd_write_digit(val/10000);
+		Lcd_write_digit(val/100);
+		Lcd_write_digit(val);
+		Lcd_write_str(" "); */
+
+		vTaskDelay(1);
+
+		Lcd_write_str("States:");
+		for (i=0; i<3; i++) {
+			if (VALVE_SENSOR_PORT->IDR>>(curvalve+i) & 1) {
+						Lcd_write_str("1");
+					}
+					else {
+						Lcd_write_str("0");
+					}
+		}
+
+#endif
+	}
+	Lcd_clear();
+}
 
 
 void valve_test(void){
-	uint8_t button=0, curState=0, i=0;
+	uint8_t button=0, curState=0, i=0, curvalve=0;
 	uint16_t tmp=0;
 	Lcd_clear();
 #ifdef USE_VALVES
@@ -1239,9 +1463,7 @@ void valve_test(void){
 #ifdef USE_VALVES
 		Lcd_goto(0,0);
 		tmp=water_counter[0];
-		Lcd_write_digit(tmp/10000);
-		Lcd_write_digit(tmp/100);
-		Lcd_write_digit(tmp);
+		Lcd_write_16b(tmp);
 
 		tmp=sonar_read[0];
 //		Lcd_write_digit(tmp/100);
@@ -1249,9 +1471,7 @@ void valve_test(void){
 		Lcd_write_str("cm");
 
 		tmp=TIM17->CNT;
-		Lcd_write_digit(tmp/10000);
-		Lcd_write_digit(tmp/100);
-		Lcd_write_digit(tmp);
+		Lcd_write_16b(tmp);
 
 //		for (i=0; i<3; i++) {
 //			curState = valveFlags&(1<<i);
@@ -1286,9 +1506,7 @@ void valve_test(void){
 		Lcd_write_str("VS");
 		uint16_t val=0;
 		val = VALVE_SENSOR_PORT->IDR>>5;
-		Lcd_write_digit(val/10000);
-		Lcd_write_digit(val/100);
-		Lcd_write_digit(val);
+		Lcd_write_16b(val);
 		Lcd_write_str(" ");
 
 		vTaskDelay(1);
@@ -1324,6 +1542,7 @@ void valve_test(void){
 
 	}
 	Lcd_clear();
+	valve_test2();
 }
 
 void water_program_setup(progId){
@@ -2355,7 +2574,7 @@ const char menuItemArray[MENURECS][18]=
 		{"DAYLIGHT SENSOR"},// 20
 		{"Tank lvl. keeper"},	// 21
 		{"Keeping window"},	// 22
-		{"Tank tests"},	// 23
+		{"Get water"},	// 23
 		{"Add Light"},	// 24
 		{"Temp. & humidity"},	// 25
 		{"Hygrostat"},	// 26
@@ -2490,7 +2709,7 @@ const int fatArray[MENURECS][7]=
 		{20,20,	17,	21,	14,	17,	1},	// daylight sensor
 		{21,21,	20,	25,	22,	18,	0},	// keepers
 		{22,22,	24,	23,	28,	22,	1},	// tank keeper level window setup
-		{23,23,	22,	24,	16,	23,	1},	// t+2ct
+		{23,23,	22,	24,	23,	23,	1},	// t+2ct
 		{24,24,	23,	22,	17,	24,	1},	// add light
 		{25,25,	21,	26,	17,	25,	1},	// temp and humidity
 		{26,26,	25,	27,	18,	26,	1},	// hygrostat
@@ -3613,6 +3832,7 @@ void programRunner(uint8_t programId){
 		break;
 	case 20:
 		valve_test();
+		valve_test();
 		break;
 	case 21:
 		watering_setup();
@@ -3621,7 +3841,8 @@ void programRunner(uint8_t programId){
 		fertilization_setup();
 		break;
 	case 23:
-		calibrateEc();
+		get_water(0,0,100);
+		//calibrateEc();
 		break;
 	case 24:
 		// ecStabSettings();
@@ -3736,6 +3957,7 @@ uint8_t adjust8bit(uint8_t val){
 	Lcd_clear();
 	Lcd_write_str("OK");
 	vTaskDelay(200);
+	Lcd_clear();
 	return val;
 }
 
@@ -3766,11 +3988,50 @@ uint16_t adjust16bit(uint16_t val){
 		}
 		Lcd_goto(1,0);
 		Lcd_write_str("numero <");
-		Lcd_write_digit(val/10000);
-		Lcd_write_digit(val/100);
-		Lcd_write_digit(val);
+		Lcd_write_16b(val);
 		Lcd_write_str(">");
 		vTaskDelay(25);
+	}
+	Lcd_clear();
+	Lcd_write_str("OK");
+	vTaskDelay(200);
+	return val;
+}
+
+uint16_t adjust16bit_fast(uint16_t val, uint8_t speed){
+	uint8_t button=0;
+	char buffer[11];
+	if (val>65534) {
+		val=0;
+	}
+	vTaskDelay(200);
+	while (button!=BUTTON_OK) {
+		button=readButtons();
+		vTaskDelay(speed);
+		if (button==BUTTON_BCK) {
+			if (val<1) {
+				val=65535;
+			}
+			else {
+				val--;
+			}
+		}
+		if (button==BUTTON_FWD) {
+			if (val>65534) {
+
+				val=0;
+			}
+			else {
+				val++;
+			}
+		}
+		Lcd_goto(1,0);
+		Lcd_write_str("numero <");
+//		utoa_fast_div(val, &buffer);
+//		copy_arr(&buffer, &LCDLine2, 5, 2);
+		Lcd_write_16b(val);
+		Lcd_write_str(">");
+		vTaskDelay(speed);
 	}
 	Lcd_clear();
 	Lcd_write_str("OK");
@@ -4843,7 +5104,9 @@ void loadSettings(void){	// function loads the predefined data
 	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
 	EE_ReadVariable(WATER_TANK_BOTTOM, &tank_windows_bottom[0]);
 
-
+	for (i=0; i<WFM_AMOUNT; i++) {
+		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);
+	}
 
 
 	// log FMP data

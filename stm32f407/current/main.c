@@ -21,7 +21,6 @@
 #include "hd44780_lib.h"
 #include "stdio.h"
 #include "wireless_nrf24/nrf24_lib.h"
-#include "hd44780_ear2earoak/hd44780.h"
 #include "fatfs_easyelectronics/ff.h"
 #include "fatfs_easyelectronics/mmc_stm32f4.h"
 //#include "ff9a/src/diskio.h"
@@ -303,10 +302,33 @@ typedef struct
 #define CS_DISABLE          GPIOB->BSRRH |= GPIO_Pin_5;
 
 
-RTC_TimeTypeDef curtime;
-RTC_DateTypeDef curdate;
+// === Chloe system registers ===
 
-uint8_t button_code = 0;
+RTC_TimeTypeDef curtime;	// current time
+RTC_DateTypeDef curdate;	// current date
+
+uint8_t button_code = 0;	// button pressed code
+
+DHT_data DHTValue;			// DHT values structure
+
+// LCD string data to display
+static uint8_t LCDLine1[16], LCDLine2[16];              // framebuffer
+static uint8_t lcd_pointerx=0, lcd_pointery=0;			// framebuffer pointers
+
+// Migrated from Cadi (F100) firmware
+
+char curphstr[5];										// ph value string
+uint16_t phAdcValue;									// pH ADC reading value
+uint32_t timerStateFlags, cTimerStateFlags;				// timer and cyclic timer state flags
+uint32_t plugStateFlags;								// plugs' (loads) states
+uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};        	// PLUG_AMOUNT - number of plugs HARDCODE
+// elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
+// 0 element - pervyj plug, 1 element - plug no 2, etc
+
+
+
+
+// === Chloe system variables ===
 
 // sonar variables
 uint16_t        sonar_ccnt=0;
@@ -316,47 +338,50 @@ uint16_t        IC2Value[84];
 
 
 // digital humidity and temperature data
-uint16_t dht_bit_array[50];
-DHT_data DHTValue;
-uint8_t                dht_data[5];
-uint8_t dht_bit_position = 0;
-uint8_t dht_bit_ready = 0;
-uint8_t                dht_data_ready = 0;
-uint8_t         dht_rh_str[4], dht_t_str[4];
+uint16_t dht_bit_array[50];				// buffer to store pulse widths of DHT response
+uint8_t dht_data[5];					// 40bits of DHT data extracted from DHT response
+uint8_t dht_bit_position = 0;			// bit array read pointer
+uint8_t dht_bit_ready = 0;				// bit read ready flag
+uint8_t dht_data_ready = 0;				// DHT sensor data read ready flag
+uint8_t dht_rh_str[4], dht_t_str[4];	// DHT22 humidity and temperature values strings
 
 // Real-time clock variables
-uint8_t                rtc_time_now_str[16];
+uint8_t rtc_time_now_str[16];	// time and date string
 
+static uint8_t sonar_str[5];	// sonar value string
+uint16_t capture1=0, capture2=0;	// sonar echo pulse width
+uint8_t capture_is_ready = 0;
 
-static uint8_t                sonar_str[5];
 GPIO_InitTypeDef GPIO_InitStructure;
 NVIC_InitTypeDef NVIC_InitStructure;
 EXTI_InitTypeDef EXTI_InitStructure;
-uint16_t        capture1=0, capture2=0;
-volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
-volatile uint16_t systick_ms = 0;
 TIM_ICInitTypeDef TIM_ICInitStructure;
+
+
+volatile uint16_t systick_ms = 0;
 /* Virtual address defined by the user: 0xFFFF value is prohibited */
 uint16_t VirtAddVarTab[2] = {
                         EE_TIMER1_ON,
                         EE_CTIMER_DURATION
 };
+
+// --- Buttons system variables ---
 uint16_t button_ranges[8];        // 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
-uint8_t buttonReverse=0;
-uint16_t buttonBuffer[10];
+uint8_t buttonReverse=0;		// used for both directions button calibration capability
 
-// string data to display
-static uint8_t LCDLine1[16], LCDLine2[16];                // framebuffer
-static uint8_t lcd_pointerx=0, lcd_pointery=0;
-
-
+// Chloe SD card support with FatFS
 uint8_t SDHC;
-static FIL cadizlog;
-uint8_t logString[64];
+static FIL cadizlog;		// file structure associated with logfile on SD card
+uint8_t logString[64];		// log string to store on SD card
+
+// --- NRF24 wireless module ---
+extern unsigned char nrfRxBuff[NRF24_RX_BUFF_SIZE];		// RX FIFO buffer
+extern unsigned char nrfTxBuff[NRF24_TX_BUFF_SIZE];		// TX FIFO buffer
+extern uint8_t nrf_rx_pointer, nrf_tx_pointer;			// RX and TX FIFO pointers
+uint8_t nrf_spi_busy=0;									// NRF24 SPI bus busy flag
 
 //// MIGRATED FROM F100 ////
 uint8_t logInterval=0;
-//RTC_Time toAdjust;
 ErrorStatus HSEStartUpStatus;
 FLASH_Status FlashStatus;
 uint8_t no_sd;
@@ -367,21 +392,10 @@ uint32_t ph0=0;
 uint16_t ph4=0;
 int cdel=0;
 uint16_t phBuffer[10];
-char curphstr[5];
-uint16_t phAdcValue;
 uint32_t lastWriteTime=0;
 //uint16_t ph_seven, ph4;
 uint8_t lightSensor;
 uint16_t lightRange;
-uint32_t timerStateFlags, cTimerStateFlags;
-uint32_t plugStateFlags;
-uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};        // PLUG_AMOUNT - number of plugs HARDCODE
-// elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
-// 0 element - pervyj plug, 1 element - plug no 2, etc
-
-extern unsigned char nrfRxBuff[NRF24_RX_BUFF_SIZE];
-extern unsigned char nrfTxBuff[NRF24_TX_BUFF_SIZE];
-extern uint8_t nrf_rx_pointer, nrf_tx_pointer;
 
 
 #define MENURECS        23
@@ -446,8 +460,6 @@ const int fatArray[MENURECS][7]=
 
 //// EOF MIGRATED FROM F100 ////
 
-
-
 void Lcd_write_str_fb(uc8 *STRING);
 void dht_arr_displayer(void);
 int menuSelector(void);
@@ -478,10 +490,12 @@ void nrf24init(void);
 void Lcd_print_digit(uint8_t numb);
 void nrfTest(void);
 void Lcd_write_digit(uint8_t numb);
+void buttonCodeSupplier(uint16_t adc_value);
 
-void nfr24init2(void){
+unsigned char nrf_spi_xfer_byte(unsigned char data);
+int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf, uint8_t plsize);
 
-}
+
 
 void Lcd_print_digit(uint8_t numb){
 	if (numb<10) {
@@ -1206,10 +1220,11 @@ void sonar_trig(){        // send the signal to sonar to measure the distance
 int main(void)
 {
 	int del=0;
+    Delay_us(4500);
 	Init_lcd();
-	flush_lcd_buffer();
+//	flush_lcd_buffer();
     Lcd_write_str("1");
-    del=5000*SPEED_K; while (del--){}
+
 
     Lcd_write_str("2");
         RTC_TimeTypeDef RTC_TimeStructure;
@@ -1220,13 +1235,15 @@ int main(void)
         Lcd_write_str("4");
         buttonsInit();
         Lcd_write_str("5");
-        del=1000*SPEED_K; while (del--){}
+        Delay_us(500);
         uint8_t i=0, res=0;
         uint16_t i2;
         Delay_us(50);
         FLASH_Unlock();
         Lcd_write_str("6");
-  //      EE_Init();
+        Delay_us(500);
+        EE_Init();
+        Delay_us(50);
         Lcd_write_str("7");
         sonar_init();
         Lcd_write_str("8");
@@ -1273,7 +1290,7 @@ int main(void)
         Lcd_write_data((tmpvar%100)/10+48);
         Lcd_write_data((tmpvar%10)+48); */
 
-        del=1000*SPEED_K; while (del--){}
+        Delay_us(500);
 
         STM32F4_Discovery_LEDInit(LED6);
         STM32F4_Discovery_LEDInit(LED5);
@@ -1291,30 +1308,23 @@ int main(void)
         vTaskStartScheduler();
 }
 
+void buttonCodeSupplier(uint16_t adc_value){
+	uint8_t i=0;
+	button_code=0;
+	for (i=0;i<4;i++) {
+		if (adc_value>button_ranges[i*2] && adc_value<button_ranges[i*2+1]) {
+			button_code = i+1;
+		}
+	}
+}
+
 void vTaskReadButtons(void *pvParameters) {
         uint16_t curval = 0, avg=0;
         uint8_t i;
         for (;;) {
                 adc_read();
                 vTaskDelay(10);
-//                buttonBuffer = 0;
-                // filtering algorithm
-/*                avg = 0;
-                for(i=0; i < 9; i++) {
-                        avg += buttonBuffer[i];
-                        buttonBuffer[i] = buttonBuffer[i+1];
-                }
-                avg += buttonBuffer[9];
-                avg /= 10;
-                buttonBuffer[9] = JDR_BUTTONS; */
-
-                curval = JDR_BUTTONS;
-                button_code = 0;
-                for (i=0;i<4;i++) {
-                        if (curval>button_ranges[i*2] && curval<button_ranges[i*2+1]) {
-                                button_code = i+1;
-                        }
-                }
+                buttonCodeSupplier(JDR_BUTTONS);
         }
 }
 
@@ -1335,6 +1345,8 @@ extern void EXTI15_10_IRQHandler(void)
 
 uint8_t blinker=0;
 
+nrf_reg_buf reg_buffer;
+
 void nrfTest(void){
 	uint8_t resp=0, cmd=0;
 	vTaskDelay(200);
@@ -1346,30 +1358,89 @@ void nrfTest(void){
 	    vTaskDelay(20);
 	    Lcd_write_str_fb("Send command");
 	    Lcd_go2(1,0);
+	    vTaskDelay(20);
 	    Lcd_write_str_fb("CMD:");
 	    Lcd_print_digit(cmd);
-	    Lcd_write_str_fb(" resp:");
-	    Lcd_print_digit(resp);
-	    vTaskDelay(20);
-	    resp = NRF24_SPIx->DR;
-	    if (button_code==BUTTON_FWD) {
-	    	NRF24_SPIx->DR=++cmd;
-	    	NRF24_CSN_LOW;
-	    	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, ENABLE);
-	    }
+	    Lcd_write_str_fb("rs:");
+//	    Lcd_print_digit(resp);
+	 //   resp = NRF24_SPIx->DR;
 	    if (button_code==BUTTON_BCK) {
-	    	NRF24_SPIx->DR=--cmd;
-	    	NRF24_CSN_LOW;
-	    	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, ENABLE);
-
+	  //  	--cmd;
+	//    	nrf_read_reg(7, &reg_buffer, 5);
+	    	vTaskDelay(5);
+            copy_arr(&reg_buffer.data, &LCDLine2, 5, 7);
+	    }
+	    if (button_code==BUTTON_FWD) {
+	    	++cmd;
+	    	nrf_read_reg(0, &reg_buffer, 5);
+	    	vTaskDelay(5);
+            copy_arr(&reg_buffer.data, &LCDLine1, 5, 7);
+            if (cmd>10){
+            	cmd=0;
+            }
 	    }
 
 	    if (button_code==BUTTON_OK) {
-	    	NRF24_SPIx->DR=cmd;
-	    	NRF24_CSN_LOW;
-	    	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, ENABLE);
+	 //   	NRF24_SPIx->DR=++cmd;
+	 //   	NRF24_CSN_LOW;
+	//    	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, ENABLE);
+	    	if (cmd>10){
+	    		cmd=0;
+	    	}
+	    	vTaskDelay(5);
 	    }
+	    vTaskDelay(10);
 	}
+}
+
+unsigned char nrf_spi_xfer_byte(unsigned char data){
+	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, ENABLE);
+	SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_RXNE, ENABLE);
+	NRF24_SPIx->DR=data;
+	nrf_spi_busy=1;
+	while (nrf_spi_busy==1) {
+		vTaskDelay(1);
+	}
+}
+
+int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf, uint8_t plsize)
+{
+     int i;
+     NRF24_CSN_LOW;
+
+     // send command
+     nrf_spi_xfer_byte(NRF_CMD_RREG | reg);
+
+     // receive response
+     for(i = 0; i < plsize; i++) {
+          buf->data[i] = nrf_spi_xfer_byte(NRF_CMD_NOP);
+          vTaskDelay(2);
+     }
+
+     NRF24_CSN_HIGH;
+
+     buf->size = i;
+
+     return i;
+}
+
+int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf, uint8_t plsize)
+{
+     int i;
+
+     NRF24_CSN_LOW;
+
+     // send command
+     nrf_spi_xfer_byte(NRF_CMD_WREG | reg);
+
+     // send payload
+     for(i = 0; i < plsize; i++) {
+          nrf_spi_xfer_byte(buf->data[i]);
+     }
+
+     NRF24_CSN_HIGH;
+
+     return i;
 }
 
 void monitorDisplayer(void){
@@ -1687,85 +1758,94 @@ char* int32str(uint32_t d, char* out)
 }
 
 void buttonCalibration(void){        // buttons calibration function
+		readButtonRanges();
         uint16_t button_val[4], diff;
-        Lcd_clear();
         Lcd_goto(0,0);
-        Lcd_write_arr("<", 1);
-        Delay_us(10000);
+        Lcd_write_arr("Press OK to skip", 16);
+        Lcd_goto(1,0);
+        Lcd_write_arr("calibration", 11);
+        Delay_us(1500);
         adc_read();
-        Delay_us(100);
-        button_val[0] = JDR_BUTTONS;
-        Lcd_goto(0,0);
-        Lcd_write_arr("OK", 2);
-        Delay_us(10000);
-        adc_read();
-        Delay_us(100);
-        button_val[1] = JDR_BUTTONS;
-        Lcd_goto(0,0);
-        Lcd_write_arr("CANCEL", 6);
-        Delay_us(10000);
-        adc_read();
-        Delay_us(100);
-        Lcd_clear();
-        button_val[2] = JDR_BUTTONS;
-        Lcd_goto(0,0);
-        Lcd_write_arr(">", 1);
-        Delay_us(10000);
-        adc_read();
-        Delay_us(100);
-        button_val[3] = JDR_BUTTONS;
+		Delay_us(100);
+        buttonCodeSupplier(JDR_BUTTONS);
+        if (button_code!=BUTTON_OK) {
+			Lcd_clear();
+			Lcd_write_arr("<", 1);
+			Delay_us(30000);
+			adc_read();
+			Delay_us(100);
+			button_val[0] = JDR_BUTTONS;
+			Lcd_goto(0,0);
+			Lcd_write_arr("OK", 2);
+			Delay_us(30000);
+			adc_read();
+			Delay_us(100);
+			button_val[1] = JDR_BUTTONS;
+			Lcd_goto(0,0);
+			Lcd_write_arr("CANCEL", 6);
+			Delay_us(30000);
+			adc_read();
+			Delay_us(100);
+			Lcd_clear();
+			button_val[2] = JDR_BUTTONS;
+			Lcd_write_arr(">", 1);
+			Delay_us(30000);
+			adc_read();
+			Delay_us(100);
+			button_val[3] = JDR_BUTTONS;
 
-        if ((button_val[3]>>3)<(button_val[0]>>3)) {
-                buttonReverse = 1;
-        }
-        else if ((button_val[3]>>3)>(button_val[0]>>3)) {
-                buttonReverse = 0;
-        }
-        else {
-                // loadButtonSettings();        // no key pressed, loading settings from EEPROM
-                buttonReverse = 2;        //means loading button settings from EEPROM
-        }
-        if (buttonReverse == 0) {
-                diff = ((button_val[1]-button_val[0])/2)-5;
-                button_ranges[0] = button_val[0]-diff;
-                button_ranges[1] = button_val[0]+diff;
-                button_ranges[2] = button_val[1]-diff;
-                diff = ((button_val[2]-button_val[1])/2)-5;
-                button_ranges[3] = button_val[1]+diff;
-                button_ranges[4] = button_val[2]-diff;
-                diff = ((button_val[3]-button_val[2])/2)-5;
-                button_ranges[5] = button_val[2]+diff;
-                button_ranges[6] = button_val[3]-diff;
-                button_ranges[7] = button_val[3]+diff;
-                saveButtonRanges();
-        }
-        else if (buttonReverse == 1) {
-                diff = ((button_val[0]-button_val[1])/2)-5;
-                button_ranges[0] = button_val[0]-diff;
-                button_ranges[1] = button_val[0]+diff;
-                button_ranges[2] = button_val[1]-diff;
-                diff = ((button_val[1]-button_val[2])/2)-5;
-                button_ranges[3] = button_val[1]+diff;
-                button_ranges[4] = button_val[2]-diff;
-                diff = ((button_val[2]-button_val[3])/2)-5;
-                button_ranges[5] = button_val[2]+diff;
-                button_ranges[6] = button_val[3]-diff;
-                button_ranges[7] = button_val[3]+diff;
-                saveButtonRanges();
-                Lcd_goto(0,0);
-                Lcd_write_str("Complete");
-                Delay_us(10000);
-        }
-        else {
-        		Lcd_clear();
-                Lcd_write_str("EEPROM buttons");
-                readButtonRanges();
-                Delay_us(10000);
-                Lcd_clear();
-        }
+			if ((button_val[3]>>3)<(button_val[0]>>3)) {
+					buttonReverse = 1;
+			}
+			else if ((button_val[3]>>3)>(button_val[0]>>3)) {
+					buttonReverse = 0;
+			}
+			else {
+					// loadButtonSettings();        // no key pressed, loading settings from EEPROM
+					buttonReverse = 2;        //means loading button settings from EEPROM
+			}
+			if (buttonReverse == 0) {
+					diff = ((button_val[1]-button_val[0])/2)-5;
+					button_ranges[0] = button_val[0]-diff;
+					button_ranges[1] = button_val[0]+diff;
+					button_ranges[2] = button_val[1]-diff;
+					diff = ((button_val[2]-button_val[1])/2)-5;
+					button_ranges[3] = button_val[1]+diff;
+					button_ranges[4] = button_val[2]-diff;
+					diff = ((button_val[3]-button_val[2])/2)-5;
+					button_ranges[5] = button_val[2]+diff;
+					button_ranges[6] = button_val[3]-diff;
+					button_ranges[7] = button_val[3]+diff;
+					saveButtonRanges();
+			}
+			else if (buttonReverse == 1) {
+					diff = ((button_val[0]-button_val[1])/2)-5;
+					button_ranges[0] = button_val[0]-diff;
+					button_ranges[1] = button_val[0]+diff;
+					button_ranges[2] = button_val[1]-diff;
+					diff = ((button_val[1]-button_val[2])/2)-5;
+					button_ranges[3] = button_val[1]+diff;
+					button_ranges[4] = button_val[2]-diff;
+					diff = ((button_val[2]-button_val[3])/2)-5;
+					button_ranges[5] = button_val[2]+diff;
+					button_ranges[6] = button_val[3]-diff;
+					button_ranges[7] = button_val[3]+diff;
+					saveButtonRanges();
+					Lcd_goto(0,0);
+					Lcd_write_str("Complete");
+					Delay_us(10000);
+			}
+			else {
+					Lcd_clear();
+					Lcd_write_str("EEPROM buttons");
+					readButtonRanges();
+					Delay_us(10000);
+					Lcd_clear();
+			}
 
-        if (button_ranges[0]>button_ranges[8]) {
-                                buttonReverse=1;
+			if (button_ranges[0]>button_ranges[8]) {
+					buttonReverse=1;
+			}
         }
 }
 
@@ -1883,24 +1963,25 @@ SPI1_IRQHandler(void) {
 	else {
 		spi_irq_counter++;
 	}
-	   if (NRF24_SPIx->SR & SPI_SR_TXE) {
-	// if ((NRF24_SPIx->SR & SPI_I2S_FLAG_RXNE) == RESET) {
-		   NRF24_SPIx->DR=nrfRxBuff[nrf_tx_pointer++];
-//		   NRF24_CSN_HIGH;
+	if (NRF24_SPIx->SR & SPI_SR_TXE) {
+		NRF24_SPIx->DR=nrfRxBuff[nrf_tx_pointer++];
 
-		   /* Disable the Tx buffer empty interrupt */
+			   /* Disable the Tx buffer empty interrupt */
 		SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_TXE, DISABLE);
-		   if (nrf_tx_pointer>(NRF24_TX_BUFF_SIZE-1)) {
-			   nrf_tx_pointer=0;
-		   }
-	    }
-	  // if (NRF24_SPIx->SR & SPI_SR_RXNE) {
-	 if ((NRF24_SPIx->SR & SPI_I2S_FLAG_RXNE) != RESET) {
-		   SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_RXNE, DISABLE);
-		   nrfRxBuff[nrf_rx_pointer++]=NRF24_SPIx->DR;
-		   NRF24_CSN_HIGH;
-		   if (nrf_rx_pointer>(NRF24_RX_BUFF_SIZE-1)) {
-			   nrf_rx_pointer=0;
-		   }
-	    }
+		if (nrf_tx_pointer>(NRF24_TX_BUFF_SIZE-1)) {
+			nrf_tx_pointer=0;
+		}
+		nrf_spi_busy=0;
+
+	}
+	if ((NRF24_SPIx->SR & SPI_I2S_FLAG_RXNE) != RESET) {
+		SPI_I2S_ITConfig(NRF24_SPIx, SPI_I2S_IT_RXNE, DISABLE);
+		nrfRxBuff[nrf_rx_pointer++]=NRF24_SPIx->DR;
+		NRF24_CSN_HIGH;
+		if (nrf_rx_pointer>(NRF24_RX_BUFF_SIZE-1)) {
+			nrf_rx_pointer=0;
+		}
+		nrf_spi_busy=0;
+	}
+	nrf_spi_busy=0;
 }

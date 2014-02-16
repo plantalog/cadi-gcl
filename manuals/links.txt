@@ -1,0 +1,47 @@
+http://www.sendspace.com/file/30k1sn	-	cadi_fw_v1_beta8_130814.zip
+ http://www.sendspace.com/file/4o9gi8	-	cadi_fw_v1_beta8_130814_src.zip
+ http://www.sendspace.com/file/bhmuln	-	ec_tds_meter_eagle.zip
+ http://www.sendspace.com/file/57cy0f	-	ec_tds_meter_isabella_1_3_topor_pdf.zip
+https://olkpeace.org/proxy/storage3.static.itmages.ru/i/13/0816/h_1376669068_2230104_c3f2109d34.png	-	ec/tds schematics isabella based v1.3
+
+
+
+
+
+ http://www.sendspace.com/file/ut2cph			- cadi_fw_v1_rc2_130826_src.zip
+ http://www.sendspace.com/file/94cgxh			- cadi_fw_v1_rc2_130826.zip
+http://storage3.static.itmages.ru/i/13/0826/h_1377518254_6863948_6f16158922.png -  ec_tds_meter_v2_schematics.png
+ http://www.sendspace.com/file/oaktj4	-	cadi_ec_tds_meter_v2_board_schematics.zip
+
+
+ http://www.sendspace.com/file/m0ynid		-	 cadi fw v1 release
+ http://www.sendspace.com/file/1erpzs		-	-||- src
+
+
+http://storage9.static.itmages.ru/i/13/1003/h_1380827556_3329069_a204b9bc79.png - cadi bt remote win32 interface
+
+ http://www.sendspace.com/file/hg9s9b	-	cadi bt remote win32 Qt src and binary
+
+ http://www.sendspace.com/file/220ldw	-	android cadi bluetooth monitor 1.2
+
+ http://www.sendspace.com/file/kyejp8	-	cadi_fw_v1_2_131024_1_source.zip
+
+aquaplant.ee/hw_dev/cadiz/cadiz1/android/android/CadiBTmon_1_2.zip
+
+
+
+
+http://storage9.static.itmages.ru/i/14/0129/h_1390965208_3204118_58b3717029.jpg
+http://storage7.static.itmages.ru/i/14/0129/h_1390965102_6673619_2530f91815.jpg
+http://storage5.static.itmages.ru/i/14/0129/h_1390965064_1602714_999a6e834d.jpg
+http://storage8.static.itmages.ru/i/14/0129/h_1390964900_2263715_52db75e77c.jpg
+http://storage7.static.itmages.ru/i/14/0129/h_1390964861_9763623_958e9751f2.jpg
+http://storage6.static.itmages.ru/i/14/0129/h_1390964793_8269989_08500906d3.jpg
+http://storage5.static.itmages.ru/i/14/0129/h_1390964637_8809604_493e737a90.jpg
+http://storage9.static.itmages.ru/i/14/0129/h_1390964624_3581349_493e737a90.jpg
+http://storage8.static.itmages.ru/i/14/0129/h_1390964134_9619816_2530f91815.jpg
+http://storage9.static.itmages.ru/i/14/0129/h_1390961740_3769669_37bc4d160c.jpg
+http://storage7.static.itmages.ru/i/14/0129/h_1390961646_4143623_d88245a088.jpg
+http://storage5.static.itmages.ru/i/14/0129/h_1390961597_6643912_58b3717029.jpg
+http://storage9.static.itmages.ru/i/14/0129/h_1390961568_8561021_7d4a7be616.jpg
+http://storage8.static.itmages.ru/i/14/0129/h_1390961391_7472258_426a97d0dc.jpg

@@ -13,16 +13,18 @@ const unsigned char russian[]={ 0x41, 0xA0, 0x42, 0xA1, 0xE0, 0x45,
 extern uint8_t LCDLine1[16], LCDLine2[16];                // framebuffer
 extern uint8_t lcd_pointerx=0, lcd_pointery=0;
 
-void Lcd_write_str(uc8 *STRING)
+void Lcd_write_str(uint8_t *str)
 {
-        char c;
-        while (c=*STRING++){
-                if(c>=192) {
-                        Lcd_write_data(russian[c-192]);
+        uint8_t c;
+ //       uint8_t max=16;
+        while (c=*str++){
+                if (c>=192) {
+                        Lcd_write_data(49);
                 }
                 else {
                         Lcd_write_data(c);
                 }
+  //              max--;
         }
 }
 
@@ -74,7 +76,7 @@ void STM32F4_LCDInit(void)
   GPIO_InitStructure.GPIO_Pin = (pin_d7 | pin_d6 | pin_d5 | pin_d4 | pin_rw | pin_rs | pin_e);
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
   GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;                // vozmozhno uvelichit'
   GPIO_Init(lcd_port, &GPIO_InitStructure);
 
@@ -161,21 +163,10 @@ void Delay_us(uint32_t delay){
 
 void Delay_us(uint32_t delay){
 	    uint32_t del=0;
-        del=delay*SPEED_K; while (del--){}
-}
+        del=delay*SPEED_K;
+        while (del--){
 
-void lcd_nybble()
-{
- uint32_t i;
- lcd_port->BSRRL=GPIO_BSRR_BS_10;
- for(i=0; i<500000; i++);
- lcd_port->BSRRH=GPIO_BSRR_BS_10;         	//Clock enable: falling edge
-}
-
-void lcd_strobe(void){
-	e_1;
-	Delay_us(1000);
-	e_0;
+        }
 }
 
 void Init_lcd(void)
@@ -186,7 +177,7 @@ void Init_lcd(void)
         Delay_us(300);	// assume 10ms
         set4lowBits(0b0010);	// set 4 bit bus
         e_0;rs_0;rw_0;
-        Delay_us(10);
+        Delay_us(100);
         e_1;
         set4lowBits(0b0010);	// set 4 bit bus
         Delay_us(10);

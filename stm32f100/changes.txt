@@ -1,3 +1,16 @@
+v1.6.2
+- now the water flow meter tick counter reseted when the valve is fully opened and waer dosing counting is then started, preventing "false" counting.
+- refactored Lcd_write_16b for printing uint16_t values on LCD. Fixed over 255 value bug (and with adjust16bit() function as well).
+
+v1.6.1
+- calibrated values now stored in "EEPROM"
+- more precise calibration of water flow meter
+
+v1.6
+- new function adjust16bit_fast() with additional argument - speed
+- water flow counter calibration function
+- function for water flow meter reading based volume top-up get_water()
+
 v1.5
 - fixed valve feedback init
 - tank level stabilizer function and UI

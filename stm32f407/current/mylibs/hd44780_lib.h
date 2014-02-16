@@ -56,7 +56,7 @@ void Lcd_write_cmd(uint8_t byte);
 void Lcd_clear(void);
 void Return_home(void);
 void Lcd_goto(uc8 x, uc8 y);
-void Lcd_write_str(uc8 *STRING);
+void Lcd_write_str(uint8_t *STRING);
 void STM32F4_LCDInit(void);
 void Delay_us(uint32_t delay);
 void Lcd_write_arr(uc8 *STRING, uint8_t chars);

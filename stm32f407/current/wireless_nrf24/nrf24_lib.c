@@ -183,7 +183,7 @@ void nrf24init_dma(void){
 	  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_256;
 	  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
 	  SPI_InitStructure.SPI_CRCPolynomial = 7;
-	  
+	  // master setting?
 	  NRF24_SPIx->CR2 |= (uint16_t)SPI_CR2_SSOE; // set nss pin as output
 	  SPI1->CR2 |= SPI_CR2_SSOE;	
 	  NRF24_SPIx->CR1 |= SPI_NSSInternalSoft_Set;
@@ -353,7 +353,7 @@ static void nrf24init2(void)
 */
 
 
-
+/*
 int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf)
 {
      int i;
@@ -378,6 +378,8 @@ int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf)
      return i;
 }
 
+
+
 int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf)
 {
      int i;
@@ -385,7 +387,7 @@ int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf)
      // get register payload size
      unsigned char s = nrf_reg_def.data[reg].size;
 
-     nrf_spi_csl();
+     NRF24_CSN_LOW;
 
      // send command
      nrf_spi_xfer_byte(NRF_CMD_WREG | reg);
@@ -395,10 +397,12 @@ int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf)
           nrf_spi_xfer_byte(buf->data[i]);
      }
 
-     nrf_spi_csh();
+     NRF24_CSN_HIGH;
 
      return i;
 }
+
+
 
 int nrf_send(nrf_payload *payload)
 {
@@ -870,3 +874,5 @@ unsigned char nrf_spi_xfer_byte(unsigned char data)
 	NRF24_SPIx->DR = data;
      //return spi_xfer(SPI2, data);
 }
+
+*/

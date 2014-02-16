@@ -78,16 +78,7 @@
       <File name="stm32f10x_it.c" path="stm_lib/src/stm32f10x_it.c" type="1"/>
     </ExcludeFile>
   </Target>
-  <Components path="./">
-    <Component id="30" name="C Library" path="" type="2"/>
-    <Component id="440" name="RCC" path="" type="2"/>
-    <Component id="442" name="PWR" path="" type="2"/>
-    <Component id="444" name="GPIO" path="" type="2"/>
-    <Component id="446" name="DMA" path="" type="2"/>
-    <Component id="455" name="FLASH" path="" type="2"/>
-    <Component id="457" name="ADC" path="" type="2"/>
-    <Component id="464" name="CMSIS Boot" path="" type="2"/>
-  </Components>
+  <Components path="./"/>
   <Files>
     <File name="cmsis_boot/startup/startup_stm32f10x_md_vl.c" path="cmsis_boot/startup/startup_stm32f10x_md_vl.c" type="1"/>
     <File name="ff9a/src/integer.h" path="ff9a/src/integer.h" type="1"/>

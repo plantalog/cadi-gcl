@@ -344,7 +344,7 @@ extern nrf_reg_fields nrf_reg_rxpw_fields; // Fields of the RX_PW register.
 extern nrf_reg_fields nrf_reg_fifostat_fields; // Fields of the FIFO_STAT register.
 extern nrf_reg_fields nrf_reg_dynpd_fields; // Fields of the DYNPD register.
 extern nrf_reg_fields nrf_reg_feature_fields; // Fields of the FEATURE register.
-extern nrf_regs nrf_reg_def; // Complete register definition for the nNRF24l01.
+nrf_regs nrf_reg_def; // Complete register definition for the nNRF24l01.
 
 
 // === NRF library functions prototypes ===
@@ -377,7 +377,7 @@ void nrf_set_reg_field(unsigned char reg, unsigned char regf, nrf_reg_buf *buf, 
 * @param[in] reg        register to read (see NRF_REG_* form nrf24l01_regs.h)
 * @param[out] *buf        the value(s) read from the register
 * @return                         number of bytes read from the register */
-int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf);
+//int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf);
 
 
 /* Write contents of a register to the nRF24l01.
@@ -386,7 +386,7 @@ int nrf_read_reg(unsigned char reg, nrf_reg_buf *buf);
 * @param[in] *buf        the value(s) to write the register
 * @return                         number of bytes written to the register
 */
-int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf);
+// int nrf_write_reg(unsigned char reg, nrf_reg_buf *buf);
 
 
 /* Send payload non-blocking through the nRF24l01.
