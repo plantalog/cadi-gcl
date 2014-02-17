@@ -485,7 +485,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM4_IRQHandler(void);
 void tankLevelStabSetup(void);
 void tankLevelStab(void);
-void Lcd_write_16b(uint16_t);
+void Lcd_write_16b(uint16_t tmp);
 
 void calibrateFlowMeter(void){
 	uint8_t button=0, valve=0, counter_id=0, volume=0;
@@ -494,6 +494,7 @@ void calibrateFlowMeter(void){
 	Lcd_clear();
 	Lcd_write_str("Choose one:");
 	vTaskDelay(500);
+
 	while (button==0) {
 		button = readButtons();
 		Lcd_goto(0,0);
@@ -2310,6 +2311,7 @@ void phStabSettings(void){	// function guides user through setting the pH level 
 uint8_t readPercentVal(uint8_t value){
 	uint8_t button=0;
 	char prcntStr[5];
+	value %= 101;	// drop all except 0..100
 	while (button!=BUTTON_OK) {
 		button = readButtons();
 		Lcd_goto(1,3);
@@ -2322,7 +2324,7 @@ uint8_t readPercentVal(uint8_t value){
 		Lcd_write_str(">");
 		vTaskDelay(10);
 		if (button==BUTTON_FWD) {
-			if (value<99) {
+			if (value<100) {
 				value++;
 			}
 			else {
