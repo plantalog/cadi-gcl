@@ -23,6 +23,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include "semphr.h"
 #include "stm32f10x_flash.h"
 #include "eeprom.h"
 #include "ff9a/src/diskio.h"
@@ -85,15 +86,21 @@ uint8_t valve_failed;
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 #define USARTx_IRQHandler   USART1_IRQHandler
+
+uint8_t RxBuff[16];
 //#define TxBufferSize   (countof(TxBuffer) - 1)
 //#define RxBufferSize   0x10
-
 /* Private macro -------------------------------------------------------------*/
 #define countof(a)   (sizeof(a) / sizeof(*(a)))
 
 /* Private variables ---------------------------------------------------------*/
 // uint8_t TxBuffer[] = "\n\rCadi sends HELLO!\n\r";
-uint8_t RxBuffer[10];
+static struct {
+xQueueHandle txq;
+xQueueHandle rxq;
+} uart;
+xSemaphoreHandle xSemaphorePacket;
+uint8_t packetBuff[10];
 uint8_t RxByte;
 uint8_t TxByte;
 uint8_t comm_state=48;	// communication state
@@ -126,9 +133,10 @@ __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
 TIM_ICInitTypeDef  TIM_ICInitStructure;
 // digital humidity and temperature data
-uint16_t dht_bit_array[50];
+// uint16_t dht_bit_array[45];
 DHT_data DHTValue;
 uint8_t		dht_data[5];
+uint8_t		dht_data2[5];
 uint8_t dht_bit_position = 0;
 uint8_t dht_bit_ready = 0;
 uint8_t		dht_data_ready = 0;
@@ -151,6 +159,20 @@ uint8_t rhUnderOver = 0;
 #define pin_d4		use_gpio>>3		// to d4 of 4bit bus of 1602 LCD
 
 
+
+
+// #define PAPA_EDITION
+#ifdef PAPA_EDITION
+#define lcd_init_port_data			RCC_APB2Periph_GPIOB
+#define lcd_init_port_cmd			RCC_APB2Periph_GPIOB
+#define pin_e 					GPIO_Pin_7
+#define pin_rw					GPIO_Pin_8
+#define pin_rs					GPIO_Pin_9
+#define lcd_port_data			GPIOB
+#define lcd_port_cmd			GPIOB
+#endif
+
+#ifndef PAPA_EDITION
 #define lcd_init_port_data			RCC_APB2Periph_GPIOB
 #define lcd_init_port_cmd			RCC_APB2Periph_GPIOC
 #define pin_e 					GPIO_Pin_10
@@ -158,6 +180,9 @@ uint8_t rhUnderOver = 0;
 #define pin_rs					GPIO_Pin_12
 #define lcd_port_data			GPIOB
 #define lcd_port_cmd			GPIOC
+#endif
+
+
 
 #define Function_set 				0b00100000//4-bit,2 - line mode, 5*8 dots
 #define Display_on_off_control		0b00001100/// display on,cursor off,blink off
@@ -453,11 +478,15 @@ char * utoa_fast_div(uint32_t value, char *buffer);
 static void prvSetupHardware( void );
 static void displayClock( void *pvParameters );
 static void timerStateTrigger(void *pvParameters);
-static void plugStateTrigger(void  *pvParameters);
+static void plugStateTrigger(void);
 static void sdLog(void  *pvParameters);
 static void phMonitor(void  *pvParameters);
 static void vTaskLCDdraw(void *pvParameters);
 static void watering_program_trigger(void *pvParameters);
+static void uart_task(void *params);
+static void packet_extractor(void *pvParameters);
+
+
 // static void valveManager(void);
 static void valve_status_updater(void);
 void bluetooth_init(void);
@@ -486,6 +515,45 @@ void TIM4_IRQHandler(void);
 void tankLevelStabSetup(void);
 void tankLevelStab(void);
 void Lcd_write_16b(uint16_t tmp);
+
+
+static void uart_task(void *params)
+{
+	int c;
+	for (;;) {
+		if (USART_GetFlagStatus(BT_USART, USART_FLAG_TXE) != RESET) {
+			if(pdPASS == xQueueReceive(uart.txq, &c, portMAX_DELAY)) {
+				USART_SendData(BT_USART, c);
+			}
+		} else {
+			vTaskDelay(10);
+		}
+	}
+}
+
+static void packet_extractor(void *pvParameters){
+	uint8_t packetSize=0, i=0;
+	uint8_t args[10];
+	while (1){
+		if (pdPASS==xSemaphoreTake(xSemaphorePacket, portMAX_DELAY )){
+//			xQueuePeek(uart.rxq, &packetSize, 100);
+/*			for (i=0; i<uxQueueMessagesWaiting(uart.rxq); i++) {
+				xQueueReceive(uart.rxq, packetBuff[i], 100);
+			} */
+			xQueueReceive(uart.rxq, cmd, 100);	// get command id
+			for (i=0;i<uxQueueMessagesWaiting(uart.rxq);i++) {
+				xQueueReceive(uart.rxq, args[i], 100);	// get byte from queue into args[i]
+			}
+			switch (cmd){
+			case 0:
+				get_water(args[0], args[1], (args[2]*256+args[3]));
+				break;
+			}
+		}
+		vTaskDelay(10);
+	}
+//	USART1_IRQHandler();
+}
 
 void calibrateFlowMeter(void){
 	uint8_t button=0, valve=0, counter_id=0, volume=0;
@@ -555,8 +623,9 @@ void calibrateFlowMeter(void){
 
 void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 {
+	uint32_t cnt_to_reach=0;
 	cnt_to_reach = ((uint32_t)amount*(uint32_t)wfCalArray[0])/10;
-	button=0;
+	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<cnt_to_reach) {
@@ -567,7 +636,7 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 
 void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
 {
-	button=0;
+	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<ticks) {
@@ -745,7 +814,55 @@ void comm_manager(void){
 }
 
 
-void USART1_IRQHandler(void)
+
+uint8_t rxpointer=0;
+uint8_t sepFlag=0, size=0;
+void USART1_IRQHandler(void) {
+// packet_extractor();
+
+	portBASE_TYPE xTaskWoken;
+	portBASE_TYPE xHigherPriorityTaskWoken = 0;
+	if (USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET) {
+		RxByte = USART_ReceiveData(BT_USART);
+		RxBuff[rxpointer++]=RxByte;
+		if (rxpointer>15){
+			rxpointer=0;
+		}
+		// xQueueSendToBackFromISR(uart.rxq, (const void *)&RxByte, &xHigherPriorityTaskWoken);
+	}
+
+	if (sepFlag==3){
+		sepFlag=0;
+		size=RxByte;
+	}
+	if (size>0) {
+		// process packet
+		size--;
+		// push RxByte into uart.rxq fifo queue
+		xQueueSendToBackFromISR(uart.rxq, (const void *)&RxByte, &xHigherPriorityTaskWoken);
+		if (size==0) {	// final byte completes with packet_extractor call using semaphore give
+			  xSemaphoreGiveFromISR( xSemaphorePacket, &xTaskWoken );
+			     if( xTaskWoken == pdTRUE) {
+			         taskYIELD();
+			     }
+		}
+	}
+
+	if (RxByte=="Z" && size==0) {
+		sepFlag=1;	// ready
+	}
+	if (RxByte=="X" && sepFlag==1 && size==0){
+		sepFlag=2;	// steady
+	}
+	if (RxByte=="0" && sepFlag==2 && size==0){
+		sepFlag=3;	// go!
+	}
+}
+
+
+uint8_t RxBuffer[2];
+
+void USART1_IRQHandler_bak(void)
 {
 	if (comm_state==48) {
 
@@ -814,15 +931,9 @@ void USART1_IRQHandler(void)
 }
 
 
-
-
 void DMA1_Channel4_IRQHandler (void)
 {
-  if(DMA1->ISR & DMA_ISR_TCIF4) { }  
-//  if(DMA1->ISR & DMA_ISR_HTIF4) { }      //
-
-
-//  if(DMA1->ISR & DMA_ISR_TEIF4) { }      
+  if(DMA1->ISR & DMA_ISR_TCIF4) { }
 }
 
 void DMA1_Channel5_IRQHandler (void)
@@ -902,28 +1013,6 @@ void bluetooth_init(void){
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-/*
-    // DMA USART1 setup
-    DMA_InitTypeDef DMA_InitStructure;
-
-    // USARTy_Tx_DMA_Channel (triggered by USARTy Tx event) Config
-    DMA_DeInit(USARTy_Tx_DMA_Channel);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = USARTy_DR_Base;
-    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)TxBuffer1;
-    DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-    DMA_InitStructure.DMA_BufferSize = TxBufferSize1;
-    DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-    DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;
-    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(USARTy_Tx_DMA_Channel, &DMA_InitStructure);
-*/
-
-
-
   USART_InitTypeDef USART_InitStructure;
 
   // USART 1 init
@@ -944,34 +1033,7 @@ void bluetooth_init(void){
   USART1->CR1  |= USART_CR1_RXNEIE;
   USART1->CR1  |= USART_CR1_TCIE;
   USART_Cmd(USART1, ENABLE);
-  NVIC_EnableIRQ(USART1_IRQn);     
-/*
-  
-  if ((RCC->AHBENR & RCC_AHBENR_DMA1EN) != RCC_AHBENR_DMA1EN)
-  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-  // set source and target addresses and data amount to be transferred
-  DMA1_Channel4->CPAR  =  (uint32_t)&USART1->DR;   // USART data adress
-  DMA1_Channel4->CMAR  =  (uint32_t)&log_str[0];   // memory address
-  DMA1_Channel4->CNDTR =  64;                      // data amount
-
-  DMA1_Channel4->CCR   =  0;                       //reset config register
-  DMA1_Channel4->CCR   = ~DMA_CCR4_CIRC;           //disable cyclic mode
-  DMA1_Channel4->CCR  |=  DMA_CCR4_DIR;            //direction: read FROM memory
-  
-  DMA1_Channel4->CCR   = ~DMA_CCR4_PSIZE;          //data size 8 bit
-  DMA1_Channel4->CCR   = ~DMA_CCR4_PINC;           //do not use increment of pointer
-  
-  DMA1_Channel4->CCR   = ~DMA_CCR4_MSIZE;          //data size 8 bit
-  DMA1_Channel4->CCR  |=  DMA_CCR4_MINC;           //use pointer increment
-  USART1->CR3 |= USART_CR3_DMAT;                    //enable transfer USART1 through DMA */
-//  USART1->CR3 |= USART_CR3_DMAR;                    //enable receiving USART1 via DMA
-
-/*  // Enable USARTy DMA TX Channel
-  DMA_Cmd(USARTy_Tx_DMA_Channel, ENABLE);
-
-  // Enable USARTz DMA TX Channel
-  DMA_Cmd(USARTz_Tx_DMA_Channel, ENABLE); */
-
+  NVIC_EnableIRQ(USART1_IRQn);
 }
 
 #endif
@@ -1024,44 +1086,6 @@ void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
 //	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
-/*
-	  // Enable AFIO clock
-//	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	  // Connect EXTI10 Line to PC10 pin
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource5);
-
-	  // Configure EXTI5 line
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Configure EXTI6 line
-
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource6);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line6;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Configure EXTI12 line
-
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource7);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line7;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Enable and set EXTI15_10 Interrupt to the lowest priority
-	  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-	  NVIC_Init(&NVIC_InitStructure); */
 }
 
 
@@ -1116,10 +1140,6 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 	  GPIO_InitTypeDef GPIO_InitStructure;
 	  TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
 	  TIM_OCInitTypeDef TIM_OCInitStruct;
-
-//	  volatile int i;
-//	  int n = 1;
-//	    int brightness = 0;
 
 	    RCC_APB2PeriphClockCmd(
 	            RCC_APB2Periph_GPIOC |
@@ -2093,10 +2113,19 @@ void TIM3_IRQHandler(void)
     DutyCycle = 0;
     Frequency = 0;
   }
-  // fill one more value of dht bits array
-  dht_bit_array[dht_bit_position]=DutyCycle;
+  if (dht_bit_position<DHT_DATA_START_POINTER) {
+  }
+  else {
+	  // fill one more value of dht bits array
+	  if (DutyCycle>25 && DutyCycle<35) {
+		  // reset bit
+	  }
+	  else {
+		  dht_data2[(dht_bit_position-DHT_DATA_START_POINTER)/8] |= (1<<((dht_bit_position-DHT_DATA_START_POINTER)%8));
+		  // set bit
+	  }
+  }
   dht_bit_position++;
-
 }
 
 void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
@@ -2111,21 +2140,13 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   {
     /* Duty cycle computation */
     DutyCycle = ((TIM15->CCR1) * 100) / IC2Value;
-
-    /* Frequency computation */
- //   Frequency = SystemCoreClock / IC2Value;
   }
   else
   {
     DutyCycle = 0;
     Frequency = 0;
   }
-  // fill one more value of dht bits array
-//  dht_bit_array[dht_bit_position]=TIM_GetCapture1(TIM15);
-  dht_bit_array[dht_bit_position]=DutyCycle;
   dht_bit_position++;
-//  dht_bit_array[dht_bit_position]=TIM15->CCR2;
-//  dht_bit_position++;
 }
 
 
@@ -2142,7 +2163,6 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
 {
   /* Clear TIM16 Capture compare interrupt pending bit */
   TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
-//  TIM17->SR &= ~TIM_SR_CC1IF;
   /* Get the Input Capture value */
   if (!(GPIOB->IDR & (1<<9))) {
 	  sonar_read[0]=SONAR1_TIM->CNT;
@@ -2151,62 +2171,36 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
 }
 
 
+
 void dht_get_data(void){	// function starts getting data from DHT22 sensor
-//	SONAR1_TIM->EGR |= TIM_EGR_CC1G;
 	vTaskDelay(25);
 	  uint8_t i;
-	  for (i=0;i<50;i++) {
-		dht_bit_array[i]=0;
+	  for (i=0;i<5;i++) {
+		dht_data[i]=0;
 	  }
 	  dht_bit_ready = 0;
 	  dht_bit_position = 0;
 	  dht_init_out();
 	  DHT_0;
-//	  GPIOA->BRR = (1<<DHT_TRIG_PLUG);		// set 0
 	  vTaskDelay(5);
 	  DHT_1;
 	  dht_init();
 	  vTaskDelay(200);
-
 	  dht_bit_ready = 1;
 	  dht_bit_position = 0;
-//	  GPIOA->BSRR = (1<<DHT_TRIG_PLUG);	// set 1
 	  vTaskDelay(5);
 	  dht_conv_data();
 }
 
 void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and strings of T and rH
 	uint8_t i, i2;
-	uint16_t caps1[45];
-//	uint16_t zero_ticks, one_ticks;
 	vTaskDelay(10);
 	if (dht_bit_ready==1) {
-		int dht_buf_pointer=DHT_DATA_START_POINTER;	// points the dht data start bit
-		for (i=0;i<45;i++) {
-			caps1[i]=dht_bit_array[i];
-		}
-		dht_data_ready = 0;
-		for (i=0; i<5; i++){
-			dht_data[i]=0;
-			vTaskDelay(10);
-			for (i2=8; i2>0; i2--) {
-/*				if (caps1[dht_buf_pointer]>25 && caps1[dht_buf_pointer]<35) {
-					dht_data[i] |= (1<<(i2-1)); // set i2 bit in dht_data[i]
-				}
-				*/
-				if (caps1[dht_buf_pointer]>25 && caps1[dht_buf_pointer]<35) {
-				}
-				else {
-					dht_data[i] |= (1<<(i2-1)); // set i2 bit in dht_data[i];
-				}
-				dht_buf_pointer++;
-			}
-		}
 		vTaskDelay(10);
 
-		DHTValue.DHT_Humidity = dht_data[0]*256+dht_data[1];
-		DHTValue.DHT_Temperature = dht_data[2]*256+dht_data[3];
-		DHTValue.DHT_CRC = dht_data[5];
+		DHTValue.DHT_Humidity = dht_data2[0]*256+dht_data2[1];
+		DHTValue.DHT_Temperature = dht_data2[2]*256+dht_data2[3];
+		DHTValue.DHT_CRC = dht_data2[5];
 
 		if (DHTValue.DHT_Humidity>rhWindowBottom && DHTValue.DHT_Humidity<rhWindowTop) {
 			rhUnderOver=0;
@@ -2235,19 +2229,15 @@ void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and 
 }
 
 void dht_arr_displayer(void){
-//	dht_get_data();
 	uint8_t button=0;
 	uint8_t arr_pointer=0;
 	while (button!=BUTTON_OK) {
-//		dht_get_data();
 		vTaskDelay(30);
 #ifdef TEST_MODE
 		button=readButtons();
 		Lcd_goto(0,0);
 		Lcd_write_digit(arr_pointer);
 		Lcd_write_str(": ");
-		Lcd_write_digit(dht_bit_array[arr_pointer]/100);
-		Lcd_write_digit(dht_bit_array[arr_pointer]);
 		if (button==BUTTON_FWD) {
 			if (arr_pointer==255) {
 				arr_pointer==0;
@@ -2265,8 +2255,6 @@ void dht_arr_displayer(void){
 			}
 		}
 #endif
-
-
 		Lcd_goto(1,0);
 		Lcd_write_str("T:");
 		copy_arr(&dht_t_str, &LCDLine2, 4, 2);
@@ -2808,22 +2796,22 @@ void buttonCalibration(void){	// buttons calibration function
 	Lcd_clear();
 	Lcd_goto(0,0);
 	Lcd_write_arr("<", 1);
-	Delay_us(10000);
+	Delay_us(30000);
 	Delay_us(100);
 	button_val[0] = get_average_adc(10);
 	Lcd_goto(0,0);
 	Lcd_write_arr("OK", 2);
-	Delay_us(10000);
+	Delay_us(30000);
 	Delay_us(100);
 	button_val[1] = get_average_adc(10);
 	Lcd_goto(0,0);
 	Lcd_write_arr("CANCEL", 6);
-	Delay_us(10000);
+	Delay_us(30000);
 	Delay_us(100);
 	button_val[2] = get_average_adc(10);
 	Lcd_clear();
 	Lcd_write_arr(">", 1);
-	Delay_us(10000);
+	Delay_us(30000);
 	Delay_us(100);
 	button_val[3] = get_average_adc(10);
 
@@ -2906,6 +2894,7 @@ void displayAdcValues(void){
 #endif
 }
 
+
 void display_usart_rx(void){
 		uint8_t button=0;
 		Lcd_clear();
@@ -2913,7 +2902,7 @@ void display_usart_rx(void){
 		while (button!=BUTTON_OK){
 			button=readButtons();
 			Lcd_goto(0,0);
-			Lcd_write_arr(&RxBuffer, 10);
+			Lcd_write_arr(&RxBuff, 16);
 			vTaskDelay(20);
 		}
 		Lcd_clear();
@@ -3526,10 +3515,11 @@ void timerStateTrigger(void *pvParameters){
 			}
 			vTaskDelay(1);
 		}
+		plugStateTrigger();
 	}
 }
 
-void plugStateTrigger(void  *pvParameters){
+void plugStateTrigger(void){
 	uint8_t plugStateFlag, plugTimerId, plugType;
 	uint8_t i;
 	while (1) {
@@ -4701,6 +4691,7 @@ void displayClock(void *pvParameters)
 	    	Lcd_write_digit(DateTime.hour);
 	    	Lcd_write_digit(DateTime.min);
 	    	Lcd_write_digit(DateTime.sec);
+    	//	displayAdcValues();
 
 	    	vTaskDelay(5);
 
@@ -5014,7 +5005,9 @@ int main(void)
 	valve_feedback_init();
 #endif
 
+#ifndef PAPA_EDITION
 	sonar_init();
+#endif
 
 	bluetooth_init();
 
@@ -5043,12 +5036,19 @@ int main(void)
 	Lcd_clear();
 	loadSettings();
 	flush_lcd_buffer();	// fills the LCD frame buffer with spaces
+	uart.txq = xQueueCreate(16, sizeof(uint8_t));
+	uart.rxq = xQueueCreate(16, sizeof(uint8_t));
+
+	xTaskCreate(uart_task, (signed char *)"UART", 30,
+	(void *)NULL, tskIDLE_PRIORITY + 3, NULL);
+	xTaskCreate(packet_extractor, (signed char *)"PACKET", 30,
+	(void *)NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
             NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(timerStateTrigger,(signed char*)"TIMERS",configMINIMAL_STACK_SIZE,
             NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(plugStateTrigger,(signed char*)"PLUGS",configMINIMAL_STACK_SIZE+35,
-            NULL, tskIDLE_PRIORITY + 1, NULL);
+//    xTaskCreate(plugStateTrigger,(signed char*)"PLUGS",configMINIMAL_STACK_SIZE+35,
+//            NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(phMonitor,(signed char*)"PHMON",configMINIMAL_STACK_SIZE,
             NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(vTaskLCDdraw,(signed char*)"LCDDRW",configMINIMAL_STACK_SIZE,
@@ -5058,6 +5058,8 @@ int main(void)
 if (resp==0){
 	xTaskCreate(sdLog,(signed char*)"SDLOG",256,NULL, tskIDLE_PRIORITY + 1, NULL);
 }
+
+vSemaphoreCreateBinary( xSemaphorePacket );
 
 /* Start the scheduler. */
 

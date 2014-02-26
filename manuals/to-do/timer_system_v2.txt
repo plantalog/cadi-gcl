@@ -12,7 +12,8 @@ The simple timer could be one of three types:
 
 Each timer has 80bits of data (10bytes):
 	- Timer type - TT[0..2]. 001 - 24H, 010 - Full Range, 011 - Cyclic
-	- Timer Enabled - TE[3]. If set to 1, Cadi loads this timer for processing (depending on firmware working speed and delay changes due to changing the processing loop length, we should decide if we want the loop to be always fixed length, or we can let it be adjustable without having problems with main program flow. Этот параметр отвечает за включение таймера в очередь обработчика состояний таймеров. То есть, размер цикла for будет разным в зависимости от того какие таймеры включены. Это может повлиять на "гладкость" выполнения программы, что необходимо проверить на практике. Если будут проблемы, то простейшее решение - зафиксировать размер цикла)
+	- Timer Enabled - TE[3]. If set to 1, Cadi loads this timer for processing (depending on firmware working speed and delay changes due to changing the processing loop length, we should decide if we want the loop to be always fixed length, or we can let it be adjustable without having problems with main program flow.
+Этот параметр отвечает за включение таймера в очередь обработчика состояний таймеров. То есть, размер цикла for будет разным в зависимости от того какие таймеры включены. Это может повлиять на "гладкость" выполнения программы, что необходимо проверить на практике. Если будут проблемы, то простейшее решение - зафиксировать размер цикла)
 	- TimerOn/Duration - TND[16..47]. 32 bits of data for timer ON or Duration, depending on type set in TE[0..2].
 	- TimerOff/Interval - TFI[48..79]. Timer OFF or Interval
 	
