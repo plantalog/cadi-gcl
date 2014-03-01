@@ -31,6 +31,9 @@ switch ($action) {
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
+	case 'tx':
+		bt_tx('rfcomm0', $_POST['data']);
+		break;
 	case 'rfcomm_scan':
 		rfcomm_scan();
 		break;
@@ -54,6 +57,13 @@ function command_send($command, $mac){
 //	$out = exec('sudo python test_btserialclient2.py '.$mac.' '.$command);
 	exec($cmd, $out);
 	echo $cmd;
+}
+
+function bt_tx($rfcomm, $data){
+		$toput = "tx,".$rfcomm.",".$data.", ";		// rfcomm0 HARDCODEd
+		echo $toput;
+		file_put_contents('daemon_cmd', $toput);
+		sleep(1);
 }
 
 function tail_serial_log($amount){

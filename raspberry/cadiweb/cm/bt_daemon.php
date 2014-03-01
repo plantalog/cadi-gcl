@@ -33,6 +33,10 @@ while(1){
 			case 'restart':
 				$execmd = "'./bt_restart.sh'";
 				break;
+			case 'tx':		// send packet
+				$execmd = "echo ".$cmd_arr[2]." > /dev/".$cmd_arr[1];
+				echo $execmd;
+				break;
 		}
 
 	//	echo $execmd;

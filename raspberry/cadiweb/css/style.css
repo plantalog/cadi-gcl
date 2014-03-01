@@ -1,0 +1,12 @@
+
+
+.table_advanced td {
+	padding-top: 0px;
+	padding-bottom: 0px;
+	height: 40px;
+	border: 1px solid gray;
+}
+
+.table_advanced input {
+	width: 120px;
+}
