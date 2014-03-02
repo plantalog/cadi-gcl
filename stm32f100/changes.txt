@@ -1,3 +1,11 @@
+v1.7
+- implemented packet communication protocol for remote function calls
+	uart_task to process packets and it's functions
+- changed dht duty cycle array from 16bit to 8 bit
+
+
+v1.6.3
+
 v1.6.2
 - now the water flow meter tick counter reseted when the valve is fully opened and waer dosing counting is then started, preventing "false" counting.
 - refactored Lcd_write_16b for printing uint16_t values on LCD. Fixed over 255 value bug (and with adjust16bit() function as well).
