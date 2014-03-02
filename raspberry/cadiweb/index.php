@@ -51,6 +51,15 @@ function bt_connect(){
 	});
 }
 
+function bt_restart(){
+	alert('restarting');
+	$.post('cm/cadi_bt_processor.php', {action: 'bt_restart'}, function(data){
+		alert('restarted');
+		cadi_list_rfcomms();
+		$('#main_output').html(data);
+	});
+}
+
 function bt_disconnect(){
 	$.post('cm/cadi_bt_processor.php', {action: 'bt_disconnect'}, function(data){
 		alert('disconnected');
@@ -85,10 +94,34 @@ function stopSerialRead(psid){
 }
 
 function bt_tx_packet() {
-	var data = $('#tx_data').val();
+	var data = $('#tx_data_packet').val();
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', data: data}, function(data){
 		cadi_list_rfcomms();
+		alert(data);
+	});  
+}
+
+
+function bt_tx() {
+	var data = $('#tx_data').val();
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug_id:'1', state:data}, function(data){
+		cadi_list_rfcomms();
 //		alert('kill -9 sent');
+	});  
+}
+
+function plugStateSet(plug, state){
+//	alert('oga');
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug:plug, state:state}, function(data){
+		cadi_list_rfcomms();
+//		alert(data);
+	});  
+}
+
+function bt_setdd() {
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '2'}, function(data){
+		cadi_list_rfcomms();
+//		alert(data);
 	});  
 }
 
@@ -147,7 +180,8 @@ function bt_tx_packet() {
 	</table>
 	=================================================	
 	<br>
-	<div onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</div>
+	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div><br>
+	<div onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</div><br>
 	<div onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</div>
 	<select id="bind_mac" name="bind_mac">
 	<option>Scan to get the list</option>
@@ -159,6 +193,16 @@ function bt_tx_packet() {
 		<div onClick="bt_tx_packet()">Send</div>	
 	</div>
 
+
+	<div title="send ZX2[1],[1],[1]" id="tx_form">
+		<input type="text" name="tx_data_packet" id="tx_data_packet" />
+		<div onClick="bt_tx()">Send packet</div>	
+	</div>
+
+<div onClick="bt_setdd()">Set DD</div>	
+
+<div onClick="plugStateSet('1','1')">Enable P1</div>
+<div onClick="plugStateSet('1','0')">Disable P1</div>
 
 </div>
 </div>

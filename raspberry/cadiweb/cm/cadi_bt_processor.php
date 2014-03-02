@@ -1,6 +1,8 @@
 <?php 
 session_start();
 
+include('packet_processor.php');
+
 if (isset($_GET['action'])) {
 	$action = $_GET['action'];
 }
@@ -31,7 +33,17 @@ switch ($action) {
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
+	case 'bt_restart':
+		$toput = "restart,";
+		echo $toput;
+		file_put_contents('daemon_cmd', $toput);
+		sleep(1);
+		break;
 	case 'tx':
+		bt_tx('rfcomm0', $packet);
+		print_r($packet);
+		break;
+	case 'tx_packet':
 		bt_tx('rfcomm0', $_POST['data']);
 		break;
 	case 'rfcomm_scan':

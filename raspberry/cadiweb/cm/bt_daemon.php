@@ -5,7 +5,7 @@ echo "Bluetooth daemon for Cadi started";
 
 while(1){
 	$command = file_get_contents('daemon_cmd');
-
+	unset($execmd);
 	if(!empty($command)){
 		$cmd_arr = explode(",", $command);
 		print_r($cmd_arr);
@@ -34,12 +34,16 @@ while(1){
 				$execmd = "'./bt_restart.sh'";
 				break;
 			case 'tx':		// send packet
-				$execmd = "echo ".$cmd_arr[2]." > /dev/".$cmd_arr[1];
+				unset($arguments);
+				for ($i=0; $i<strlen($cmd_arr[2]);$i++) {
+					$arguments .= sprintf("\\x%02x",ord($cmd_arr[2][$i]));
+				}
+				$execmd = "echo -e '".$arguments."' > /dev/".$cmd_arr[1];
 				echo $execmd;
 				break;
 		}
 
-	//	echo $execmd;
+		echo $execmd;
 		exec($execmd);
 	}
 
