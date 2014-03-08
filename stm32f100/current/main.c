@@ -507,6 +507,8 @@ void tankLevelStab(void);
 void Lcd_write_16b(uint16_t tmp);
 void Lcd_write_8b(uint8_t tmp);
 void run_uart_cmd(void);
+void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount);
+void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount);
 
 
 void Lcd_write_8b(uint8_t tmp) {
@@ -804,7 +806,8 @@ void USART1_IRQHandler(void)
 			RxCounter=0;
 	}
 	if (USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET) {
-			RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
+//			RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
+			RxByte = USART_ReceiveData(BT_USART);
 			RxBuffer[RxCounter++] = RxByte;
 			USART1->SR &= ~USART_FLAG_RXNE;
 	}
@@ -872,7 +875,7 @@ void rx_flush(){
 void run_uart_cmd(void){
 	switch (cmdbuf[1]) {
 		case 0:
-			get_water(cmdbuf[2],cmdbuf[3],cmdbuf[4]*256+cmdbuf[5]);
+			get_water_cl(cmdbuf[2],cmdbuf[3],cmdbuf[4]*256+cmdbuf[5]);
 			break;
 		case 1:
 			plugStateSet(cmdbuf[2], cmdbuf[3]);
