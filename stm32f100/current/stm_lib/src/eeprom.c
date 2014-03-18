@@ -580,7 +580,7 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint16_t Data)
   uint16_t curaddr = 0;
   for (VarIdx = 0; VarIdx < NumbOfVar; VarIdx++)
   {
-	curaddr = 0x05C0+VarIdx;
+	curaddr = SETTINGS_START_ADDR+VarIdx;
     if (curaddr != VirtAddress)  /* Check each variable except the one passed as parameter */
 //    if (VirtAddVarTab[VarIdx] != VirtAddress)  /* Check each variable except the one passed as parameter */
     {

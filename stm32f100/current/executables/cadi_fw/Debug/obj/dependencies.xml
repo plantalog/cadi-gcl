@@ -146,10 +146,10 @@
       </source>
       <source file="..\..\..\..\cmsis\core_cm3.h" lastModified="12e0a816e90">
       </source>
-      <source file="..\..\..\..\stm_lib\inc\eeprom.h" lastModified="141074d90b7">
-         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
-      </source>
       <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">
+      </source>
+      <source file="..\..\..\..\stm_lib\inc\eeprom.h" lastModified="144acc1cf88">
+         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\include\StackMacros.h" lastModified="13843cf2fc0">
       </source>
@@ -181,7 +181,7 @@
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_pwr.h"/>
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_rcc.h"/>
       </source>
-      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="141f0f92cb8">
+      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7">
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_flash.h"/>
          <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
       </source>
@@ -207,9 +207,6 @@
       </source>
       <source file="..\..\..\..\stm_lib\src\stm32f10x_exti.c" lastModified="12e9ef2ce20">
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_exti.h"/>
-      </source>
-      <source file="..\..\..\..\stm_lib\inc\stm32f10x_it.h" lastModified="1366443f8f0">
-         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
    </includePath>
 </dependencies>

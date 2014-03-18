@@ -94,14 +94,15 @@ uint8_t valve_failed;
 /* Private variables ---------------------------------------------------------*/
 // uint8_t TxBuffer[] = "\n\rCadi sends HELLO!\n\r";
 uint8_t RxBuffer[10];
+uint8_t TxBuffer[16];
 uint8_t RxByte;
 uint8_t TxByte;
 uint8_t comm_state=48;	// communication state
 uint8_t TxDataReady;
 uint8_t RxDataReady;
-// uint8_t RxDataReady;
-//uint8_t NbrOfDataToTransfer = TxBufferSize;
-//uint8_t NbrOfDataToRead = RxBufferSize;
+uint8_t NbrOfDataToTransfer = 16;
+//uint8_t NbrOfDataToRead = RxBufferSize
+uint8_t txbuff_ne = 0;
 uint8_t TxCounter = 0;
 uint16_t RxCounter = 0;
 uint8_t logstr_crc=0;
@@ -140,15 +141,63 @@ uint8_t rhUnderOver = 0;
 #endif						// EOF DHT DEFINITIONS
 
 
-// DRIVER: HD44780/1602 LCD module
+
+#define CADI_MB
 #define USE_LCD
-#ifdef USE_LCD				// START LCD DEFINITIONS
+
+
+
+#ifdef CADI_MB
 #define lcd_shift	11				// seems to be not used here anymore?
 #define use_gpio	GPIO_Pin_13		// last data pin number
 #define pin_d7		use_gpio		// define pins from last
 #define pin_d6		use_gpio>>1
 #define pin_d5		use_gpio>>2
 #define pin_d4		use_gpio>>3		// to d4 of 4bit bus of 1602 LCD
+
+#define d7_0		GPIOA->BSRRH |= (GPIO_Pin_15);
+#define d7_1		GPIOA->BSRRL |= (GPIO_Pin_15);
+#define d6_0		GPIOC->BSRRH |= (GPIO_Pin_10);
+#define d6_1		GPIOC->BSRRL |= (GPIO_Pin_10);
+#define d5_0		GPIOC->BSRRH |= (GPIO_Pin_11);
+#define d5_1		GPIOC->BSRRL |= (GPIO_Pin_11);
+#define d4_0		GPIOC->BSRRH |= (GPIO_Pin_12);
+#define d4_1		GPIOC->BSRRL |= (GPIO_Pin_12);
+
+/*  reverse
+#define d7_1		GPIOA->BSRRH |= (GPIO_Pin_15);
+#define d7_0		GPIOA->BSRRL |= (GPIO_Pin_15);
+#define d6_1		GPIOC->BSRRH |= (GPIO_Pin_10);
+#define d6_0		GPIOC->BSRRL |= (GPIO_Pin_10);
+#define d5_1		GPIOC->BSRRH |= (GPIO_Pin_11);
+#define d5_0		GPIOC->BSRRL |= (GPIO_Pin_11);
+#define d4_1		GPIOC->BSRRH |= (GPIO_Pin_12);
+#define d4_0		GPIOC->BSRRL |= (GPIO_Pin_12);
+
+*/
+
+
+/*
+#define e_0 	GPIOD->ODR |=  GPIO_Pin_2
+#define e_1		GPIOD->ODR &=~ GPIO_Pin_2
+#define rw_0	GPIOB->ODR |=  GPIO_Pin_3
+#define rw_1	GPIOB->ODR &=~ GPIO_Pin_3
+#define rs_0	GPIOB->ODR |=  GPIO_Pin_4
+#define rs_1	GPIOB->ODR &=~ GPIO_Pin_4
+*/
+
+
+
+#define e_1 	GPIOD->ODR |=  GPIO_Pin_2
+#define e_0		GPIOD->ODR &=~ GPIO_Pin_2
+#define rw_1	GPIOB->ODR |=  GPIO_Pin_3
+#define rw_0	GPIOB->ODR &=~ GPIO_Pin_3
+#define rs_1	GPIOB->ODR |=  GPIO_Pin_4
+#define rs_0	GPIOB->ODR &=~ GPIO_Pin_4
+
+
+
+#endif
 
 
 
@@ -181,16 +230,15 @@ uint8_t rhUnderOver = 0;
 #define Display_clear				0b00000001
 #define Entry_mode_set				0b00000100//
 
-#define rs_1	lcd_port_cmd->ODR |=  pin_rs
-#define rs_0	lcd_port_cmd->ODR &=~ pin_rs
-#define e_1 	lcd_port_cmd->ODR |=  pin_e
-#define e_0		lcd_port_cmd->ODR &=~ pin_e
-#define rw_1	lcd_port_cmd->ODR |=  pin_rw
-#define rw_0	lcd_port_cmd->ODR &=~ pin_rw
+
+
+
+
+
+
 u32 del;
 static uint8_t		LCDLine1[16], LCDLine2[16];		// lcd frame buffer
 uint8_t lcd_pointerx=0, lcd_pointery=0;
-#endif 						// EOF LCD DEFINITIONS
 
 
 // DRIVER: Analog buttons
@@ -201,10 +249,18 @@ uint8_t lcd_pointerx=0, lcd_pointery=0;
 #define BUTTON_BCK				1
 #define BUTTON_FWD				4
 #define BUTTON_RANGE_SHRINKER	0
-#define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
 uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
 uint8_t buttonReverse=0;
 #endif						// EOF BUTTONS DEFINITIONS
+
+
+#ifdef CADI_MB
+#define JDR_BUTTONS	ADC1->JDR1		// continuous ADC channel for buttons
+#endif
+
+#ifndef CADI_MB
+#define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
+#endif
 
 
 
@@ -327,8 +383,10 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 #define COMM_GET_SETTINGS		49
 #define COMM_SET_SETTINGS		50
 #define COMM_DIRECT_DRIVE		51
-#define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
-#define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
+
+// two following defines moved to eeprom.h
+//#define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
+//#define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
 
 #define WATER_TANK_TOP			0x0622
 #define WATER_TANK_BOTTOM		0x0632
@@ -482,6 +540,13 @@ static void valve_status_updater(void);
 void bluetooth_init(void);
 void display_usart_rx(void);
 
+
+void device_open_valve(uint8_t device_id);						// wrapper for open_valve()
+void device_close_valve(uint8_t device_id);						// wrapper for close_valve()
+void device_plug_state_set(uint8_t device_id, uint8_t state);	// wrapper for  plugStateSet()
+void device_enable_dosing_pump(uint8_t device_id, uint8_t state);	// wrapper for enable_dosing_pump()
+
+
 void open_valve(uint8_t valveId);
 void close_valve(uint8_t valveId);
 void run_valve_motor(uint8_t valveId);
@@ -509,6 +574,24 @@ void Lcd_write_8b(uint8_t tmp);
 void run_uart_cmd(void);
 void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount);
+void send_packet();
+
+
+void device_open_valve(uint8_t device_id){
+	open_valve(device_id-20);
+}
+
+void device_close_valve(uint8_t device_id){
+	close_valve(device_id-20);
+}
+
+void device_plug_state_set(uint8_t device_id, uint8_t state){
+	plugStateSet(device_id, state);
+}
+
+void device_enable_dosing_pump(uint8_t device_id, uint8_t state){
+	enable_dosing_pump(device_id-10, state);
+}
 
 
 void Lcd_write_8b(uint8_t tmp) {
@@ -807,11 +890,17 @@ void USART1_IRQHandler(void)
 	}
 	if (USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET) {
 //			RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
-			RxByte = USART_ReceiveData(BT_USART);
-			RxBuffer[RxCounter++] = RxByte;
-			USART1->SR &= ~USART_FLAG_RXNE;
+			RxByte = USART_ReceiveData(BT_USART);	// get byte from Data Register
+			RxBuffer[RxCounter++] = RxByte;			// write it into RxBuffer
+			USART1->SR &= ~USART_FLAG_RXNE;			// clear Rx Not Empty flag
 	}
 	BT_USART->SR &= ~USART_SR_TC;
+
+	// sending packet in case of Tx Not Empty flag is set and buffer not sent completely yet
+	if (txbuff_ne && TxCounter<NbrOfDataToTransfer) {
+		USART1->DR = TxBuffer[TxCounter++];	// write TxBuff byte into Data Register for sending
+		USART1->SR &= ~USART_SR_TC;		// clear Transfer Complete flag
+	}
 
 	if (packet_ready==0) {
 		if (rxm_state==RXM_CMD) {
@@ -858,10 +947,23 @@ void USART1_IRQHandler(void)
 static void uart_task(void *pvParameters){
 	while (1) {
 		if (packet_ready==1) {
-			run_uart_cmd();
+			run_uart_cmd();	// when
 			packet_ready=0;
 		}
 		vTaskDelay(10);
+		if (txbuff_ne==1) {	// if TxBuff is not empty (flag set by, for example, get_settings_block())
+			send_packet();	// send packet from TxBuff
+			txbuff_ne=0;	// packet sent, reset tx not empty flag
+		}
+		vTaskDelay(10);
+	}
+}
+
+void send_packet(){
+	NbrOfDataToTransfer = TxBuffer[3];	// packet size
+	TxCounter=0;						// reset tx buffer pointer
+	while (TxCounter<NbrOfDataToTransfer){
+		vTaskDelay(5);
 	}
 }
 
@@ -892,9 +994,31 @@ void run_uart_cmd(void){
 		case 5:
 			close_valve(cmdbuf[2]);
 			break;
+		case 6:
+			get_settings_block(cmdbuf[2]);
+			break;
 	}
 	rx_flush();
+}
 
+void get_settings_block(block_number){
+	/* block_number is a number from 0 to N, where N is a
+	 * Settings memory array length / 8
+	 * 8 - is a default block size for this function
+	 */
+	uint8_t i=0;
+	uint16_t addr = 0;
+	TxBuffer[0] = "Z";
+	TxBuffer[1] = "X";
+	TxBuffer[2] = "0";	// sending settings
+	TxBuffer[3] = 13;	// packet size (ZX0+packet_size+payload). Payload is 8bytes
+	TxBuffer[4] = block_number;
+	for (i=0; i<4; i++) {
+		// here goes EEPROM reading loop, that puts payload data into TX buff, equipped with appropriate packet header
+		addr = SETTINGS_START_ADDR+block_number*4+i*2;	// address for
+		EE_ReadVariable(addr, &TxBuffer[5+i*2]);
+	}
+	txbuff_ne=1;
 }
 
 /* void onPacketType(uint8_t b) {
@@ -1101,7 +1225,9 @@ void StartDMAChannel4(unsigned int LengthBufer)
 
 
 void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control output
-	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+
+#ifndef CADI_MB
+			GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
 	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF13;
@@ -1110,6 +1236,23 @@ void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control o
 	     GPIOA->CRH   |= GPIO_CRH_MODE12_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF11;
 	     GPIOA->CRH   |= GPIO_CRH_MODE11_0;
+#endif
+
+#ifdef CADI_MB
+	 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	 //	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+	 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+	 	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
+	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF13;
+	     GPIOA->CRH   |= GPIO_CRH_MODE13_0;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF12;
+	     GPIOA->CRH   |= GPIO_CRH_MODE12_0;
+		 GPIOA->CRH      &= ~GPIO_CRH_CNF11;
+	     GPIOA->CRH   |= GPIO_CRH_MODE11_0;
+
+#endif
 }
 
 void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
@@ -4828,7 +4971,7 @@ void displayClock(void *pvParameters)
 //    		}
 
 	    	vTaskDelay(10);
-//	    	setPwmDc(20);
+
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
 	    	LCDLine1[0]= (DateTime.day / 10) + 48;
@@ -4901,8 +5044,11 @@ void displayClock(void *pvParameters)
 	    	}
 	    	// USART_SendData(BT_USART, 50);
 //	    	USART1->DR=55;
+
+
 	    	vTaskDelay(10);
 	    }
+
 
 
 
@@ -5122,7 +5268,7 @@ void setDutyCycle(void){
 
 int main(void)
 {
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 	SystemInit();
 #ifdef USE_VALVES
 	valve_motor_control_init();
@@ -5130,14 +5276,25 @@ int main(void)
 	stop_valve_motor(1);
 	stop_valve_motor(2);
 	stop_valve_motor(3);
+
+
+/*
+	run_valve_motor(0);
+	run_valve_motor(1);
+	run_valve_motor(2);
+	run_valve_motor(3);
+*/
+
+	uint32_t i;
+	for (i=0; i<4000000; i++) {}
 #endif
 
 //	valve_status_updater();
 	dosing_motor_control_init();
-	enable_dosing_pump(0, 0);
-	enable_dosing_pump(1, 0);
-	enable_dosing_pump(2, 0);
-	enable_dosing_pump(3, 0);
+//	enable_dosing_pump(0, 0);
+//	enable_dosing_pump(1, 0);
+//	enable_dosing_pump(2, 0);
+//	enable_dosing_pump(3, 0);
 //	close_valve(0,1);
 	/* Unlock the Flash Program Erase controller */
 	FLASH_Unlock();
@@ -5149,35 +5306,9 @@ int main(void)
 	int32str(tmp, &value); */
 	AdcInit();
 	dht_init();
-	uint32_t i;
-	for (i=0; i<40000; i++) {}
-	Init_lcd();
+//	Init_lcd();
 
-	water_level_input_init();
-
-
-
-#ifdef USE_VALVES
-	valve_feedback_init();
-#endif
-
-#ifndef PAPA_EDITION
-	sonar_init();
-#endif
-
-	bluetooth_init();
-
-	buttonCalibration();
-	Lcd_clear();
-
-
-
-	prvSetupHardware();		// setup gpio for load triggering and led indication
-// reinit valves HARDCODE
-#ifdef USE_VALVES
-
-
-#endif
+//	water_level_input_init();
 
 	RtcInit();		//init real time clock
 
@@ -5187,6 +5318,34 @@ int main(void)
 		no_sd = f_mount(0, &fs);
 		no_sd = string2log("System started\n", 15);
 	}
+
+#ifdef USE_VALVES
+//	valve_feedback_init();
+#endif
+
+#ifndef PAPA_EDITION
+	sonar_init();
+#endif
+
+	prvSetupHardware();
+
+	bluetooth_init();
+	Init_lcd();
+
+
+
+
+	buttonCalibration();
+
+	Lcd_clear();
+
+		// setup gpio for load triggering and led indication
+// reinit valves HARDCODE
+#ifdef USE_VALVES
+
+
+#endif
+
 
 
 	Lcd_clear();
@@ -5485,17 +5644,6 @@ void loadSettings(void){	// function loads the predefined data
 	readButtonRanges();
 }
 
-void set4highBits(uint8_t dta){		// setting higher 4 bits of word on corresponding GPIO pins
-	if (dta&16) lcd_port_data->BSRRL |= (pin_d4);
-	else lcd_port_data->BSRRH |= (pin_d4);
-	if (dta&32) lcd_port_data->BSRRL |= (pin_d5);
-	else lcd_port_data->BSRRH |= (pin_d5);
-	if (dta&64) lcd_port_data->BSRRL |= (pin_d6);
-	else lcd_port_data->BSRRH |= (pin_d6);
-	if (dta&128) lcd_port_data->BSRRL |= (pin_d7);
-	else lcd_port_data->BSRRH |= (pin_d7);
-}
-
 
 void Lcd_write_str(char *STRING)
 {
@@ -5525,7 +5673,41 @@ void Lcd_goto(uc8 x,uc8 y)
 	lcd_pointery = x;
 }
 
+
+// Cadi mainboard LCD Init
 void Init_pin_out()
+{
+	// Cadi MB pins for LCD are following:
+	// data: PA15, PC10, PC11, PC12
+	// cmd: PD2, PB3, PB4
+
+
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE);
+//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+	GPIO_InitTypeDef init_pin;
+	init_pin.GPIO_Pin  = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOC, &init_pin);
+	init_pin.GPIO_Pin  = GPIO_Pin_15;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &init_pin);
+	init_pin.GPIO_Pin  = GPIO_Pin_3 | GPIO_Pin_4;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOB, &init_pin);
+	init_pin.GPIO_Pin  = GPIO_Pin_2;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOD, &init_pin);
+}
+
+
+void Init_pin_out_bak()
 {
 	RCC_APB2PeriphClockCmd(lcd_init_port_data | lcd_init_port_cmd, ENABLE);
 	GPIO_InitTypeDef init_pin;
@@ -5583,16 +5765,84 @@ void Lcd_write_data(uint8_t data)
 	Delay_us(6);
 }
 
-void set4lowBits(uint8_t dta){
-	if (dta&1) lcd_port_data->BSRRL |= (pin_d4);
-	else lcd_port_data->BSRRH |= (pin_d4);
-	if (dta&2) lcd_port_data->BSRRL |= (pin_d5);
-	else lcd_port_data->BSRRH |= (pin_d5);
-	if (dta&4) lcd_port_data->BSRRL |= (pin_d6);
-	else lcd_port_data->BSRRH |= (pin_d6);
-	if (dta&8) lcd_port_data->BSRRL |= (pin_d7);
-	else lcd_port_data->BSRRH |= (pin_d7);
+void set4highBits(uint8_t dta){		// setting higher 4 bits of word on corresponding GPIO pins
+/*	if (dta&16) {
+		d4_0;
+	}
+	else {
+		d4_1;
+	}
+	if (dta&32) {
+		d5_0;
+	}
+	else {
+		d5_1;
+	}
+	if (dta&64) {
+		d6_0;
+	}
+	else {
+		d6_1;
+	}
+	if (dta&128) {
+		d7_0;
+	}
+	else {
+		d7_1;
+	} */
 
+	if (dta&16) {
+		d4_1;
+	}
+	else {
+		d4_0;
+	}
+	if (dta&32) {
+		d5_1;
+	}
+	else {
+		d5_0;
+	}
+	if (dta&64) {
+		d6_1;
+	}
+	else {
+		d6_0;
+	}
+	if (dta&128) {
+		d7_1;
+	}
+	else {
+		d7_0;
+	}
+}
+
+
+void set4lowBits(uint8_t dta){
+	if (dta&1) {
+		d4_1;
+	}
+	else {
+		d4_0;
+	}
+	if (dta&2) {
+		d5_1;
+	}
+	else {
+		d5_0;
+	}
+	if (dta&4) {
+		d6_1;
+	}
+	else {
+		d6_0;
+	}
+	if (dta&8) {
+		d7_1;
+	}
+	else {
+		d7_0;
+	}
 }
 
 void Init_lcd()
@@ -5625,7 +5875,7 @@ void Init_lcd()
 
 
 
-//		  Lcd_write_str("12345678");
+		  Lcd_write_str("12345678");
 
 
 	  	Delay_us(10);

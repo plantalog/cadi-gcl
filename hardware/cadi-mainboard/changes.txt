@@ -1,0 +1,3 @@
+The file cadi_pcb_140210_polygoned_kamitra.rar contains layout for the Cadi mainboard PCB and has following known issues:
+- T8 gate pad interconnected with other pad of this MOSFET
+- SV5 should be .1" in X axis (just a bit left) closer to SV2

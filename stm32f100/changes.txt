@@ -1,3 +1,7 @@
+v2 beta
+- changed pinout according Cadi main board layout (HARDWARE/CADI-MAINBOARD/cadi_pcb_140210_polygoned_kamitra.rar)
+- changed some LCD functions to init and drive LCD properly
+
 v1.7
 - implemented packet communication protocol for remote function calls
 	uart_task to process packets and it's functions
