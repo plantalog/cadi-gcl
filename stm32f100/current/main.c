@@ -110,6 +110,7 @@ uint8_t logstr_crc=0;
 
 
 // DRIVER: Digital Temperature and Humidity sensor DHT22
+
 #define USE_DHT
 #ifdef USE_DHT			// START DHT DEFINITIONS
 #define DHT_TRIG_PLUG			15		// PB15
@@ -125,14 +126,18 @@ typedef struct
 __IO uint16_t IC2Value = 0;
 __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
+uint8_t dht_shifter=DHT_DATA_START_POINTER;
 TIM_ICInitTypeDef  TIM_ICInitStructure;
 // digital humidity and temperature data
-uint8_t dht_bit_array[50];
+//uint8_t dht_bit_array[50];
 DHT_data DHTValue;
 uint8_t		dht_data[5];
+uint8_t		dht_data2[5];
 uint8_t dht_bit_position = 0;
 uint8_t dht_bit_ready = 0;
 uint8_t		dht_data_ready = 0;
+uint8_t  dht_byte_pointer;
+uint8_t  dht_bit_pointer;
 uint8_t 	dht_rh_str[4], dht_t_str[4];
 uint16_t	capture1=0, capture2=0;
 volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
@@ -248,7 +253,7 @@ uint8_t lcd_pointerx=0, lcd_pointery=0;
 #define BUTTON_CNL				3
 #define BUTTON_BCK				1
 #define BUTTON_FWD				4
-#define BUTTON_RANGE_SHRINKER	0
+#define BUTTON_RANGE_SHRINKER	30
 uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
 uint8_t buttonReverse=0;
 #endif						// EOF BUTTONS DEFINITIONS
@@ -256,9 +261,11 @@ uint8_t buttonReverse=0;
 
 #ifdef CADI_MB
 #define JDR_BUTTONS	ADC1->JDR1		// continuous ADC channel for buttons
+#define ADC_AVG_BUTTONS		0	// N=ADC_AVG_BUTTONS, for adcAverage[N]
 #endif
 
 #ifndef CADI_MB
+#define ADC_AVG_BUTTONS		3
 #define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
 #endif
 
@@ -298,9 +305,9 @@ uint32_t timerStateFlags, cTimerStateFlags;
 #define PLUG_DISABLE	GPIOC->BSRR
 #define PLUG_ENABLE		GPIOC->BRR
 #define	PLUG_INVERT		0		// enable reverse plugStateSet
-#define PLUG_AMOUNT		3
+#define PLUG_AMOUNT		4
 uint32_t plugStateFlags;
-uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs HARDCODE
+uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plugs HARDCODE
 // elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
 // 0 element - pervyj plug, 1 element - plug no 2, etc
 #endif						// EOF LOADS DEFINITIONS
@@ -390,9 +397,12 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 
 #define WATER_TANK_TOP			0x0622
 #define WATER_TANK_BOTTOM		0x0632
-
 #define WFM_CAL_OFFSET			0x0642
 
+#define PSI_SENSOR_0PSI			0x0643
+#define PSI_SENSOR_32PSI		0x0644
+#define PSI_SENSOR_TOP			0x0645
+#define PSI_SENSOR_BTM			0x0646
 
 #define DAY						1
 #define NIGHT					0
@@ -406,6 +416,12 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2};	// PLUG_AMOUNT - number of plugs 
 // analog inputs
 #define JDR_EC		ADC1->JDR3		// continuous ADC channel for EC
 #define JDR_PH		ADC1->JDR2		// continuous ADC channel for pH
+#define JDR_PSI		ADC1->JDR3		// pressure sensor
+#define JDR_BUFFER_SIZE 10
+
+#define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
+#define AVG_ADC_PH		2			// adcAverage[2]
+#define AVG_ADC_PSI		3			// adcAverage[3]
 
 
 uint16_t tank_windows_top[1];
@@ -418,18 +434,21 @@ char log_str[64];
 uint8_t circulationPumpId;
 ErrorStatus  HSEStartUpStatus;
 FLASH_Status FlashStatus;
-uint16_t VarValue = 0;
 uint16_t ph_seven=0;
 uint32_t ph0=0;
 uint16_t ph4=0;
 uint16_t ec1413 = 0, ec0 = 0;
 int cdel=0;
-uint16_t phBuffer[10];
-uint16_t ecBuffer[10];
+
+uint16_t adcAverage[4];
+uint16_t jdrBuff1[JDR_BUFFER_SIZE];
+uint16_t jdrBuff2[JDR_BUFFER_SIZE];
+uint16_t jdrBuff3[JDR_BUFFER_SIZE];
+uint16_t jdrBuff4[JDR_BUFFER_SIZE];
 uint8_t curphstr[5];
 uint8_t curecstr[5];
-uint16_t phAdcValue;
-uint16_t ecAdcValue;
+
+//uint16_t ecAdcValue;
 uint8_t currentEc=0;
 uint8_t currentPh=0;
 uint8_t phUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 - over window
@@ -437,14 +456,33 @@ uint8_t ecUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 -
 uint16_t phWindowTop, phWindowBottom;
 uint16_t ecWindowTop, ecWindowBottom;
 uint32_t lastWriteTime=0;
-uint8_t lightSensor;
-uint16_t lightRange;
 uint8_t wpStateFlags;
 uint8_t dosingPumpStateFlags;
 uint8_t waterSensorStateFlags;
-uint8_t wsl_buff[3];
+// uint8_t wsl_buff[3];
 uint8_t curculationPumpId;
 uint16_t wfCalArray[WFM_AMOUNT];
+
+
+#define STATE_NOTHING					0
+#define STATE_CONFIGURATION_PAYLOAD		1
+#define STATE_CONFIGURATION_CRC			2
+#define STATE_COMMAND_TYPE				3
+#define STATE_COMMAND_PAYLOAD			4
+#define STATE_COMMAND_CRC				5
+
+
+#define RXM_NONE						0
+#define RXM_CMD							4
+#define RXM_SET							3
+uint8_t cmdbuf[10];		// command packet buffer
+uint8_t cmdbufp=0;		// pointer
+uint8_t prefixDetectionIdx=0;
+uint8_t pb_pntr=0;			// packet buffer pointer
+uint8_t packet_length=0;
+uint8_t rxm_state=0;
+uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
+
 
 void hygroStatSettings(void);
 uint8_t readPercentVal(uint8_t value);
@@ -510,7 +548,7 @@ void dht_arr_displayer(void);
 void setPwmDc(uint8_t duty_cycle);
 void setDutyCycle(void);
 void displayAdcValues(void);
-uint16_t get_average_adc(uint8_t amount);
+// uint16_t get_average_adc(uint8_t amount);
 void EXTI0_IRQHandler(void);
 void EXTI1_IRQHandler(void);
 
@@ -575,6 +613,8 @@ void run_uart_cmd(void);
 void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void send_packet();
+void setTimerSelector(void);
+uint8_t idSelector(uint8_t min, uint8_t max);
 
 
 void device_open_valve(uint8_t device_id){
@@ -686,7 +726,7 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 
 void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
 {
-	uint8_t button=0;
+//	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<ticks) {
@@ -863,24 +903,7 @@ void comm_manager(void){
 	comm_state=comm_state;
 }
 
-#define STATE_NOTHING					0
-#define STATE_CONFIGURATION_PAYLOAD		1
-#define STATE_CONFIGURATION_CRC			2
-#define STATE_COMMAND_TYPE				3
-#define STATE_COMMAND_PAYLOAD			4
-#define STATE_COMMAND_CRC				5
 
-
-#define RXM_NONE						0
-#define RXM_CMD							4
-#define RXM_SET							3
-uint8_t cmdbuf[10];		// command packet buffer
-uint8_t cmdbufp=0;		// pointer
-uint8_t prefixDetectionIdx=0;
-uint8_t pb_pntr=0;			// packet buffer pointer
-uint8_t packet_length=0;
-uint8_t rxm_state=0;
-uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
 
 void USART1_IRQHandler(void)
 {
@@ -1048,66 +1071,15 @@ void onPayloadByte(uint8_t b, uint8_t nextState) {
 
 void DMA1_Channel4_IRQHandler (void)
 {
-  if(DMA1->ISR & DMA_ISR_TCIF4) { }  
-//  if(DMA1->ISR & DMA_ISR_HTIF4) { }      //
-
-
-//  if(DMA1->ISR & DMA_ISR_TEIF4) { }      
+  if(DMA1->ISR & DMA_ISR_TCIF4) { }
 }
 
 void DMA1_Channel5_IRQHandler (void)
 {
 
  if(DMA1->ISR & DMA_ISR_TCIF5) { }
-// if(DMA1->ISR & DMA_ISR_HTIF5) { }
-// if(DMA1->ISR & DMA_ISR_TEIF5) { }
 }
 
-#ifdef KOSTYLI_MODE
-void bluetooth_init(void){
-	NVIC_InitTypeDef NVIC_InitStructure;
-	GPIO_InitTypeDef GPIO_InitStructure;
-
-
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
-
-    // Tx on PA9 as alternate function push-pull
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-  /* Rx on PA10 as input floating */
-    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);
-
-
-  USART_InitTypeDef USART_InitStructure;
-
-  // USART 1 init
-  USART_DeInit(USART1);
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-
-  USART_InitStructure.USART_BaudRate = 9600;
-  USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-  USART_InitStructure.USART_StopBits = USART_StopBits_1;
-  USART_InitStructure.USART_Parity = USART_Parity_No;
-  USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-  USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
-  USART_Init(USART1, &USART_InitStructure);
-
-  USART_ClearFlag(USART1, USART_FLAG_CTS | USART_FLAG_LBD  |
-                        USART_FLAG_TC  | USART_FLAG_RXNE
-                );
-
-  USART_Cmd(USART1, ENABLE);
-
-}
-
-#endif
-
-#ifndef KOSTYLI_MODE
 void bluetooth_init(void){
 	NVIC_InitTypeDef NVIC_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -1132,28 +1104,6 @@ void bluetooth_init(void){
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
     GPIO_Init(GPIOA, &GPIO_InitStructure);
 
-/*
-    // DMA USART1 setup
-    DMA_InitTypeDef DMA_InitStructure;
-
-    // USARTy_Tx_DMA_Channel (triggered by USARTy Tx event) Config
-    DMA_DeInit(USARTy_Tx_DMA_Channel);
-    DMA_InitStructure.DMA_PeripheralBaseAddr = USARTy_DR_Base;
-    DMA_InitStructure.DMA_MemoryBaseAddr = (uint32_t)TxBuffer1;
-    DMA_InitStructure.DMA_DIR = DMA_DIR_PeripheralDST;
-    DMA_InitStructure.DMA_BufferSize = TxBufferSize1;
-    DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-    DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
-    DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Byte;
-    DMA_InitStructure.DMA_MemoryDataSize = DMA_MemoryDataSize_Byte;
-    DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
-    DMA_InitStructure.DMA_Priority = DMA_Priority_VeryHigh;
-    DMA_InitStructure.DMA_M2M = DMA_M2M_Disable;
-    DMA_Init(USARTy_Tx_DMA_Channel, &DMA_InitStructure);
-*/
-
-
-
   USART_InitTypeDef USART_InitStructure;
 
   // USART 1 init
@@ -1174,37 +1124,10 @@ void bluetooth_init(void){
   USART1->CR1  |= USART_CR1_RXNEIE;
   USART1->CR1  |= USART_CR1_TCIE;
   USART_Cmd(USART1, ENABLE);
-  NVIC_EnableIRQ(USART1_IRQn);     
-/*
-  
-  if ((RCC->AHBENR & RCC_AHBENR_DMA1EN) != RCC_AHBENR_DMA1EN)
-  RCC->AHBENR |= RCC_AHBENR_DMA1EN;
-  // set source and target addresses and data amount to be transferred
-  DMA1_Channel4->CPAR  =  (uint32_t)&USART1->DR;   // USART data adress
-  DMA1_Channel4->CMAR  =  (uint32_t)&log_str[0];   // memory address
-  DMA1_Channel4->CNDTR =  64;                      // data amount
-
-  DMA1_Channel4->CCR   =  0;                       //reset config register
-  DMA1_Channel4->CCR   = ~DMA_CCR4_CIRC;           //disable cyclic mode
-  DMA1_Channel4->CCR  |=  DMA_CCR4_DIR;            //direction: read FROM memory
-  
-  DMA1_Channel4->CCR   = ~DMA_CCR4_PSIZE;          //data size 8 bit
-  DMA1_Channel4->CCR   = ~DMA_CCR4_PINC;           //do not use increment of pointer
-  
-  DMA1_Channel4->CCR   = ~DMA_CCR4_MSIZE;          //data size 8 bit
-  DMA1_Channel4->CCR  |=  DMA_CCR4_MINC;           //use pointer increment
-  USART1->CR3 |= USART_CR3_DMAT;                    //enable transfer USART1 through DMA */
-//  USART1->CR3 |= USART_CR3_DMAR;                    //enable receiving USART1 via DMA
-
-/*  // Enable USARTy DMA TX Channel
-  DMA_Cmd(USARTy_Tx_DMA_Channel, ENABLE);
-
-  // Enable USARTz DMA TX Channel
-  DMA_Cmd(USARTz_Tx_DMA_Channel, ENABLE); */
-
+  NVIC_EnableIRQ(USART1_IRQn);
 }
 
-#endif
+
 
 unsigned char GetStateDMAChannel4(void)
 {
@@ -1273,50 +1196,13 @@ void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
 //	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
-/*
-	  // Enable AFIO clock
-//	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
-	  // Connect EXTI10 Line to PC10 pin
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource5);
 
-	  // Configure EXTI5 line
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line5;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Configure EXTI6 line
-
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource6);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line6;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Configure EXTI12 line
-
-	  GPIO_EXTILineConfig(VALVE_SENSOR_PORT_SOURCE, GPIO_PinSource7);
-	  EXTI_InitStructure.EXTI_Line = EXTI_Line7;
-	  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
-	  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising_Falling;
-	  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
-	  EXTI_Init(&EXTI_InitStructure);
-
-	  // Enable and set EXTI15_10 Interrupt to the lowest priority
-	  NVIC_InitStructure.NVIC_IRQChannel = EXTI9_5_IRQn;
-	  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
-	  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
-	  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-
-	  NVIC_Init(&NVIC_InitStructure); */
 }
 
 
 
 void water_level_input_init(void){
-#ifdef WFM_PINS_PB0_1
+#ifdef WFM_PINS_PB0_1			// Configuring PINs for Water Flow Meters
 		GPIO_InitTypeDef GPIO_InitStructure;
 		EXTI_InitTypeDef EXTI_InitStructure;
 		NVIC_InitTypeDef NVIC_InitStructure;
@@ -1366,9 +1252,6 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 	  TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
 	  TIM_OCInitTypeDef TIM_OCInitStruct;
 
-//	  volatile int i;
-//	  int n = 1;
-//	    int brightness = 0;
 
 	    RCC_APB2PeriphClockCmd(
 	            RCC_APB2Periph_GPIOC |
@@ -1408,37 +1291,6 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 
 	    TIM_Cmd( TIM3, ENABLE );
 }
-
-/*
-uint8_t get_wsl(uint8_t wsId){
-	uint8_t i=0, tmp=0;
-	for (i=0; i<8; i++){
-		tmp = tmp + (wsl_buff[wsId]>>i)&1;
-	}
-	if (wsl_buff[wsId]>8) {
-		return 1;
-	}
-	else {
-		return 0;
-	}
-}
-*/
-
-void waterSensorStateTrigger(void){
-	uint8_t i=0;
-	for (i=0; i<2; i++) {
-		wsl_buff[i]=wsl_buff[i]<<1;
-		wsl_buff[i] = wsl_buff[i] + (((GPIOB->IDR)>>i)&1);
-
-		if (wsl_buff[i]>8) {
-			waterSensorStateFlags |= (1<<i);	// set flag
-		}
-		else {
-			waterSensorStateFlags &= ~(1<<i);	//reset flag
-		}
-	}
-}
-
 
 
 void tankLevelStabSetup(void){
@@ -1552,42 +1404,11 @@ void close_valve(uint8_t valveId){
 
 
 
-// updates valve_state variable
-/*
-void valve_status_updater(void){
-#ifdef USE_VALVES
-	uint8_t i=0;
-
-		for (i=0; i<(VALVE_AMOUNT); i++) {
-			vTaskDelay(5);
-			if (((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+i) & 1) {
-				valve_state |= (1<<i);	// set flag
-			}
-			else {
-				valve_state &= ~(1<<i);	//reset flag
-			}
-		}
-		vTaskDelay(10);
-
-
-#endif
-}
-*/
-
 void run_valve_motor(uint8_t valveId){
-
-//	void setPwmDc(uint8_t duty_cycle){		// duty_cycle in %
-//	TIM3->CCR3 = duty_cycle*10;
-//	TIM3->CCR4 = 1000 - duty_cycle*10;
 	VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-//	}
-//	setPwmDc(0);
-//	VALVE_MOTOR_PORT->BSRR |= (1<<valveId);
-//	GPIOC->BSRR= GPIO_BSRR_BS9;
 }
 
 void stop_valve_motor(uint8_t valveId){
-//	setPwmDc(100);
 	VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 }
 
@@ -1610,7 +1431,6 @@ void EXTI1_IRQHandler(void) {
 
 void EXTI2_IRQHandler(void) {
 	EXTI_ClearITPendingBit(EXTI_Line2);
-//	water_counter++;
 
 }
 
@@ -1620,7 +1440,6 @@ void EXTI15_10_IRQHandler(void)
 	EXTI_ClearITPendingBit(EXTI_Line10);
 	EXTI_ClearITPendingBit(EXTI_Line11);
 	EXTI_ClearITPendingBit(EXTI_Line12);
-//    valve_status_updater();
 }
 
 void EXTI9_5_IRQHandler(void)
@@ -1629,16 +1448,12 @@ void EXTI9_5_IRQHandler(void)
 	EXTI_ClearITPendingBit(EXTI_Line5);
 	EXTI_ClearITPendingBit(EXTI_Line6);
 	EXTI_ClearITPendingBit(EXTI_Line7);
-//    valve_status_updater();
 }
 
 void valve_test2(void){
 	uint8_t button=0, curvalve=0, i=0;
 	Lcd_clear();
-#ifdef USE_VALVES
 
-	//Lcd_write_str("Open/close valve");
-#endif
 	while (button!=BUTTON_OK) {
 		vTaskDelay(20);
 		button=readButtons();
@@ -1646,13 +1461,6 @@ void valve_test2(void){
 		Lcd_goto(0,0);
 		Lcd_write_str("curvalve:");
 		Lcd_write_digit(curvalve);
-/*		tmp=water_counter[0];
-		Lcd_write_16b(tmp);
-
-		tmp=sonar_read[0];
-//		Lcd_write_digit(tmp/100);
-		Lcd_write_digit(tmp);
-		Lcd_write_str("cm"); */
 
 
 
@@ -1674,12 +1482,6 @@ void valve_test2(void){
 		Lcd_goto(1,0);
 		Lcd_write_str("VF");
 		Lcd_write_digit(valveFlags);
-//		uint16_t val=0;
-/*		val = VALVE_SENSOR_PORT->IDR>>5;
-		Lcd_write_digit(val/10000);
-		Lcd_write_digit(val/100);
-		Lcd_write_digit(val);
-		Lcd_write_str(" "); */
 
 		vTaskDelay(1);
 
@@ -1703,10 +1505,6 @@ void valve_test(void){
 	uint8_t button=0, curState=0, i=0, curvalve=0;
 	uint16_t tmp=0;
 	Lcd_clear();
-#ifdef USE_VALVES
-
-	//Lcd_write_str("Open/close valve");
-#endif
 	while (button!=BUTTON_OK) {
 		vTaskDelay(20);
 		button=readButtons();
@@ -1783,12 +1581,6 @@ void valve_test(void){
 #endif
 
 		Lcd_write_str("W");
-
-//		Lcd_write_digit(wsl_buff[0]/100);
-//		Lcd_write_digit(wsl_buff[0]);
-//		Lcd_write_digit(waterSensorStateFlags);
-//		Lcd_write_digit(GPIOB->IDR/100);
-//		Lcd_write_digit(GPIOB->IDR);
 
 	}
 	Lcd_clear();
@@ -2053,7 +1845,6 @@ void run_watering_program(progId){
 	vTaskDelay(5);
 	// fill the tank
 	open_valve(0);
-//	valveFlags=1;		// open fill valve | HARDCODE
 	while (waterSensorFlag==0 && now<end) {
 		now = RTC_GetCounter();
 		waterSensorFlag=waterSensorStateFlags&(1<<sensorId);	// check if water level reached top sensor
@@ -2061,8 +1852,6 @@ void run_watering_program(progId){
 		vTaskDelay(25);
 	}
 	close_valve(0);
-//	valveFlags=0;
-	//close_valve(0, 0);		// HARDCODE
 	vTaskDelay(1000);
 
 
@@ -2112,39 +1901,18 @@ void run_watering_program(progId){
 		waterSensorFlag=waterSensorStateFlags&(1<<sensorId);	// check if water level reached top sensor
 		waterSensorFlag>>=sensorId;	// ostavit' toka flag
 		i=cTimerStateFlags&1;	// HARDCODE!!! (0)
-//		i>>=0;	// ostavit' toka flag
 		if ((lastTime<RTC_GetCounter()) && i==1 && waterSensorFlag==1) {
 			now++;
 			lastTime=RTC_GetCounter();
 		}
 		vTaskDelay(5);
-//		if (waterSensorFlag==0) {
-//			now=end;
-//		}
-		// now=RTC_GetCounter();
 		plugStateSet(wateringPlugId, (1&i&waterSensorFlag));
 	}
 	plugStateSet(wateringPlugId, 0);
 	// drain the rest of the tank
-//	addr = WP_OFFSET+progId*WP_SIZE+WP_DRAIN_DURATION_SHIFT;
-//	EE_ReadVariable(addr, &wateringDuration);
-//	now = RTC_GetCounter();
-//	end = now + wateringDuration*10;
-//	valveFlags = 2;	//	open drain valve, while the rest are shut
+
 	vTaskDelay(10);
 	open_valve(DRAIN_VALVE_ID);
-/*	while (now<end) {
-		vTaskDelay(10);
-	}
-	open_valve(0);
-	end = wateringDuration+RTC_GetCounter();
-	while (waterSensorFlag!=1 || now<end) {
-		waterSensorFlag=waterSensorStateFlags&(1<<sensorId);	// check if water level reached top sensor
-		waterSensorFlag>>=sensorId;	// ostavit' toka flag
-		now = RTC_GetCounter();
-		vTaskDelay(25);
-	}
-	close_valve(0,0); */
 
 	addr = WP_OFFSET+progId*WP_SIZE+WP_LAST_RUN_SHIFT;
 	EE_WriteWord(addr, RTC_GetCounter());	// write last run time
@@ -2186,11 +1954,6 @@ void run_circulation_pump(uint16_t time){
 }
 
 void enable_dosing_pump(uint8_t pumpId, uint8_t state){
-//	uint32_t* addr;
-//	addr = &TIM3->CCR1+pumpId*2;		// TIM3->CCR1 Address offset: 0x34. from page 327 of RM0041
-//	*addr = 100*state;
-
-
 	if (state==1) {
 		dosingPumpStateFlags |= (1<<pumpId);
 	}
@@ -2342,10 +2105,28 @@ void TIM3_IRQHandler(void)
     DutyCycle = 0;
     Frequency = 0;
   }
-  // fill one more value of dht bits array
-  dht_bit_array[dht_bit_position]=DutyCycle;
   dht_bit_position++;
 
+	if (dht_bit_position>dht_shifter && dht_data_ready==0) {
+		if (DutyCycle>25 && DutyCycle<35) {
+			dht_data[dht_byte_pointer] &= ~(1<<(dht_bit_pointer--));	// reset bit in dht_data[i]
+		}
+		else {
+			dht_data[dht_byte_pointer] |= (1<<(dht_bit_pointer--)); // set bit
+		}
+		if (dht_bit_pointer==0){
+			dht_bit_pointer=7;
+			dht_byte_pointer++;
+			if (dht_byte_pointer==4) {
+				dht_data_ready=1;
+				dht_byte_pointer = 0;
+				dht_bit_pointer = 7;
+			}
+		}
+		else {
+			// dht_bit_pointer--;
+		}
+	}
 }
 
 void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
@@ -2369,12 +2150,38 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
     DutyCycle = 0;
     Frequency = 0;
   }
+
+
+
   // fill one more value of dht bits array
 //  dht_bit_array[dht_bit_position]=TIM_GetCapture1(TIM15);
-  dht_bit_array[dht_bit_position]=DutyCycle;
-  dht_bit_position++;
-//  dht_bit_array[dht_bit_position]=TIM15->CCR2;
+//  dht_bit_array[dht_bit_position]=DutyCycle;
 //  dht_bit_position++;
+//  dht_bit_array[dht_bit_position]=TIM15->CCR2;
+  dht_bit_position++;		// holds current DHT response bit sequence number
+
+	if (dht_bit_position>dht_shifter && dht_data_ready==0) {
+		if (DutyCycle>25 && DutyCycle<35) {
+			dht_data[dht_byte_pointer] &= ~(1<<(dht_bit_pointer));	// reset bit in dht_data[i]
+		}
+		else {
+			dht_data[dht_byte_pointer] |= (1<<(dht_bit_pointer)); // set bit
+		}
+		if (dht_bit_pointer==0){
+			dht_bit_pointer=7;
+			dht_byte_pointer++;
+			if (dht_byte_pointer==4) {
+				dht_data_ready=1;
+				dht_byte_pointer = 0;
+				dht_bit_pointer = 7;
+//				dht_bit_position = 0;
+			}
+		}
+		else {
+			dht_bit_pointer--;
+		}
+	}
+
 }
 
 
@@ -2404,11 +2211,12 @@ void dht_get_data(void){	// function starts getting data from DHT22 sensor
 //	SONAR1_TIM->EGR |= TIM_EGR_CC1G;
 	vTaskDelay(25);
 	  uint8_t i;
-	  for (i=0;i<50;i++) {
-		dht_bit_array[i]=0;
+	  for (i=0;i<5;i++) {
+		dht_data[i]=0;
 	  }
-	  dht_bit_ready = 0;
+//	  dht_bit_ready = 0;
 	  dht_bit_position = 0;
+	  dht_data_ready=0;
 	  dht_init_out();
 	  DHT_0;
 //	  GPIOA->BRR = (1<<DHT_TRIG_PLUG);		// set 0
@@ -2417,8 +2225,8 @@ void dht_get_data(void){	// function starts getting data from DHT22 sensor
 	  dht_init();
 	  vTaskDelay(200);
 
-	  dht_bit_ready = 1;
-	  dht_bit_position = 0;
+//	  dht_bit_ready = 1;
+//	  dht_bit_position = 0;
 //	  GPIOA->BSRR = (1<<DHT_TRIG_PLUG);	// set 1
 	  vTaskDelay(5);
 	  dht_conv_data();
@@ -2426,31 +2234,11 @@ void dht_get_data(void){	// function starts getting data from DHT22 sensor
 
 void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and strings of T and rH
 	uint8_t i, i2;
-	uint16_t caps1[45];
+//	uint16_t caps1[45];
 //	uint16_t zero_ticks, one_ticks;
 	vTaskDelay(10);
-	if (dht_bit_ready==1) {
-		int dht_buf_pointer=DHT_DATA_START_POINTER;	// points the dht data start bit
-		for (i=0;i<45;i++) {
-			caps1[i]=dht_bit_array[i];
-		}
-		dht_data_ready = 0;
-		for (i=0; i<5; i++){
-			dht_data[i]=0;
-			vTaskDelay(10);
-			for (i2=8; i2>0; i2--) {
-/*				if (caps1[dht_buf_pointer]>25 && caps1[dht_buf_pointer]<35) {
-					dht_data[i] |= (1<<(i2-1)); // set i2 bit in dht_data[i]
-				}
-				*/
-				if (caps1[dht_buf_pointer]>25 && caps1[dht_buf_pointer]<35) {
-				}
-				else {
-					dht_data[i] |= (1<<(i2-1)); // set i2 bit in dht_data[i];
-				}
-				dht_buf_pointer++;
-			}
-		}
+	if (dht_data_ready==1) {
+
 		vTaskDelay(10);
 
 		DHTValue.DHT_Humidity = dht_data[0]*256+dht_data[1];
@@ -2479,7 +2267,7 @@ void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and 
 		dht_rh_str[2] = 46;
 		dht_rh_str[3] = (DHTValue.DHT_Humidity%10)+48;
 
-		dht_data_ready = 1;
+		dht_data_ready = 0;
 	}
 }
 
@@ -2493,25 +2281,15 @@ void dht_arr_displayer(void){
 #ifdef TEST_MODE
 		button=readButtons();
 		Lcd_goto(0,0);
-		Lcd_write_digit(arr_pointer);
+		Lcd_write_digit(dht_shifter);
 		Lcd_write_str(": ");
-		Lcd_write_digit(dht_bit_array[arr_pointer]/100);
-		Lcd_write_digit(dht_bit_array[arr_pointer]);
+//		Lcd_write_digit(dht_data[arr_pointer]/100);
+//		Lcd_write_digit(dht_bit_array[arr_pointer]);
 		if (button==BUTTON_FWD) {
-			if (arr_pointer==255) {
-				arr_pointer==0;
-			}
-			else {
-				arr_pointer++;
-			}
+			dht_shifter++;
 		}
 		if (button==BUTTON_BCK){
-			if (arr_pointer==0) {
-				arr_pointer==255;
-			}
-			else {
-				arr_pointer--;
-			}
+			dht_shifter--;
 		}
 #endif
 
@@ -2843,7 +2621,7 @@ const char menuItemArray[MENURECS][18]=
 const int fatArray[MENURECS][7]=
 {
 		{0,	0,	33,	1,	1,	0,	1},
-		{1,	1,	0,	5,	2,	1,	0},
+		{1,	1,	0,	5,	2,	1,	1},
 		{2,	2,	4,	3,	2,	1,	1},
 		{3,	3,	2,	4,	3,	1,	1},
 		{4,	4,	3,	2,	4,	1,	1},
@@ -2859,7 +2637,6 @@ const int fatArray[MENURECS][7]=
 		{14,14,	10,	17,	15,	14,	0},
 		{15,15,	16,	16,	15,	14,	1},
 		{16,16,	15,	15,	16,	14,	1},
-
 		{17,17,	14,	20,	18,	17,	0},
 		{18,18,	19,	19,	23,	17,	1},	// ec calibration
 		{19,19,	18,	18,	24,	17,	1},	// ec stab settings
@@ -2892,9 +2669,9 @@ const char menuItemArray[MENURECS][18]=
 {
 		{"MONITOR MODE"},		// 0
 		{"TIMERS"},				// 1
-		{"Timer 1"},			// 2
-		{"Timer 2"},			// 3
-		{"Timer 3"},			// 4
+		{"Tests"},	    		// 2
+		{"Plug test"},			// 3
+		{"PSI sensor cal."},			// 4
 		{"SET CLOCK"},			// 5
 		{"CYCLIC TIMERS"},			// 6
 		{"C Timer 1"},			// 7
@@ -2933,16 +2710,16 @@ const char menuItemArray[MENURECS][18]=
 const int fatArray[MENURECS][7]=
 {
 		{0,	0,	33,	1,	1,	0,	1},
-		{1,	1,	0,	5,	2,	1,	0},
-		{2,	2,	4,	3,	2,	1,	1},
-		{3,	3,	2,	4,	3,	1,	1},
-		{4,	4,	3,	2,	4,	1,	1},
+		{1,	1,	0,	2,	2,	1,	1},
+		{2,	2,	1,	5,	3,	2,	0},
+		{3,	3,	4,	4,	3,	1,	1},
+		{4,	4,	3,	3,	4,	1,	1},
 		{5,	5,	1,	6,	5,	5,	1},
 		{6,	6,	5,	10,	7,	6,	0},
 		{7,	7,	9,	8,	6,	6,	1},
 		{8,	8,	7,	9,	7,	6,	1},
 		{9,	9,	8,	7,	8,	6,	1},
-		{10,10,	6,	14,	11,	10,	0},
+		{10,10,	6,	14,	9,	10,	1},
 		{11,11,	13,	12,	9,	10,	1},
 		{12,12,	11,	13,	10,	10,	1},
 		{13,13,	12,	11,	11,	10,	1},
@@ -3043,14 +2820,14 @@ void Delay_us(uint32_t delay){
 	uint32_t del=delay*250; while (del--){}
 }
 
-uint16_t get_average_adc(uint8_t amount){
+/* uint16_t get_average_adc(uint8_t amount){
 	uint8_t i=0;
 	uint32_t sum = 0;
 	for (i=0; i<amount; i++) {
 		sum += JDR_BUTTONS;
 	}
 	return sum/amount;
-}
+} */
 
 void buttonCalibration(void){	// buttons calibration function
 	uint16_t button_val[4], diff;
@@ -3058,23 +2835,28 @@ void buttonCalibration(void){	// buttons calibration function
 	Lcd_goto(0,0);
 	Lcd_write_arr("<", 1);
 	Delay_us(30000);
+	adcAverager();
 	Delay_us(100);
-	button_val[0] = get_average_adc(10);
+//	uint16_t adcAverage[4];
+	button_val[0] = adcAverage[ADC_AVG_BUTTONS];
 	Lcd_goto(0,0);
 	Lcd_write_arr("OK", 2);
 	Delay_us(30000);
+	adcAverager();
 	Delay_us(100);
-	button_val[1] = get_average_adc(10);
+	button_val[1] = adcAverage[ADC_AVG_BUTTONS];
 	Lcd_goto(0,0);
 	Lcd_write_arr("CANCEL", 6);
 	Delay_us(30000);
+	adcAverager();
 	Delay_us(100);
-	button_val[2] = get_average_adc(10);
+	button_val[2] = adcAverage[ADC_AVG_BUTTONS];
 	Lcd_clear();
 	Lcd_write_arr(">", 1);
 	Delay_us(30000);
+	adcAverager();
 	Delay_us(100);
-	button_val[3] = get_average_adc(10);
+	button_val[3] = adcAverage[ADC_AVG_BUTTONS];
 
 	if ((button_val[3]>>3)<(button_val[0]>>3)) {
 		buttonReverse = 1;
@@ -3129,6 +2911,33 @@ void buttonCalibration(void){	// buttons calibration function
 }
 
 void displayAdcValues(void){
+#ifdef TEST_MODE
+	uint8_t button=0;
+	Lcd_clear();
+	vTaskDelay(500);
+	while (button!=BUTTON_OK){
+		button=readButtons();
+		Lcd_goto(0,0);
+		Lcd_write_str("1:");
+		Lcd_write_digit(adcAverage[0]/100);
+		Lcd_write_digit(adcAverage[0]);
+		Lcd_write_str(" 2:");
+		Lcd_write_digit(adcAverage[1]/100);
+		Lcd_write_digit(adcAverage[1]);
+		Lcd_goto(1,0);
+		Lcd_write_str("3:");
+		Lcd_write_digit(adcAverage[2]/100);
+		Lcd_write_digit(adcAverage[2]);
+		Lcd_write_str(" 4:");
+		Lcd_write_digit(adcAverage[3]/100);
+		Lcd_write_digit(adcAverage[3]);
+		vTaskDelay(20);
+	}
+	Lcd_clear();
+#endif
+}
+
+void displayAdcValues_bak(void){
 #ifdef TEST_MODE
 	uint8_t button=0;
 	Lcd_clear();
@@ -3427,7 +3236,7 @@ void calibratePh(){
 #endif
 //		Lcd_write_str(buffer);
 		Lcd_goto(1,5);
-		int10str(JDR_PH, &buffer);
+		int10str(adcAverage[AVG_ADC_PH], &buffer);
 		Lcd_write_str(buffer);
 		vTaskDelay(10);
 		Lcd_goto(1,0);
@@ -3439,7 +3248,7 @@ void calibratePh(){
 
     	}
 	}
-	ph=JDR_PH;
+	ph=adcAverage[AVG_ADC_PH];
 	EE_WriteVariable(PH7_ADDR, ph);
 	button = 0;
 
@@ -3457,7 +3266,7 @@ void calibratePh(){
 		adc2str(ph4, &buffer);
 		Lcd_write_str(buffer);
 		Lcd_goto(1,5);
-		adc2str(phAdcValue, &buffer);
+		adc2str(adcAverage[AVG_ADC_EC], &buffer);
 		Lcd_write_str(buffer);
 		vTaskDelay(25);
 		Lcd_goto(1,0);
@@ -3466,8 +3275,8 @@ void calibratePh(){
     	vTaskDelay(500);
 	}
 
-	ph=JDR_PH;
-	EE_WriteVariable(PH4_ADDR, phAdcValue);
+	ph=adcAverage[AVG_ADC_PH];
+	EE_WriteVariable(PH4_ADDR, adcAverage[AVG_ADC_EC]);
 	loadSettings();
 }
 
@@ -3495,7 +3304,7 @@ void calibrateEc(void){
 #endif
 //		Lcd_write_str(buffer);
 		Lcd_goto(1,6);
-		int10str(ecAdcValue, &buffer);
+		int10str(adcAverage[AVG_ADC_EC], &buffer);
 		Lcd_write_str(buffer);
 		vTaskDelay(10);
 		Lcd_goto(1,0);
@@ -3504,8 +3313,7 @@ void calibrateEc(void){
     	Lcd_write_str("0mS = ");
     	vTaskDelay(100);
 	}
-	ec=ecAdcValue;
-	EE_WriteVariable(EC0_ADDR, ec);
+	EE_WriteVariable(EC0_ADDR, adcAverage[AVG_ADC_EC]);
 	button = 0;
 	Lcd_clear();
     Lcd_write_str("0 mS saved");
@@ -3527,7 +3335,7 @@ void calibrateEc(void){
 #endif
 //		Lcd_write_str(buffer);
 		Lcd_goto(1,10);
-		int10str(ecAdcValue, &buffer);
+		int10str(adcAverage[AVG_ADC_EC], &buffer);
 		Lcd_write_str(buffer);
 		vTaskDelay(10);
 		Lcd_goto(1,0);
@@ -3539,8 +3347,7 @@ void calibrateEc(void){
 
 //    	}
 	}
-	ec=ecAdcValue;
-	EE_WriteVariable(EC1413_ADDR, ec);
+	EE_WriteVariable(EC1413_ADDR, adcAverage[AVG_ADC_EC]);
 	button = 0;
 
 	Lcd_goto(0,0);
@@ -3550,25 +3357,64 @@ void calibrateEc(void){
 	loadSettings();
 }
 
+
+void adcAverager(void){
+	int i=0, i2=0;
+	uint32_t jdrBuff1Total=0, jdrBuff2Total=0, jdrBuff3Total=0, jdrBuff4Total=0;
+
+	for(i2=0; i2<9; i2++){
+	    for(i=0; i < 9; i++) {
+	    	jdrBuff1[i] = jdrBuff1[i+1];
+	    	jdrBuff2[i] = jdrBuff2[i+1];
+	    	jdrBuff3[i] = jdrBuff3[i+1];
+	    	jdrBuff4[i] = jdrBuff4[i+1];
+ 		}
+ 		jdrBuff1[JDR_BUFFER_SIZE-1] = ADC1->JDR1;
+ 		jdrBuff2[JDR_BUFFER_SIZE-1] = ADC1->JDR2;
+ 		jdrBuff3[JDR_BUFFER_SIZE-1] = ADC1->JDR3;
+ 		jdrBuff4[JDR_BUFFER_SIZE-1] = ADC1->JDR4;
+    	jdrBuff1Total += jdrBuff1[JDR_BUFFER_SIZE-1];
+    	jdrBuff2Total += jdrBuff2[JDR_BUFFER_SIZE-1];
+    	jdrBuff3Total += jdrBuff3[JDR_BUFFER_SIZE-1];
+    	jdrBuff4Total += jdrBuff4[JDR_BUFFER_SIZE-1];
+	}
+	    adcAverage[0] = jdrBuff1Total/10;
+	    adcAverage[1] = jdrBuff2Total/10;
+	    adcAverage[2] = jdrBuff3Total/10;
+	    adcAverage[3] = jdrBuff4Total/10;
+}
+
 void getPh() {	// current PH, please!
-	uint32_t total=0, ph;
+	uint32_t total=0, total2=0, ph;
 	vTaskDelay(5);
 	uint8_t i;
-    for(i=0; i < 10; i++) {
-    	total += phBuffer[i];
-	}
-    phAdcValue = total/10;
-	if (phAdcValue>phWindowTop) {
+
+
+
+    // count pH underOver flag
+	if (adcAverage[AVG_ADC_PH]>phWindowTop) {
 		phUnderOver = 2;
 	}
-	else if (phAdcValue<phWindowBottom) {
+	else if (adcAverage[AVG_ADC_PH]<phWindowBottom) {
 		phUnderOver = 1;
 	}
 	else {
 		phUnderOver = 0;
 	}
+
+	//count ec underOver flag
+	if (adcAverage[AVG_ADC_EC]>ecWindowTop) {
+		ecUnderOver = 2;
+	}
+	else if (adcAverage[AVG_ADC_EC]<ecWindowBottom) {
+		ecUnderOver = 1;
+	}
+	else {
+		ecUnderOver = 0;
+	}
+
 	vTaskDelay(5);
-	ph = ((phAdcValue - ph0)*10)/cdel;
+	ph = ((adcAverage[AVG_ADC_EC] - ph0)*10)/cdel;
 	currentPh = ph;
 	curphstr[3] = ph-(ph/10)*10+48;
 	vTaskDelay(5);
@@ -3585,14 +3431,10 @@ void getEc(void){
 	uint32_t total=0, ec, ec_div;
 	vTaskDelay(5);
 	uint8_t i;
-    for(i=0; i < 10; i++) {
-    	total += ecBuffer[i];
-	}
-    ecAdcValue = total/10;
-	if (ecAdcValue>ecWindowTop) {
+	if (adcAverage[AVG_ADC_EC]>ecWindowTop) {
 		ecUnderOver = 2;
 	}
-	else if (ecAdcValue<ecWindowBottom) {
+	else if (adcAverage[AVG_ADC_EC]<ecWindowBottom) {
 		ecUnderOver = 1;
 	}
 	else {
@@ -3602,14 +3444,12 @@ void getEc(void){
 //	ec1413 = 200;		// this is 1.413ms
 	ec_div = ((ec1413-ec0)*100)/141;		// 0.01mS = ec1413/141. We store it 100 times more for precision
 
-	if (ecAdcValue>ec0) {
-		ec = ((ecAdcValue-ec0)*100)/ec_div;	//
+	if (adcAverage[AVG_ADC_EC]>ec0) {
+		ec = ((adcAverage[AVG_ADC_EC]-ec0)*100)/ec_div;	//
 	}
 	else {
 		ec = 0;
 	}
-//	ec = 210;
-//	ec = ecAdcValue/ec_div;
 	currentEc = ec;
 	curecstr[4] = '\0';
 	curecstr[3] = '0' + ( ec       )    % 10;
@@ -3913,6 +3753,85 @@ void plugStateTrigger(void  *pvParameters){
 	}
 }
 
+
+uint8_t psi_pump_load_id=0;
+uint8_t psi_underOver=0;
+uint16_t psi_pump_top_level=0;
+uint16_t psi_pump_btm_level=0;
+uint16_t psi_cur_adc_value=0;
+
+void psiSetup(void){
+	uint8_t curbutton=0, tmp;
+	uint16_t curpsiadc=0;
+	comm_state=COMM_DIRECT_DRIVE;
+	Lcd_write_str("PSI pump load id");
+	tmp = idSelector(0,4);
+	Lcd_write_str("ADC psi reading");
+	while (curbutton!=BUTTON_FWD){
+		Lcd_goto(1,0);
+		Lcd_write_str("TOP:");
+		if (curbutton==BUTTON_BCK){
+			plugStateSet(tmp, 1);
+		}
+		if (curbutton==BUTTON_OK){
+			plugStateSet(tmp, 0);
+		}
+		if (curbutton==BUTTON_CNL){
+			psi_pump_top_level = JDR_PSI;
+		}
+		vTaskDelay(25);
+		Lcd_write_16b(JDR_PSI);
+		Lcd_write_str("/");
+		Lcd_write_16b(psi_pump_top_level);
+		curbutton=readButtons();
+	}
+
+	while (curbutton!=BUTTON_FWD){
+		Lcd_goto(1,0);
+		Lcd_write_str("BTM:");
+		if (curbutton==BUTTON_BCK){
+			plugStateSet(tmp, 1);
+		}
+		if (curbutton==BUTTON_OK){
+			plugStateSet(tmp, 0);
+		}
+		if (curbutton==BUTTON_CNL){
+			psi_pump_btm_level = JDR_PSI;
+		}
+		vTaskDelay(10);
+		Lcd_write_16b(JDR_PSI);
+		Lcd_write_str("/");
+		Lcd_write_16b(psi_pump_btm_level);
+		curbutton=readButtons();
+	}
+	comm_state=COMM_MONITOR_MODE;
+}
+
+void plugTest(void){
+	uint8_t curplug=0, curbutton=0;
+	comm_state=COMM_DIRECT_DRIVE;
+	while (curbutton!=BUTTON_FWD){
+		Lcd_goto(0,0);
+		Lcd_write_str("Plug:");
+		Lcd_write_digit(curplug);
+		if (curbutton==BUTTON_BCK){
+			curplug++;
+			if (curplug==PLUG_AMOUNT) {
+				curplug=0;
+			}
+		}
+		if (curbutton==BUTTON_OK){
+			plugStateSet(curplug, 1);
+		}
+		if (curbutton==BUTTON_CNL){
+			plugStateSet(curplug, 0);
+		}
+		vTaskDelay(10);
+		curbutton=readButtons();
+	}
+	comm_state=COMM_MONITOR_MODE;
+}
+
 void plugStateSet(uint8_t plug, uint8_t state){
 //	if (PLUG_INVERT==1) {
 //		state ^= (1<<0);
@@ -3943,7 +3862,7 @@ void valveMotorStateSet(uint8_t valveId, uint8_t state){
 
 
 
-void lightSensorTriger() {
+/* void lightSensorTriger() {
 //	int lightSensorLevel;
 //	lightSensorLevel=ADC1->JDR3;
 	if (ADC1->JDR3 > lightRange) {
@@ -3953,7 +3872,7 @@ void lightSensorTriger() {
 		lightSensor=NIGHT;
 	}
 }
-
+*/
 /* void lightRangeSet(){
 	uint16_t definedLightRange, Address;
 	uint_fast16_t curLevel;
@@ -4059,17 +3978,19 @@ void EE_WriteWord(uint16_t Address, uint32_t Data){
 void programRunner(uint8_t programId){
 
 	uint32_t tmp;
+	uint8_t tmp8;
 	switch (programId) {
 	case 1:
 		break;
 	case 2:
-	    setTimer(0);
+		tmp8 = idSelector(0,4);
+	    setTimer(tmp8);
 		break;
 	case 3:
-		setTimer(1);
+		plugTest();
 		break;
 	case 4:
-		setTimer(2);
+		psiSetup();
 		break;
 	case 5:
 		tmp = RTC_GetCounter();
@@ -4078,22 +3999,24 @@ void programRunner(uint8_t programId){
 		Lcd_clear();
 		break;
 	case 6:
-	    setCTimer(0);
+		tmp8 = idSelector(0,4);
+	    setCTimer(tmp8);
 		break;
 	case 7:
-		setCTimer(1);
+//		setCTimer(1);
 		break;
 	case 8:
-		setCTimer(2);
+//		setCTimer(2);
 		break;
 	case 9:
-		setPlug(0);
+		tmp8 = idSelector(0,4);
+		setPlug(tmp8);
 		break;
 	case 10:
-		setPlug(1);
+//		setPlug(1);
 		break;
 	case 11:
-		setPlug(2);
+//		setPlug(2);
 		break;
 	case 13:
 		phMonSettings();
@@ -4419,6 +4342,29 @@ void setCTimer(uint8_t timerId){
 	vTaskDelay(500);
 	Lcd_clear();
 }
+
+uint8_t idSelector(uint8_t min, uint8_t max){
+	uint8_t curid=0, curbutton=0;
+	while (curbutton!=BUTTON_OK){
+		vTaskDelay(25);
+		Lcd_goto(1,0);
+		Lcd_write_digit(curid);
+		if (curbutton==BUTTON_FWD) {
+			if (curid<max) {
+				curid++;
+			}
+		}
+		if (curbutton==BUTTON_BCK) {
+			if (curid>min) {
+				curid--;
+			}
+		}
+		curbutton=readButtons();
+		vTaskDelay(25);
+	}
+	return curid;
+}
+
 
 void setTimer(uint8_t timerId){
 //	timerId--;	// chtoby Timer 1 byl nulevym
@@ -4916,34 +4862,8 @@ unsigned char  RtcInit(void)
 // function slides the buffer window for pH ADC values (and EC)
 void phMonitor(void *pvParameters){
  	while(1){
- 		int i=0;
- 	    for(i=0; i < 9; i++) {
- 	            phBuffer[i] = phBuffer[i+1];
- 	           ecBuffer[i] = ecBuffer[i+1];
-
-#ifdef KOSTYLI_MODE
- 	          			USART1->SR &= ~USART_SR_TC;
- 	          			if (log_inc==64){
- 	          			    log_inc=0;
- 	          			    USART1->DR=13;
- 	          			}
- 	          			else {
- 	          				USART1->DR=log_str[log_inc++];
- 	          			}
- //	          		}
-#endif
- 	          vTaskDelay(2);
-
- 		}
- 		phBuffer[9] = JDR_PH;
- 		ecBuffer[9] = JDR_EC;
  		vTaskDelay(1);
-		waterSensorStateTrigger();
-		vTaskDelay(1);
-//		valve_status_updater();
-		vTaskDelay(1);
-  //  	comm_manager();
-//		vTaskDelay(1);
+ 		adcAverager();
  	}
 }
 
@@ -4971,7 +4891,6 @@ void displayClock(void *pvParameters)
 //    		}
 
 	    	vTaskDelay(10);
-
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
 	    	LCDLine1[0]= (DateTime.day / 10) + 48;
@@ -5047,6 +4966,7 @@ void displayClock(void *pvParameters)
 
 
 	    	vTaskDelay(10);
+
 	    }
 
 
@@ -5062,7 +4982,7 @@ void displayClock(void *pvParameters)
 uint8_t readButtons(void){
 	uint16_t curval = 0;
 	uint8_t i;
-		curval = get_average_adc(10);
+		curval = adcAverage[ADC_AVG_BUTTONS];
 		for (i=0;i<4;i++) {
 				if (curval>button_ranges[i*2]+BUTTON_RANGE_SHRINKER && curval<button_ranges[i*2+1]-BUTTON_RANGE_SHRINKER) {
 					return i+1;

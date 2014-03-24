@@ -16710,10 +16710,10 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <part name="SD_CARD" library="con-lsta" deviceset="FE06-1" device=""/>
 <part name="GND9" library="supply1" deviceset="GND" device=""/>
 <part name="T1" library="FDS6680A" deviceset="FDS6680A_SOP8" device="" value="FDS6680A"/>
-<part name="R1" library="resistor" deviceset="R-EU_" device="M1206"/>
-<part name="R2" library="resistor" deviceset="R-EU_" device="M1206"/>
-<part name="R3" library="resistor" deviceset="R-EU_" device="M1206"/>
-<part name="R4" library="resistor" deviceset="R-EU_" device="M1206"/>
+<part name="R1" library="resistor" deviceset="R-EU_" device="M1206" value="220"/>
+<part name="R2" library="resistor" deviceset="R-EU_" device="M1206" value="220"/>
+<part name="R3" library="resistor" deviceset="R-EU_" device="M1206" value="220"/>
+<part name="R4" library="resistor" deviceset="R-EU_" device="M1206" value="220"/>
 <part name="VT1" library="transistor" deviceset="BC847" device="" value="3904"/>
 <part name="R5" library="resistor" deviceset="R-EU_" device="M1206" value="100"/>
 <part name="R6" library="resistor" deviceset="R-EU_" device="M1206" value="470"/>
@@ -16759,9 +16759,9 @@ Source: http://products.nichicon.co.jp/en/pdf/XJA043/e-ud.pdf</description>
 <part name="BUTTONS" library="con-molex" deviceset="22-23-2021" device="" value=""/>
 <part name="GND28" library="supply1" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
-<part name="R32" library="resistor" deviceset="R-EU_" device="M1206"/>
-<part name="R33" library="resistor" deviceset="R-EU_" device="M1206"/>
-<part name="R34" library="resistor" deviceset="R-EU_" device="M1206"/>
+<part name="R32" library="resistor" deviceset="R-EU_" device="M1206" value="470"/>
+<part name="R33" library="resistor" deviceset="R-EU_" device="M1206" value="470"/>
+<part name="R34" library="resistor" deviceset="R-EU_" device="M1206" value="470"/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
 <part name="BLUETOOTH_UART" library="con-lstb" deviceset="MA04-1" device=""/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
