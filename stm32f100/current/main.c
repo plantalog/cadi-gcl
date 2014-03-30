@@ -33,6 +33,7 @@
 // enabling test mode adds some test functionality
 #define	TEST_MODE
 
+#define PSI_STAB_ENABLE
 #define TANK_STAB_ENABLE
 
 // SENSOR AND CONTROL DEVICES DRIVERS
@@ -305,7 +306,7 @@ uint32_t timerStateFlags, cTimerStateFlags;
 #define PLUG_AMOUNT		4
 uint32_t plugStateFlags;
 uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plugs HARDCODE
-// elementy massiva - nomera tajmerov, sootvetstvujushih Plug'am.
+// elementy massiva - nomera programm (ex "tajmerov"), sootvetstvujushih Plug'am.
 // 0 element - pervyj plug, 1 element - plug no 2, etc
 #endif						// EOF LOADS DEFINITIONS
 
@@ -396,11 +397,6 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define WATER_TANK_BOTTOM		0x0632
 #define WFM_CAL_OFFSET			0x0642
 
-#define PSI_SENSOR_0PSI			0x0643
-#define PSI_SENSOR_32PSI		0x0644
-#define PSI_SENSOR_TOP			0x0645
-#define PSI_SENSOR_BTM			0x0646
-
 #define DAY						1
 #define NIGHT					0
 
@@ -415,6 +411,18 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define JDR_PH		ADC1->JDR2		// continuous ADC channel for pH
 #define JDR_PSI		ADC1->JDR3		// pressure sensor
 #define JDR_BUFFER_SIZE 10
+
+
+#define PSI_SENSOR_0PSI			0x0643
+#define PSI_SENSOR_32PSI		0x0644
+#define PSI_SENSOR_TOP			0x0645
+#define PSI_SENSOR_BTM			0x0646
+#define PSI_PUMP_LOAD_ID		0x0647
+uint8_t psi_pump_load_id=0;
+uint8_t psi_underOver=0;
+uint16_t psi_pump_top_level=0;
+uint16_t psi_pump_btm_level=0;
+uint16_t psi_cur_adc_value=0;
 
 #define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
 #define AVG_ADC_PH		2			// adcAverage[2]
@@ -611,7 +619,7 @@ void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void send_packet();
 void setTimerSelector(void);
-uint8_t idSelector(uint8_t min, uint8_t max);
+uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid);
 
 
 void device_open_valve(uint8_t device_id){
@@ -880,7 +888,7 @@ void comm_manager(void){
 			USART1_IRQHandler();
 		}
 		transferred=0;
-		while (transferred<SETTINGS_PACKET_SIZE*2) {	// *2 bacuse each 16 bit var should be sent in two TX cycles
+		while (transferred<SETTINGS_PACKET_SIZE*2) {	// *2 bacause each 16 bit var should be sent in two TX cycles
 			if (TxDataReady==0) {
 				if (transferred%2==0) {	// if sending odd (or even?) byte
 					EE_ReadVariable(SETTINGS_START_ADDR+(transferred/2), &buff);
@@ -1337,6 +1345,17 @@ void tankLevelStab(void){
 	}
 	if (sonar_read[0]<tank_windows_top[0]) {
 		close_valve(1);
+	}
+#endif
+}
+
+void psiStab(void){
+#ifdef PSI_STAB_ENABLE
+	if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
+		plugStateSet(psi_pump_load_id, 0);
+	}
+	if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
+		plugStateSet(psi_pump_load_id, 1);
 	}
 #endif
 }
@@ -3171,6 +3190,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 		vTaskDelay(2);
 		dht_get_data();
 		tankLevelStab();
+		psiStab();
 		sonar_ping();
 	}
 }
@@ -3696,6 +3716,10 @@ void plugStateTrigger(void  *pvParameters){
 					plugType=4;
 	//				plugTimerId-=35;
 				}
+				if (plugTimerId>79 && plugTimerId<81){	// 80 - PSI stab
+					plugType=4;
+	//				plugTimerId-=35;
+				}
 
 				if (plugTimerId>31 && plugTimerId<64) {
 				//	plugType=1;
@@ -3733,6 +3757,9 @@ void plugStateTrigger(void  *pvParameters){
 				else if (plugType==4) {
 					// watering and circulation pumps for watering controller
 				}
+				else if (plugType==5) {
+									// psi pump pressure stabilizer
+				}
 				else {
 					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0) {
 						plugStateSet(i, 1);	// enable plug
@@ -3765,27 +3792,33 @@ void plugStateTrigger(void  *pvParameters){
 }
 
 
-uint8_t psi_pump_load_id=0;
-uint8_t psi_underOver=0;
-uint16_t psi_pump_top_level=0;
-uint16_t psi_pump_btm_level=0;
-uint16_t psi_cur_adc_value=0;
-
 void psiSetup(void){
 	uint8_t curbutton=0, tmp;
-	uint16_t curpsiadc=0;
+	uint16_t curpsiadc=0, tmp2=0, tempvalue=0;
 	comm_state=COMM_DIRECT_DRIVE;
+	Lcd_clear();
 	Lcd_write_str("PSI pump load id");
-	tmp = idSelector(0,4);
+	EE_ReadVariable(PSI_PUMP_LOAD_ID, &tempvalue);
+//	tempvalue = adjust8bit(tempvalue);
+	psi_pump_load_id = idSelector(0,4,tempvalue);
+	EE_WriteVariable(PSI_PUMP_LOAD_ID, psi_pump_load_id);
+	tmp2 = EE_PLUG_SETTINGS+psi_pump_load_id;
+	EE_WriteVariable(tmp2, 80);		// HARDCODE!!! program (timer) id for booster pump
+	plugSettings[tempvalue] = 80;
+
+//	psi_pump_load_id = idSelector(0,4,psi_pump_load_id);
+//	tmp2 = (uint16_t)(psi_pump_load_id*0x00FF);
+//	EE_WriteVariable(PSI_PUMP_LOAD_ID, tmp2);
+
 	Lcd_write_str("ADC psi reading");
 	while (curbutton!=BUTTON_FWD){
 		Lcd_goto(1,0);
 		Lcd_write_str("TOP:");
 		if (curbutton==BUTTON_BCK){
-			plugStateSet(tmp, 1);
+			plugStateSet(psi_pump_load_id, 1);
 		}
 		if (curbutton==BUTTON_OK){
-			plugStateSet(tmp, 0);
+			plugStateSet(psi_pump_load_id, 0);
 		}
 		if (curbutton==BUTTON_CNL){
 			psi_pump_top_level = adcAverage[AVG_ADC_PSI];
@@ -3796,6 +3829,7 @@ void psiSetup(void){
 		Lcd_write_16b(psi_pump_top_level);
 		curbutton=readButtons();
 	}
+	plugStateSet(psi_pump_load_id, 0);
 	Lcd_write_str("OK");
 	vTaskDelay(400);
 	curbutton=0;
@@ -3803,10 +3837,10 @@ void psiSetup(void){
 		Lcd_goto(1,0);
 		Lcd_write_str("BTM:");
 		if (curbutton==BUTTON_BCK){
-			plugStateSet(tmp, 1);
+			plugStateSet(psi_pump_load_id, 1);
 		}
 		if (curbutton==BUTTON_OK){
-			plugStateSet(tmp, 0);
+			plugStateSet(psi_pump_load_id, 0);
 		}
 		if (curbutton==BUTTON_CNL){
 			psi_pump_btm_level = adcAverage[AVG_ADC_PSI];
@@ -3817,6 +3851,7 @@ void psiSetup(void){
 		Lcd_write_16b(psi_pump_btm_level);
 		curbutton=readButtons();
 	}
+	plugStateSet(psi_pump_load_id, 0);
 	comm_state=COMM_MONITOR_MODE;
 	EE_WriteVariable(PSI_SENSOR_TOP, psi_pump_top_level);
 	EE_WriteVariable(PSI_SENSOR_BTM, psi_pump_btm_level);
@@ -3896,8 +3931,8 @@ void programRunner(uint8_t programId){
 	case 1:
 		break;
 	case 2:
-		tmp8 = idSelector(0,4);
-	    setTimer(tmp8);
+		tmp8 = idSelector(1,4,0);
+	    setTimer(--tmp8);
 		break;
 	case 3:
 		plugTest();
@@ -3912,8 +3947,8 @@ void programRunner(uint8_t programId){
 		Lcd_clear();
 		break;
 	case 6:
-		tmp8 = idSelector(0,4);
-	    setCTimer(tmp8);
+		tmp8 = idSelector(1,4,0);
+	    setCTimer(--tmp8);
 		break;
 	case 7:
 //		setCTimer(1);
@@ -3922,8 +3957,9 @@ void programRunner(uint8_t programId){
 //		setCTimer(2);
 		break;
 	case 9:
-		tmp8 = idSelector(0,4);
-		setPlug(tmp8);
+		Lcd_write_str("Choose plug");
+		tmp8 = idSelector(1,4,0);
+		setPlug(--tmp8);
 		break;
 	case 10:
 //		setPlug(1);
@@ -4256,8 +4292,8 @@ void setCTimer(uint8_t timerId){
 	Lcd_clear();
 }
 
-uint8_t idSelector(uint8_t min, uint8_t max){
-	uint8_t curid=0, curbutton=0;
+uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid){
+	uint8_t curbutton=0;
 	while (curbutton!=BUTTON_OK){
 		vTaskDelay(25);
 		Lcd_goto(1,0);
@@ -5252,6 +5288,7 @@ void loadSettings(void){	// function loads the predefined data
 
 	EE_ReadVariable(PSI_SENSOR_TOP, &psi_pump_top_level);
 	EE_ReadVariable(PSI_SENSOR_BTM, &psi_pump_btm_level);
+	EE_ReadVariable(PSI_PUMP_LOAD_ID, &psi_pump_load_id);
 
 	for (i=0; i<WFM_AMOUNT; i++) {
 		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);
