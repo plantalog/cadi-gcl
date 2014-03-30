@@ -61,15 +61,12 @@ uint32_t water_counter[WFM_AMOUNT];
 #ifdef USE_VALVES	// START VALVES DEFINITIONS
 #define VALVE_DISABLE	GPIOA->BSRR
 #define VALVE_ENABLE	GPIOA->BRR
-#define VALVE_SENSOR_GPIO_SHIFT		5		// valve position sensor GPIO shift
-#define VALVE_AMOUNT				3		// number of valves to process
+#define VALVE_SENSOR_GPIO_SHIFT		6		// valve position sensor GPIO shift
+#define VALVE_AMOUNT				4		// number of valves to process
 #define VALVE_MOTOR_GPIO_SHIFT		11		// valve control motor GPIO out shift
 #define VALVE_MOTOR_PORT			GPIOA
 #define VALVE_SENSOR_PORT			GPIOA
 #define VALVE_SENSOR_PORT_SOURCE	GPIO_PortSourceGPIOA
-#define V1_SENSOR_PIN				GPIO_Pin_5
-#define V2_SENSOR_PIN				GPIO_Pin_6
-#define V3_SENSOR_PIN				GPIO_Pin_7
 #define	VALVE_FAILURE_TIMEOUT		600	// timeout for valve open/close function to avoid hanging if valve broken
 #define DRAIN_VALVE_ID				1
 // Valve variables
@@ -421,7 +418,7 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 
 #define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
 #define AVG_ADC_PH		2			// adcAverage[2]
-#define AVG_ADC_PSI		3			// adcAverage[3]
+#define AVG_ADC_PSI		2			// adcAverage[3]
 
 
 uint16_t tank_windows_top[1];
@@ -1178,10 +1175,10 @@ void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control o
 #endif
 }
 
-void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
+void valve_feedback_init(void){		// init PA6-8 as input for 3V valve feedback
 
 	// v1.4 config assumes PA5-7 pins as feedback, implement init function
-
+	// v2 config assumes PA6-8 pins as feedback
 
 // PA5-7 setup
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -1189,17 +1186,19 @@ void valve_feedback_init(void){		// init PA5-7 as input for 3V valve feedback
 	NVIC_InitTypeDef NVIC_InitStructure;
 
 	  // Enable GPIOA clock
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOD, ENABLE);
 
 	  // Configure PA5-7 pin as input pull-down
-	  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5 | GPIO_Pin_6 | GPIO_Pin_7;
+	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8;
 //	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 
+	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1;
+//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 }
-
-
 
 void water_level_input_init(void){
 #ifdef WFM_PINS_PB0_1			// Configuring PINs for Water Flow Meters
@@ -1354,7 +1353,14 @@ void open_valve(uint8_t valveId){
 	if (curstatus==0 && cur_valve_failed==0) {	// if no failure detected and current status is ok
 		run_valve_motor(valveId);
 		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
-		while (duration<3 && timeout>0) {
+		while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
+			if(valveId==1){
+				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
+			}
+			else {
+
+			}
+
 			if ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==1) {
 				duration++;
 			}
@@ -1465,10 +1471,12 @@ void valve_test2(void){
 
 
 		if (button==BUTTON_FWD){
-			open_valve(curvalve);
+			//open_valve(curvalve);
+			run_valve_motor(curvalve);
 		}
 		if (button==BUTTON_CNL){
-			close_valve(curvalve);
+			//close_valve(curvalve);
+			stop_valve_motor(curvalve);
 		}
 		if (button==BUTTON_BCK){
 			if (curvalve<2) {
@@ -1486,8 +1494,8 @@ void valve_test2(void){
 		vTaskDelay(1);
 
 		Lcd_write_str("States:");
-		for (i=0; i<3; i++) {
-			if (VALVE_SENSOR_PORT->IDR>>(curvalve+i) & 1) {
+		for (i=0; i<5; i++) {
+			if (VALVE_SENSOR_PORT->IDR>>(VALVE_SENSOR_GPIO_SHIFT+i) & 1) {
 						Lcd_write_str("1");
 					}
 					else {
@@ -1499,6 +1507,7 @@ void valve_test2(void){
 	}
 	Lcd_clear();
 }
+
 
 
 void valve_test(void){
@@ -2105,14 +2114,14 @@ void TIM3_IRQHandler(void)
     DutyCycle = 0;
     Frequency = 0;
   }
-  dht_bit_position++;
+  dht_bit_position++;		// holds current DHT response bit sequence number
 
 	if (dht_bit_position>dht_shifter && dht_data_ready==0) {
 		if (DutyCycle>25 && DutyCycle<35) {
-			dht_data[dht_byte_pointer] &= ~(1<<(dht_bit_pointer--));	// reset bit in dht_data[i]
+			dht_data[dht_byte_pointer] &= ~(1<<(dht_bit_pointer));	// reset bit in dht_data[i]
 		}
 		else {
-			dht_data[dht_byte_pointer] |= (1<<(dht_bit_pointer--)); // set bit
+			dht_data[dht_byte_pointer] |= (1<<(dht_bit_pointer)); // set bit
 		}
 		if (dht_bit_pointer==0){
 			dht_bit_pointer=7;
@@ -2121,12 +2130,14 @@ void TIM3_IRQHandler(void)
 				dht_data_ready=1;
 				dht_byte_pointer = 0;
 				dht_bit_pointer = 7;
+//				dht_bit_position = 0;
 			}
 		}
 		else {
-			// dht_bit_pointer--;
+			dht_bit_pointer--;
 		}
 	}
+
 }
 
 void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
@@ -3777,15 +3788,17 @@ void psiSetup(void){
 			plugStateSet(tmp, 0);
 		}
 		if (curbutton==BUTTON_CNL){
-			psi_pump_top_level = JDR_PSI;
+			psi_pump_top_level = adcAverage[AVG_ADC_PSI];
 		}
 		vTaskDelay(25);
-		Lcd_write_16b(JDR_PSI);
+		Lcd_write_16b(adcAverage[AVG_ADC_PSI]);
 		Lcd_write_str("/");
 		Lcd_write_16b(psi_pump_top_level);
 		curbutton=readButtons();
 	}
-
+	Lcd_write_str("OK");
+	vTaskDelay(400);
+	curbutton=0;
 	while (curbutton!=BUTTON_FWD){
 		Lcd_goto(1,0);
 		Lcd_write_str("BTM:");
@@ -3796,15 +3809,20 @@ void psiSetup(void){
 			plugStateSet(tmp, 0);
 		}
 		if (curbutton==BUTTON_CNL){
-			psi_pump_btm_level = JDR_PSI;
+			psi_pump_btm_level = adcAverage[AVG_ADC_PSI];
 		}
 		vTaskDelay(10);
-		Lcd_write_16b(JDR_PSI);
+		Lcd_write_16b(adcAverage[AVG_ADC_PSI]);
 		Lcd_write_str("/");
 		Lcd_write_16b(psi_pump_btm_level);
 		curbutton=readButtons();
 	}
 	comm_state=COMM_MONITOR_MODE;
+	EE_WriteVariable(PSI_SENSOR_TOP, psi_pump_top_level);
+	EE_WriteVariable(PSI_SENSOR_BTM, psi_pump_btm_level);
+	Lcd_write_str("OK");
+	vTaskDelay(400);
+	Lcd_clear();
 }
 
 void plugTest(void){
@@ -3861,111 +3879,6 @@ void valveMotorStateSet(uint8_t valveId, uint8_t state){
 }
 
 
-
-/* void lightSensorTriger() {
-//	int lightSensorLevel;
-//	lightSensorLevel=ADC1->JDR3;
-	if (ADC1->JDR3 > lightRange) {
-		lightSensor=DAY;
-	}
-	else {
-		lightSensor=NIGHT;
-	}
-}
-*/
-/* void lightRangeSet(){
-	uint16_t definedLightRange, Address;
-	uint_fast16_t curLevel;
-//	char bfr[4];
-	uint8_t button=0;
-	Lcd_clear();
-	Lcd_goto(0, 1);
-	Lcd_write_str("Push OK to set");
-	Address=LIGHT_RANGE_ADDR;
-	EE_ReadVariable(Address, &definedLightRange);
-//	vTaskDelay(10);
-	while (button!=BUTTON_OK){
-		vTaskDelay(100);
-		Lcd_goto(1, 3);
-		curLevel=JDR_PH;
-		vTaskDelay(10);
-
-		// po dva razrjada mozhno printovat' chto ugodno :)
-		Lcd_write_digit(curLevel);
-		Lcd_goto(1,1);
-		curLevel /= 100;	// sledujushie dva razrjada
-		vTaskDelay(10);
-		Lcd_write_digit(curLevel);
-		vTaskDelay(10);
-		button=readButtons();
-	}
-	EE_WriteVariable(Address, curLevel);
-	Lcd_clear();
-} */
-
-/* void ls2ct(uint8_t timerId) {	// Setting Light sensor plus 2 cyclic timers
-	uint16_t Address, timerData;
-	uint8_t button, dayTimerId, sec, min, hour;
-	uint32_t dayDurationUnix, dayIntervalUnix;
-//	RTC_Time ctime;
-	Lcd_clear();
-	Lcd_goto(0,0);
-	Lcd_write_str("Light sensor and");
-	Lcd_goto(1,0);
-	Lcd_write_str("2 cyclic timers");
-	vTaskDelay(1500);
-	Lcd_clear();
-
-	Address = LS2CT_ADDR+timerId;
-	EE_ReadVariable(Address, &timerData);
-	dayTimerId=timerData;
-//	nightTimerId=timerData<<8;
-	Lcd_goto(0,0);
-	vTaskDelay(25);
-	Lcd_write_str("Day timer");
-	vTaskDelay(25);
-	while (button!=BUTTON_OK) {
-		Lcd_goto(1,0);
-		Address = EE_CTIMER_DURATION+dayTimerId*EE_CTIMER_SIZE;
-		dayDurationUnix=EE_ReadWord(Address);
-		vTaskDelay(25);
-		sec = dayDurationUnix % 60;
-		dayDurationUnix /= 60;
-		min = dayDurationUnix % 60;
-		hour = dayDurationUnix/3600;
-		Lcd_write_digit(hour);
-		Lcd_write_str(":");
-		Lcd_write_digit(min);
-		Lcd_write_str(":");
-		Lcd_write_digit(sec);
-		vTaskDelay(25);
-		Address = EE_CTIMER_INTERVAL+dayTimerId*EE_CTIMER_SIZE;
-		dayIntervalUnix=EE_ReadWord(Address);
-		vTaskDelay(25);
-		sec = dayIntervalUnix % 60;
-		dayIntervalUnix /= 60;
-		min = dayIntervalUnix % 60;
-		hour = dayIntervalUnix/3600;
-		Lcd_goto(1,8);
-		Lcd_write_digit(hour);
-		Lcd_write_str(":");
-		Lcd_write_digit(min);
-		Lcd_write_str(":");
-		Lcd_write_digit(sec);
-		vTaskDelay(25);
-		button=readButtons();
-		vTaskDelay(25);
-		if (button==BUTTON_BCK) {
-			dayTimerId--;
-		}
-		if (button==BUTTON_FWD) {
-			dayTimerId++;
-		}
-	}
-	Lcd_clear();
-}
-
-*/
 
 void EE_WriteWord(uint16_t Address, uint32_t Data){
 	uint16_t tmp, tmp2;
@@ -5239,9 +5152,6 @@ int main(void)
 		no_sd = string2log("System started\n", 15);
 	}
 
-#ifdef USE_VALVES
-//	valve_feedback_init();
-#endif
 
 #ifndef PAPA_EDITION
 	sonar_init();
@@ -5250,6 +5160,10 @@ int main(void)
 	prvSetupHardware();
 
 	bluetooth_init();
+
+#ifdef USE_VALVES
+	valve_feedback_init();
+#endif
 	Init_lcd();
 
 
@@ -5335,6 +5249,9 @@ void loadSettings(void){	// function loads the predefined data
 
 	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
 	EE_ReadVariable(WATER_TANK_BOTTOM, &tank_windows_bottom[0]);
+
+	EE_ReadVariable(PSI_SENSOR_TOP, &psi_pump_top_level);
+	EE_ReadVariable(PSI_SENSOR_BTM, &psi_pump_btm_level);
 
 	for (i=0; i<WFM_AMOUNT; i++) {
 		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);

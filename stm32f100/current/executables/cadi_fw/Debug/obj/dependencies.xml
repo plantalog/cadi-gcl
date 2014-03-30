@@ -146,7 +146,7 @@
       </source>
       <source file="..\..\..\..\cmsis\core_cm3.h" lastModified="12e0a816e90">
       </source>
-      <source file="..\..\..\..\stm_lib\inc\eeprom.h" lastModified="144acc1cf88">
+      <source file="..\..\..\..\stm_lib\inc\eeprom.h" lastModified="145100c288d">
          <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">

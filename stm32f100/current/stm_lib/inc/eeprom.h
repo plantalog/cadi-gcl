@@ -66,7 +66,7 @@
 
 /* Variables' number */
 //#define NumbOfVar               ((uint8_t)0xC8)
-#define SETTINGS_PACKET_SIZE	((uint16_t)0xC8)	// look NumbOfVar define in eeprom.h (duplicated in main.c)
+#define SETTINGS_PACKET_SIZE	((uint16_t)0xFF)	// look NumbOfVar define in eeprom.h (duplicated in main.c)
 #define NumbOfVar				((uint16_t)SETTINGS_PACKET_SIZE)
 #define SETTINGS_START_ADDR		0x05C0	// duplicated in main.c, change BOTH if needed
 

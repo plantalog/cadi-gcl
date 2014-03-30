@@ -34,11 +34,11 @@
       <target file="stm32f10x_flash.o" lastModified="144c1f03388">
          <source file="..\..\..\..\stm_lib\src\stm32f10x_flash.c" lastModified="13872df6f50"/>
       </target>
+      <target file="eeprom.o" lastModified="145100e64c1">
+         <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7"/>
+      </target>
       <target file="list.o" lastModified="144c1f0305b">
          <source file="..\..\..\..\freertos\Source\list.c" lastModified="13843cf2fc0"/>
-      </target>
-      <target file="eeprom.o" lastModified="144c1f04262">
-         <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7"/>
       </target>
       <target file="port.o" lastModified="144c1f0363a">
          <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\port.c" lastModified="13843cf2fc0"/>
@@ -73,8 +73,8 @@
       <target file="startup_stm32f10x_md_vl.o" lastModified="144c1effc65">
          <source file="..\..\..\..\cmsis_boot\startup\startup_stm32f10x_md_vl.c" lastModified="13843cf2fc0"/>
       </target>
-      <target file="main.o" lastModified="144f60889ee">
-         <source file="..\..\..\..\main.c" lastModified="144f60834db"/>
+      <target file="main.o" lastModified="145100e6193">
+         <source file="..\..\..\..\main.c" lastModified="1450fca5fa9"/>
       </target>
       <target file="stm32f10x_usart.o" lastModified="144c1f02f10">
          <source file="..\..\..\..\stm_lib\src\stm32f10x_usart.c" lastModified="12e9ef2ce20"/>
