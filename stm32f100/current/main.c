@@ -620,7 +620,7 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount);
 void send_packet();
 void setTimerSelector(void);
 uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid);
-
+void printOk(void);
 
 void device_open_valve(uint8_t device_id){
 	open_valve(device_id-20);
@@ -1316,8 +1316,7 @@ void tankLevelStabSetup(void){
 	}
 	vTaskDelay(10);
 	EE_WriteVariable(WATER_TANK_TOP, curlevel);
-	Lcd_clear();
-	Lcd_write_str("OK");
+	printOk();
 	vTaskDelay(2000);
 	Lcd_write_str("Set btm lvl");
 	while (button!=BUTTON_OK) {
@@ -1331,8 +1330,7 @@ void tankLevelStabSetup(void){
 	button=0;
 	vTaskDelay(10);
 	EE_WriteVariable(WATER_TANK_BOTTOM, curlevel);
-	Lcd_clear();
-	Lcd_write_str("OK");
+	printOk();
 	vTaskDelay(2000);
 	Lcd_clear();
 	loadSettings();
@@ -3569,56 +3567,38 @@ void set16bit(uint16_t value){
 //	EE_WriteVariable(Address, timerId);
 //	loadSettings();
 //	Lcd_clear();
+	printOk();
 }
 
 
 void setPlug(uint8_t plugId){
-	uint8_t button;
+	uint8_t button=0;
 	uint16_t Address, timerId;
 //	plugId--;	// pervomu plugu sootvetstvuet nulevaja zapis' v kode (especially for menu calls)
 	Lcd_clear();
 	Lcd_goto(0,0);
 	Lcd_write_str("Plug ");
-	Lcd_write_digit(plugId);
+	Lcd_write_digit(++plugId);
 	Lcd_write_str(" timer");
+	plugId--;
 	Address = EE_PLUG_SETTINGS+plugId;
 	EE_ReadVariable(Address, &timerId);
 	vTaskDelay(50);
-	while (button!=BUTTON_OK) {
-		button=readButtons();
-		vTaskDelay(25);
-		if (button==BUTTON_BCK) {
-			if (timerId<1) {
-				timerId=99;
-			}
-			else {
-				timerId--;
-			}
-		}
-		if (button==BUTTON_FWD) {
-			if (timerId>98) {
-				timerId=0;
-			}
-			else {
-				timerId++;
-			}
-		}
-		Lcd_goto(1,0);
-		Lcd_write_str("numero <");
-		Lcd_write_digit(timerId);
-		Lcd_write_str(">");
-		vTaskDelay(25);
-	}
+	timerId = adjust8bit(timerId);
 	vTaskDelay(50);
 	Address = EE_PLUG_SETTINGS+plugId;
 	EE_WriteVariable(Address, timerId);
 	vTaskDelay(5);
 	loadSettings();
 	vTaskDelay(5);
-	Lcd_clear();
 }
 
-
+void printOk(void){
+	Lcd_clear();
+	Lcd_write_str("OK");
+	vTaskDelay(500);
+	Lcd_clear();
+}
 
 void timerStateTrigger(void *pvParameters){
 	uint8_t i, timerStateFlag;
@@ -3800,7 +3780,7 @@ void psiSetup(void){
 	Lcd_write_str("PSI pump load id");
 	EE_ReadVariable(PSI_PUMP_LOAD_ID, &tempvalue);
 //	tempvalue = adjust8bit(tempvalue);
-	psi_pump_load_id = idSelector(0,4,tempvalue);
+	psi_pump_load_id = idSelector(1,4,tempvalue);
 	EE_WriteVariable(PSI_PUMP_LOAD_ID, psi_pump_load_id);
 	tmp2 = EE_PLUG_SETTINGS+psi_pump_load_id;
 	EE_WriteVariable(tmp2, 80);		// HARDCODE!!! program (timer) id for booster pump
@@ -3830,8 +3810,7 @@ void psiSetup(void){
 		curbutton=readButtons();
 	}
 	plugStateSet(psi_pump_load_id, 0);
-	Lcd_write_str("OK");
-	vTaskDelay(400);
+	printOk();
 	curbutton=0;
 	while (curbutton!=BUTTON_FWD){
 		Lcd_goto(1,0);
@@ -3855,9 +3834,7 @@ void psiSetup(void){
 	comm_state=COMM_MONITOR_MODE;
 	EE_WriteVariable(PSI_SENSOR_TOP, psi_pump_top_level);
 	EE_WriteVariable(PSI_SENSOR_BTM, psi_pump_btm_level);
-	Lcd_write_str("OK");
-	vTaskDelay(400);
-	Lcd_clear();
+	printOk();
 }
 
 void plugTest(void){
@@ -3927,11 +3904,13 @@ void programRunner(uint8_t programId){
 
 	uint32_t tmp;
 	uint8_t tmp8;
+	Lcd_clear();
 	switch (programId) {
 	case 1:
 		break;
 	case 2:
-		tmp8 = idSelector(1,4,0);
+		Lcd_write_str("Timer to adjust:");
+		tmp8 = idSelector(1,4,1);
 	    setTimer(--tmp8);
 		break;
 	case 3:
@@ -3947,7 +3926,8 @@ void programRunner(uint8_t programId){
 		Lcd_clear();
 		break;
 	case 6:
-		tmp8 = idSelector(1,4,0);
+		Lcd_write_str("CTimer 2 adjust:");
+		tmp8 = idSelector(1,4,1);
 	    setCTimer(--tmp8);
 		break;
 	case 7:
@@ -3958,8 +3938,8 @@ void programRunner(uint8_t programId){
 		break;
 	case 9:
 		Lcd_write_str("Choose plug");
-		tmp8 = idSelector(1,4,0);
-		setPlug(--tmp8);
+		tmp8 = idSelector(1,4,1);
+		setPlug(--tmp8);	// decrement needed because of actual start from 0
 		break;
 	case 10:
 //		setPlug(1);
@@ -4096,31 +4076,28 @@ uint8_t adjust8bit(uint8_t val){
 		button=readButtons();
 		vTaskDelay(25);
 		if (button==BUTTON_BCK) {
-			if (val<1) {
-				val=99;
+			if (val<2) {
+				val=255;
 			}
 			else {
 				val--;
 			}
 		}
 		if (button==BUTTON_FWD) {
-			if (val>98) {
-				val=0;
+			if (val>254) {
+				val=1;
 			}
 			else {
 				val++;
 			}
 		}
 		Lcd_goto(1,0);
-		Lcd_write_str("numero <");
-		Lcd_write_digit(val);
-		Lcd_write_str(">");
+		Lcd_write_str("< ");
+		Lcd_write_8b(val);
+		Lcd_write_str(" >");
 		vTaskDelay(25);
 	}
-	Lcd_clear();
-	Lcd_write_str("OK");
-	vTaskDelay(200);
-	Lcd_clear();
+	printOk();
 	return val;
 }
 
@@ -4149,15 +4126,13 @@ uint16_t adjust16bit(uint16_t val){
 				val++;
 			}
 		}
-		Lcd_goto(1,0);
-		Lcd_write_str("numero <");
+		Lcd_goto(1,4);
+		Lcd_write_str("< ");
 		Lcd_write_16b(val);
-		Lcd_write_str(">");
+		Lcd_write_str(" >");
 		vTaskDelay(25);
 	}
-	Lcd_clear();
-	Lcd_write_str("OK");
-	vTaskDelay(200);
+	printOk();
 	return val;
 }
 
@@ -4188,17 +4163,15 @@ uint16_t adjust16bit_fast(uint16_t val, uint8_t speed){
 				val++;
 			}
 		}
-		Lcd_goto(1,0);
-		Lcd_write_str("numero <");
+		Lcd_goto(1,4);
+		Lcd_write_str("< ");
 //		utoa_fast_div(val, &buffer);
 //		copy_arr(&buffer, &LCDLine2, 5, 2);
 		Lcd_write_16b(val);
-		Lcd_write_str(">");
+		Lcd_write_str(" >");
 		vTaskDelay(speed);
 	}
-	Lcd_clear();
-	Lcd_write_str("OK");
-	vTaskDelay(200);
+	printOk();
 	return val;
 }
 
@@ -4252,6 +4225,7 @@ uint32_t CTimerAdjust(uint32_t time){
     	copy_arr(&timestr, LCDLine2, 10, 2);
     	vTaskDelay(10);
 	}
+	printOk();
 	return(time);
 }
 
@@ -4285,11 +4259,7 @@ void setCTimer(uint8_t timerId){
 	CTimerData=CTimerAdjust(CTimerData);	// poluchit' novoe znachenie ot user'a
 	Address = EE_CTIMER_INTERVAL+timerId*EE_CTIMER_SIZE;
 	EE_WriteWord(Address, CTimerData);
-	Lcd_clear();
-	Lcd_goto(0,2);
-	Lcd_write_str("Complete!");
-	vTaskDelay(500);
-	Lcd_clear();
+	printOk();
 }
 
 uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid){
@@ -4311,18 +4281,15 @@ uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid){
 		curbutton=readButtons();
 		vTaskDelay(25);
 	}
+	printOk();
 	return curid;
 }
 
 
 void setTimer(uint8_t timerId){
-//	timerId--;	// chtoby Timer 1 byl nulevym
 	uint32_t Data, adjusteDate;
 	uint16_t Address;
-//	int curval=0;
 	Address = EE_TIMER1_ON+timerId*EE_TIMER_SIZE;	// set ON for plain timer
-//	char value[6];
-//	uint8_t button=0;
 	Lcd_clear();
 	Lcd_goto(0,2);
 	Lcd_write_str("Set ON time");
@@ -4333,8 +4300,6 @@ void setTimer(uint8_t timerId){
 	vTaskDelay(50);
 	adjusteDate = timeAdjust(Data, 1);
 	EE_WriteWord(Address, adjusteDate);
-	Lcd_clear();
-	vTaskDelay(200);
 	Lcd_goto(0,2);
 	Lcd_write_str("Set OFF time");
 	vTaskDelay(50);
@@ -4346,17 +4311,11 @@ void setTimer(uint8_t timerId){
 	Lcd_clear();
 	adjusteDate = timeAdjust(Data, 1);
 	EE_WriteWord(Address, adjusteDate);
-	Lcd_clear();
-	vTaskDelay(50);
 	vTaskSuspendAll();
 	Address = EE_TIMER1_ON+timerId*EE_TIMER_SIZE+4;	// set daily flag
 	Data = EE_ReadWord(Address);
 	xTaskResumeAll();
-//	dowSelector();
-//	curval = Data & 1;
 	vTaskDelay(50);
-//	yesNoSelector("Every day?", curval);
-	Lcd_clear();
 }
 
 int yesNoSelector(char str, int curval){
@@ -4438,6 +4397,7 @@ uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays)
     	vTaskDelay(20);
 	}
 	button=0;
+	printOk();
 	if (includeDays==1) {
 			while (button!=BUTTON_FWD)
 				{
@@ -4491,9 +4451,7 @@ uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays)
 		unixtime2 += curtime.min*60;
 		unixtime2 += curtime.sec;
 	}
-	Lcd_write_str("OK");
-	vTaskDelay(200);
-	Lcd_clear();
+	printOk();
 	return(unixtime2);
 }
 
