@@ -578,73 +578,77 @@ static void SetSysClockToHSE(void)
   */
 static void SetSysClockTo24(void)
 {
+
   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
-  
-  /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/    
-  /* Enable HSE */    
+
+  /* SYSCLK, HCLK, PCLK2 and PCLK1 configuration ---------------------------*/
+  /* Enable HSE */
   RCC->CR |= ((uint32_t)RCC_CR_HSEON);
- 
+//  RCC->CR |= ((uint32_t)RCC_CR_HSION);
+
   /* Wait till HSE is ready and if Time out is reached exit */
   do
   {
+
+//	    HSIStatus = RCC->CR & RCC_CR_HSIRDY;
     HSEStatus = RCC->CR & RCC_CR_HSERDY;
-    StartUpCounter++;  
+    StartUpCounter++;
   } while((HSEStatus == 0) && (StartUpCounter != HSE_STARTUP_TIMEOUT));
 
-  if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+  if ((RCC->CR & RCC_CR_HSIRDY) != RESET)
   {
     HSEStatus = (uint32_t)0x01;
   }
   else
   {
     HSEStatus = (uint32_t)0x00;
-  }  
+  }
 
   if (HSEStatus == (uint32_t)0x01)
   {
-#if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL 
+#if !defined STM32F10X_LD_VL && !defined STM32F10X_MD_VL && !defined STM32F10X_HD_VL
     /* Enable Prefetch Buffer */
     FLASH->ACR |= FLASH_ACR_PRFTBE;
 
     /* Flash 0 wait state */
     FLASH->ACR &= (uint32_t)((uint32_t)~FLASH_ACR_LATENCY);
-    FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;    
+    FLASH->ACR |= (uint32_t)FLASH_ACR_LATENCY_0;
 #endif
- 
+
     /* HCLK = SYSCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_HPRE_DIV1;
-      
+
     /* PCLK2 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE2_DIV1;
-    
+
     /* PCLK1 = HCLK */
     RCC->CFGR |= (uint32_t)RCC_CFGR_PPRE1_DIV1;
-    
+
 #ifdef STM32F10X_CL
     /* Configure PLLs ------------------------------------------------------*/
-    /* PLL configuration: PLLCLK = PREDIV1 * 6 = 24 MHz */ 
+    /* PLL configuration: PLLCLK = PREDIV1 * 6 = 24 MHz */
     RCC->CFGR &= (uint32_t)~(RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL);
-    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 | 
-                            RCC_CFGR_PLLMULL6); 
+    RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLXTPRE_PREDIV1 | RCC_CFGR_PLLSRC_PREDIV1 |
+                            RCC_CFGR_PLLMULL6);
 
     /* PLL2 configuration: PLL2CLK = (HSE / 5) * 8 = 40 MHz */
-    /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 10 = 4 MHz */       
+    /* PREDIV1 configuration: PREDIV1CLK = PLL2 / 10 = 4 MHz */
     RCC->CFGR2 &= (uint32_t)~(RCC_CFGR2_PREDIV2 | RCC_CFGR2_PLL2MUL |
                               RCC_CFGR2_PREDIV1 | RCC_CFGR2_PREDIV1SRC);
     RCC->CFGR2 |= (uint32_t)(RCC_CFGR2_PREDIV2_DIV5 | RCC_CFGR2_PLL2MUL8 |
                              RCC_CFGR2_PREDIV1SRC_PLL2 | RCC_CFGR2_PREDIV1_DIV10);
-  
+
     /* Enable PLL2 */
     RCC->CR |= RCC_CR_PLL2ON;
     /* Wait till PLL2 is ready */
     while((RCC->CR & RCC_CR_PLL2RDY) == 0)
     {
-    }   
+    }
 #elif defined (STM32F10X_LD_VL) || defined (STM32F10X_MD_VL) || defined (STM32F10X_HD_VL)
     /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_PREDIV1 | RCC_CFGR_PLLXTPRE_PREDIV1_Div2 | RCC_CFGR_PLLMULL6);
-#else    
+#else
     /*  PLL configuration:  = (HSE / 2) * 6 = 24 MHz */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_PLLSRC | RCC_CFGR_PLLXTPRE | RCC_CFGR_PLLMULL));
     RCC->CFGR |= (uint32_t)(RCC_CFGR_PLLSRC_HSE | RCC_CFGR_PLLXTPRE_HSE_Div2 | RCC_CFGR_PLLMULL6);
@@ -660,7 +664,7 @@ static void SetSysClockTo24(void)
 
     /* Select PLL as system clock source */
     RCC->CFGR &= (uint32_t)((uint32_t)~(RCC_CFGR_SW));
-    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;    
+    RCC->CFGR |= (uint32_t)RCC_CFGR_SW_PLL;
 
     /* Wait till PLL is used as system clock source */
     while ((RCC->CFGR & (uint32_t)RCC_CFGR_SWS) != (uint32_t)0x08)
@@ -668,9 +672,9 @@ static void SetSysClockTo24(void)
     }
   }
   else
-  { /* If HSE fails to start-up, the application will have wrong clock 
+  { /* If HSE fails to start-up, the application will have wrong clock
          configuration. User can add here some code to deal with this error */
-  } 
+  }
 }
 #elif defined SYSCLK_FREQ_36MHz
 /**

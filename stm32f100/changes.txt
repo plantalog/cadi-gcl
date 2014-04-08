@@ -1,6 +1,13 @@
+v2 beta2
+- added response functions for Cadi STATUS reporting
+- valve feedback initialized on PA4 and PA8 (to avoid disabling HSE)
+
 v2 beta
 - changed pinout according Cadi main board layout (HARDWARE/CADI-MAINBOARD/cadi_pcb_140210_polygoned_kamitra.rar)
 - changed some LCD functions to init and drive LCD properly
+- introduced adcAverage[] array for averaging the ADC input, refactored ADC averaging process
+- DHT bits assembled into bytes directly within sensor interrupt routine
+- now SHRINKER used when button ADC input read, for more reliable read
 
 v1.7
 - implemented packet communication protocol for remote function calls

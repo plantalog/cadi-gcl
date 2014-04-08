@@ -36,7 +36,7 @@
          <include file="..\..\..\..\freertos\Source\include\FreeRTOS.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
       </source>
-      <source file="..\..\..\..\cmsis_boot\system_stm32f10x.c" lastModified="13843cf2fc0">
+      <source file="..\..\..\..\cmsis_boot\system_stm32f10x.c" lastModified="14538cf78fa">
          <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\timers.c" lastModified="13843cf2fc0">
@@ -205,11 +205,11 @@
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_dma.h"/>
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_rcc.h"/>
       </source>
-      <source file="..\..\..\..\stm_lib\inc\stm32f10x_it.h" lastModified="1366443f8f0">
-         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
-      </source>
       <source file="..\..\..\..\stm_lib\src\stm32f10x_exti.c" lastModified="12e9ef2ce20">
          <include file="..\..\..\..\stm_lib\inc\stm32f10x_exti.h"/>
+      </source>
+      <source file="..\..\..\..\stm_lib\inc\stm32f10x_it.h" lastModified="1366443f8f0">
+         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
    </includePath>
 </dependencies>

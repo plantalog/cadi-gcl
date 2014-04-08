@@ -62,7 +62,7 @@ uint32_t water_counter[WFM_AMOUNT];
 #ifdef USE_VALVES	// START VALVES DEFINITIONS
 #define VALVE_DISABLE	GPIOA->BSRR
 #define VALVE_ENABLE	GPIOA->BRR
-#define VALVE_SENSOR_GPIO_SHIFT		6		// valve position sensor GPIO shift
+#define VALVE_SENSOR_GPIO_SHIFT		4		// valve position sensor GPIO shift
 #define VALVE_AMOUNT				4		// number of valves to process
 #define VALVE_MOTOR_GPIO_SHIFT		11		// valve control motor GPIO out shift
 #define VALVE_MOTOR_PORT			GPIOA
@@ -465,7 +465,6 @@ uint8_t wpStateFlags;
 uint8_t dosingPumpStateFlags;
 uint8_t waterSensorStateFlags;
 // uint8_t wsl_buff[3];
-uint8_t curculationPumpId;
 uint16_t wfCalArray[WFM_AMOUNT];
 
 
@@ -574,7 +573,7 @@ static void prvSetupHardware( void );
 static void displayClock( void *pvParameters );
 static void timerStateTrigger(void *pvParameters);
 static void plugStateTrigger(void  *pvParameters);
-static void sdLog(void  *pvParameters);
+static void sdLog(void *pvParameters);
 static void phMonitor(void  *pvParameters);
 static void vTaskLCDdraw(void *pvParameters);
 static void watering_program_trigger(void *pvParameters);
@@ -582,6 +581,7 @@ static void watering_program_trigger(void *pvParameters);
 static void valve_status_updater(void);
 void bluetooth_init(void);
 void display_usart_rx(void);
+void display_usart_tx(void);
 
 
 void device_open_valve(uint8_t device_id);						// wrapper for open_valve()
@@ -607,7 +607,6 @@ void valveMotorStateSet(uint8_t valveId, uint8_t state);
 void USART1_IRQHandler(void);
 void StartDMAChannel4(unsigned int LengthBufer);
 unsigned char GetStateDMAChannel4(void);
-void comm_manager(void);
 void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM4_IRQHandler(void);
 void tankLevelStabSetup(void);
@@ -807,108 +806,6 @@ void Lcd_write_16b(uint16_t tmp) {
 	Lcd_write_digit((uint16_t)tmp%100);
 }
 
-void comm_manager(void){
-	int transferred=0;
-	uint16_t buff;
-	if (comm_state==COMM_SET_SETTINGS) {
-		TxByte = 48;
-		while (transferred<SETTINGS_PACKET_SIZE*2) {
-			if (RxDataReady==1) {
-				if (transferred%2==0) {
-					buff=RxByte;
-				}
-				else {
-					buff<<=8;
-					buff+=RxByte;
-					EE_WriteVariable(SETTINGS_START_ADDR+(transferred/2), buff);
-				}
-				TxByte = RxByte;
-				RxDataReady=0;
-				TxDataReady=1;
-				vTaskDelay(1);
-				transferred++;
-			}
-			//USART1_IRQHandler();
-		}
-		comm_state = COMM_MONITOR_MODE;
-	}
-
-	if (comm_state==COMM_DIRECT_DRIVE) {
-		switch (RxByte) {
-		case 49:
-			plugStateSet(0, 0);	// enable plug for ph up pump
-			break;
-		case 50:
-			plugStateSet(0, 1);	// enable plug for ph up pump
-			break;
-		case 51:
-			plugStateSet(1, 0);	// enable plug for ph up pump
-			break;
-		case 52:
-			plugStateSet(1, 1);	// enable plug for ph up pump
-			break;
-		case 53:
-			plugStateSet(2, 0);	// enable plug for ph up pump
-			break;
-		case 54:
-			plugStateSet(2, 1);	// enable plug for ph up pump
-			break;
-		case 97:	// a
-			open_valve(0);	// open valve
-			break;
-		case 98:	// b
-			close_valve(0);	// close valve
-			break;
-		case 99:	// c
-			open_valve(1);	// open valve
-			break;
-		case 100:	// d
-			close_valve(1);	// close valve
-			break;
-		case 101:	// e
-			open_valve(2);	// open valve
-			break;
-		case 102:	// f
-			close_valve(2);	// close valve
-			break;
-		case 103:	// g
-			break;
-		case 104:	// h
-			break;
-		}
-	}
-
-	if (comm_state==COMM_GET_SETTINGS) {
-
-
-		for (transferred=5; transferred!=0; transferred--) {
-			TxByte = transferred;
-			TxDataReady=1;
-			vTaskDelay(1);
-			USART1_IRQHandler();
-		}
-		transferred=0;
-		while (transferred<SETTINGS_PACKET_SIZE*2) {	// *2 bacause each 16 bit var should be sent in two TX cycles
-			if (TxDataReady==0) {
-				if (transferred%2==0) {	// if sending odd (or even?) byte
-					EE_ReadVariable(SETTINGS_START_ADDR+(transferred/2), &buff);
-				}
-				vTaskDelay(1);
-				TxByte = (buff&0xFF00)>>8;
-				buff<<=8;
-				TxDataReady=1;
-				USART1_IRQHandler();
-				transferred++;
-			}
-			vTaskDelay(1);
-		}
-		comm_state = COMM_MONITOR_MODE;
-	}
-	vTaskDelay(1);
-	comm_state=comm_state;
-}
-
-
 
 void USART1_IRQHandler(void)
 {
@@ -981,7 +878,6 @@ static void uart_task(void *pvParameters){
 		vTaskDelay(10);
 		if (txbuff_ne==1) {	// if TxBuff is not empty (flag set by, for example, get_settings_block())
 			send_packet();	// send packet from TxBuff
-			txbuff_ne=0;	// packet sent, reset tx not empty flag
 		}
 		vTaskDelay(10);
 	}
@@ -993,6 +889,7 @@ void send_packet(){
 	while (TxCounter<NbrOfDataToTransfer){
 		vTaskDelay(5);
 	}
+	txbuff_ne=0;	// packet sent, reset tx not empty flag
 }
 
 void rx_flush(){
@@ -1025,8 +922,73 @@ void run_uart_cmd(void){
 		case 6:
 			get_settings_block(cmdbuf[2]);
 			break;
+		case 7:
+			get_status_block(cmdbuf[2]);
+			break;
 	}
 	rx_flush();
+}
+
+void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
+//	uint8_t block[8];
+	TxBuffer[0] = 90;	// Z
+	TxBuffer[1] = 88;	// X
+	TxBuffer[2] = 51;	// 3 (sending STATUS)
+	TxBuffer[3] = 15;	// packet size (ZX0+packet_size+payload). Payload is 8bytes
+	if (blockId==1) {	// state block 1
+		TxBuffer[4] = comm_state;
+		TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
+		TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
+		TxBuffer[7] = valveFlags;
+		TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
+		TxBuffer[9] = blockId;
+		TxBuffer[10] = dht_data[0];
+		TxBuffer[11] = dht_data[1];
+		TxBuffer[12] = dht_data[2];
+		TxBuffer[13] = dht_data[3];
+	}
+	if (blockId==2) {	// state block 2
+		uint32_t now = RTC_GetCounter();
+		TxBuffer[4] = (uint8_t)(RTC->CNTH&(0xFF));
+		TxBuffer[5] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
+		TxBuffer[6] = (uint8_t)(RTC->CNTL&(0xFF));
+		TxBuffer[7] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
+		TxBuffer[8] = (uint8_t)(adcAverage[0]&(0xFF));
+		TxBuffer[9] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
+		TxBuffer[10] = (uint8_t)(((adcAverage[1])>>0)&(0xFF));
+		TxBuffer[11] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
+		TxBuffer[12] = (uint8_t)(((adcAverage[2])>>0)&(0xFF));
+		TxBuffer[13] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
+	}
+	if (blockId==3) {	// state block 3
+		TxBuffer[4] = (uint8_t)(GPIOA->IDR&(0xFF));
+		TxBuffer[5] = (uint8_t)(((GPIOA->IDR)>>8)&(0xFF));
+		TxBuffer[6] = (uint8_t)(((GPIOA->IDR)>>16)&(0xFF));
+		TxBuffer[7] = (uint8_t)(((GPIOA->IDR)>>24)&(0xFF));
+		TxBuffer[8] = (uint8_t)(GPIOB->IDR&(0xFF));
+		TxBuffer[9] = (uint8_t)(((GPIOB->IDR)>>8)&(0xFF));
+		TxBuffer[10] = (uint8_t)(((GPIOB->IDR)>>16)&(0xFF));
+		TxBuffer[11] = (uint8_t)(((GPIOB->IDR)>>24)&(0xFF));
+		TxBuffer[12] = dht_data[2];
+		TxBuffer[13] = dht_data[3];
+	}
+
+	if (blockId==4) {	// state block 4
+		TxBuffer[4] = currentEc;
+		TxBuffer[5] = currentPh;
+		TxBuffer[6] = phUnderOver+ecUnderOver*4;
+		TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
+		TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
+		TxBuffer[9] = wpStateFlags;
+		TxBuffer[10] = dosingPumpStateFlags;
+		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
+		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
+		TxBuffer[13] = waterSensorStateFlags;
+	}
+
+	NbrOfDataToTransfer = TxBuffer[3];
+	TxCounter=0;
+	txbuff_ne = 1;
 }
 
 void get_settings_block(block_number){
@@ -1192,20 +1154,21 @@ void valve_feedback_init(void){		// init PA6-8 as input for 3V valve feedback
 	GPIO_InitTypeDef GPIO_InitStructure;
 	EXTI_InitTypeDef EXTI_InitStructure;
 	NVIC_InitTypeDef NVIC_InitStructure;
-
+//	GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
 	  // Enable GPIOA clock
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOD, ENABLE);
+	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
 	  // Configure PA5-7 pin as input pull-down
-	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8;
+	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
 //	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PD;
 	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 
-	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1;
+//	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1;
 //	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
+//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
+//	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 }
 
 void water_level_input_init(void){
@@ -1377,8 +1340,8 @@ void open_valve(uint8_t valveId){
 			else {
 
 			}
-
-			if ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==1) {
+			//feedback = (VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId);
+			if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==1) {
 				duration++;
 			}
 			else {
@@ -1408,7 +1371,7 @@ void close_valve(uint8_t valveId){
 	if (curstatus==1 && cur_valve_failed==0) {	// if no failure detected and current status is ok
 		while (duration<3 && timeout>0) {
 					// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
-					if ((((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1)==0) {
+					if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
 						duration++;
 					}
 					else {
@@ -1511,13 +1474,32 @@ void valve_test2(void){
 		vTaskDelay(1);
 
 		Lcd_write_str("States:");
-		for (i=0; i<5; i++) {
-			if (VALVE_SENSOR_PORT->IDR>>(VALVE_SENSOR_GPIO_SHIFT+i) & 1) {
-						Lcd_write_str("1");
-					}
-					else {
-						Lcd_write_str("0");
-					}
+
+		if (VALVE_SENSOR_PORT->IDR&(1<<4)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+		if (VALVE_SENSOR_PORT->IDR&(1<<5)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+
+		if (VALVE_SENSOR_PORT->IDR&(1<<6)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+
+		if (VALVE_SENSOR_PORT->IDR&(1<<8)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
 		}
 
 #endif
@@ -3044,6 +3026,30 @@ void display_usart_rx(void){
 		Lcd_clear();
 }
 
+void display_usart_tx(void){
+		uint8_t button=0, i=0;
+		Lcd_clear();
+		vTaskDelay(500);
+		while (button!=BUTTON_OK){
+			button=readButtons();
+			Lcd_goto(0,0);
+			vTaskDelay(2);
+			for (i=0; i<5;i++) {
+				Lcd_write_8b(TxBuffer[i]);
+			}
+			vTaskDelay(1);
+			Lcd_goto(1,0);
+			Lcd_write_8b(TxBuffer[5]);
+			Lcd_write_8b(TxBuffer[6]);
+			Lcd_write_str(" ");
+			Lcd_write_digit(TxCounter);
+			copy_arr(&TxBuffer, &LCDLine2, 7,9);
+//			Lcd_write_arr(&RxBuffer, 7);
+			vTaskDelay(20);
+		}
+		Lcd_clear();
+}
+
 
 void saveButtonRanges(void){
 	uint8_t i;
@@ -3965,6 +3971,7 @@ void programRunner(uint8_t programId){
 		displayAdcValues();	// test function to display ADC values
 #endif
 		display_usart_rx();
+		display_usart_tx();
 //		setDutyCycle();
 		break;
 	case 18:
@@ -4912,6 +4919,9 @@ void AdcInit(void)
 	// WARNING NTBU (needs to be updated)! shifting pins down to 0 from 1st, saves some space on discovery board
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
+	  GPIOA->CRL   &= ~GPIO_CRL_MODE0;
+	  GPIOA->CRL   &= ~GPIO_CRL_CNF0;
+
 	  GPIOA->CRL   &= ~GPIO_CRL_MODE1;
 	  GPIOA->CRL   &= ~GPIO_CRL_CNF1;
 
@@ -4921,8 +4931,8 @@ void AdcInit(void)
 	  GPIOA->CRL   &= ~GPIO_CRL_MODE3;
 	  GPIOA->CRL   &= ~GPIO_CRL_CNF3;
 
-	  GPIOA->CRL   &= ~GPIO_CRL_MODE4;
-	  GPIOA->CRL   &= ~GPIO_CRL_CNF4;
+//	  GPIOA->CRL   &= ~GPIO_CRL_MODE4;
+//	  GPIOA->CRL   &= ~GPIO_CRL_CNF4;
 
 	  RCC->APB2ENR |=  RCC_APB2ENR_ADC1EN;
 	  RCC->CFGR    &= ~RCC_CFGR_ADCPRE;
@@ -4986,7 +4996,6 @@ void prvSetupHardware()
 
 
 //	        GPIOC->CRH   |= GPIO_CRH_MODE8_0;       //  10MHz.
-	        										// and where is 9? but works without it... maybe it is unnecessary to set 10MHz? Maybe it's default?
 	        GPIOC->CRL   |= GPIO_CRL_MODE0_0;
 	        GPIOC->CRL   |= GPIO_CRL_MODE1_0;
 	        GPIOC->CRL   |= GPIO_CRL_MODE2_0;
@@ -5154,14 +5163,10 @@ int main(void)
 	prvSetupHardware();
 
 	bluetooth_init();
-
+	Init_lcd();
 #ifdef USE_VALVES
 	valve_feedback_init();
 #endif
-	Init_lcd();
-
-
-
 
 	buttonCalibration();
 

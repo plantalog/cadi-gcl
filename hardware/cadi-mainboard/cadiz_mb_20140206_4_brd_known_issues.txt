@@ -1,0 +1,6 @@
+The file cadi_pcb_140210_polygoned_kamitra.rar contains layout for the Cadi mainboard PCB and has following known issues:
+- T8 gate pad interconnected with other pad of this MOSFET
+- SV5 should be .1" in X axis (just a bit left) closer to SV2
+- PD0 and PD1 cannot be used as valve feedback, since they are used for External oscillator - HSE. PA4 and PA8 seems to be good to use.
+- Sonar and DHT DB9 female connector could be shifted a bit, for better PCB fit into case.
+- Bluetooth USART RX and TX seems to be switched
