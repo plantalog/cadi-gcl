@@ -9,7 +9,7 @@
 
 function crc_block($input, $packet, $length){	// $input is XORin init
 	for ($i=0; $i<$length; $i++) {
-		echo $input.' xor '.ord($packet[$i]).'              ';
+//		echo $input.' xor '.ord($packet[$i]).'              ';
 		$input ^= ord($packet[$i]);
 //		echo 'CRC output='.$input.'<br>';
 	}

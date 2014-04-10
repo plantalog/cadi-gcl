@@ -66,13 +66,37 @@ function get_status_block(blockId){
 		// $('#status_block').html(data);
 	});
 	$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
+	
 		var n = data.indexOf("lock_id=1"); 
 		if (n>0) {		
 			out = data.split('lock_id=1')
 			$('#status_block').html(out[1]);
 		}
+//		var i=0;
+//		for(i=0; i<4;i++) {
+//			$('#valve'+i+'_radio1').attr('checked','checked');
+//		}
+//		alert('shas spoju');
+		
+		// for="plug3_radio2" role="button" aria-disabled="false" aria-pressed="true"
+	//	$(":input").attr('checked','checked');
+
 		d = new Date();
+//		image.load(function(){	// http://stackoverflow.com/questions/5789222/wait-with-image-replace-until-image-is-loaded
+//			 image.show();
+//		});
 		$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+	});
+}
+
+function check_plug(){
+	alert("checking!");
+	$(function(){
+		$('#radio_plug1').attr('checked','checked');
+		$('#plug1_radio').attr('checked','checked');
+		$('#plug1_radio1').attr('checked','true');
+		$("radio_").buttonset("refresh");
+		$("#radio_plug1").buttonset("refresh");
 	});
 }
 
@@ -141,16 +165,14 @@ function bt_setdd() {
 function cadi_status_stream(){
 	var state = $('#flag_status_stream').is(':checked');
 	if (state==1) {
-		var interval = setInterval(function(){get_status_block(1)},1000);
+		var interval = setInterval(function(){get_status_block(1)},1200);
 		$('#status_stream_interval').val(interval);
 	}
 	if (state==0) {
 		var  interval = $('#status_stream_interval').val();
 //		alert(interval);
 		clearInterval(interval);
-
 	}
-
 }
 		
 
@@ -167,21 +189,26 @@ function cadi_status_stream(){
 <li><a href="cm/cadi_sensors.php">Sensors</a></li>
 <li><a href="cm/cadi_execution.php">Execution</a></li>
 <li><a href="cm/cadi_advanced.php">Advanced</a></li>
-<li><a href="cm/cadi_dd.php">Direct drive</a></li>
+<!--<li><a href="cm/cadi_dd.php">Direct drive</a></li> -->
 </ul>
 <div class="ral">
-<button class="btn_ fr">Apply settings</button>
+<button class="btn_ fr" onClick="check_plug()">Apply settings</button>
 <button class="btn_ fr">Reload settings</button>
 </div>
 <div id="tabs-1">
 <input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS
-<div id="status_block">Status appears here
-	<?php include_once('cm/cadi_status.php'); ?>
+<br>
+<div style="display:block; float:right;">
+	<?php include_once('cm/cadi_dd.php'); ?>
+	<div id="status_block">Status appears here
+		<?php include_once('cm/cadi_status.php'); ?>
+	</div>
 </div>
-
+<img id="cadi_img" style="float:left;" src="img/curimage.jpeg?" />
 	=================================================	
 	<br>
-	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div><br>
+<!--	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div>  -->
+	<br> 
 	<div onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</div><br>
 	<div onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</div>
 	<select id="bind_mac" name="bind_mac">
@@ -189,24 +216,24 @@ function cadi_status_stream(){
 	</select>
 	<div onClick=bt_connect() style="display:inline; border: 1px solid red;">Connect</div>
 	<div id="binded_rfcomms"></div>
-	<div title="use this field to send the data to Cadi while connected" id="tx_form">
+<!--	<div title="use this field to send the data to Cadi while connected" id="tx_form">
 		<input type="text" name="tx_data" id="tx_data" />
 		<div onClick="bt_tx_packet()">Send</div>	
-	</div>
+	</div> 
 
 
-	<div title="send ZX2[1],[1],[1]" id="tx_form">
+  	<div title="send ZX2[1],[1],[1]" id="tx_form">
 		<input type="text" name="tx_data_packet" id="tx_data_packet" />
 		<div onClick="bt_tx()">Send packet</div>	
-	</div>
+	</div> -->
 
 	RFCOMM NUMBER:
 	<input type="text" value="0" id="rfcomm_nr" />
 
-<div onClick="bt_setdd()">Set DD</div>	
+<!--  <div onClick="bt_setdd()">Set DD</div>	
 
 <div onClick="plugStateSet('1','1')">Enable P1</div>
-<div onClick="plugStateSet('1','0')">Disable P1</div>
+<div onClick="plugStateSet('1','0')">Disable P1</div>  -->
 <button onClick="get_status_block('1')">Get Status</button>
 </div>
 </div>

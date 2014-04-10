@@ -113,6 +113,11 @@ function plugStateSet(plug, state){
 		</tr>';
 	}
 	?>
+
+
+
+
+
 	</table>
 	</div>
 </div>
@@ -132,6 +137,7 @@ Counter: 	<select id="f_gw_counter_id">
 		<option value="2">2</option>
 		<option value="3">3</option>
 	</select>
+<br>
 <input type="text" title="enter amount of water you want to get (in CL, integer value from 0 to 65535)" id="f_gw_amount" />
 <button>Get water</button>
 </div>
