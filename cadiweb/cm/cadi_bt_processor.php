@@ -1,7 +1,8 @@
 <?php 
 session_start();
 
-include('packet_processor.php');
+//include_once('cadi_response_parser.php');
+include_once('packet_processor.php');
 
 if (isset($_GET['action'])) {
 	$action = $_GET['action'];
@@ -43,11 +44,12 @@ switch ($action) {
 		sleep(1);
 		break;
 	case 'tx':
-		bt_tx('rfcomm0', $packet);
-		print_r($packet);
+		bt_tx('rfcomm0', $cadi_packet);
+		print_r($cadi_packet);
 		break;
 	case 'tx_packet':
-		bt_tx('cadi', $packet);
+//		$cadi_packet = "Test Cadi Packet";
+		bt_tx('cadi', $cadi_packet);
 		break;
 	case 'rfcomm_scan':
 		rfcomm_scan();
@@ -64,6 +66,20 @@ switch ($action) {
 	case 'command_send':
 		command_send($_POST['command'], $_POST['mac']);
 		break;
+	case 'get_status':
+		include_once('cadi_status.php');
+		break;
+/*	case 'stream_photo':
+		exec('fswebcam -d /dev/video1 -r 640x480 --jpeg 85 ../img/curimage.jpeg & >> /dev/null');
+		break;
+	case 'stream_video_stop':
+		$videostreams = exec('ps aux |grep fswebcam');
+		echo $videostreams;
+		print_r($videostreams);
+		break;
+ */
+		
+
 }
 
 function command_send($command, $mac){

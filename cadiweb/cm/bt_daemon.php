@@ -1,9 +1,13 @@
 <?php
 
+
+
+
 echo "Bluetooth daemon for Cadi started";
-
-
+$photo_divider = 2;
+$cycle_counter = 0;
 while(1){
+	$cycle_counter++;
 	$command = file_get_contents('daemon_cmd');
 	unset($execmd);
 	if(!empty($command)){
@@ -54,6 +58,14 @@ while(1){
 	}
 
 	sleep(1);
+	if ($cycle_counter%$photo_divider==0) {	// photo_divider needed for making photo NOT every while() iteration
+		exec('fswebcam -d /dev/video1 -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
+	}
+	if ($cycle_counter>9999999){
+		$cycle_counter=0;
+	}
+
+//	exec('streamer -f jpeg -o ../img/curimage.jpeg');
 }
 
 

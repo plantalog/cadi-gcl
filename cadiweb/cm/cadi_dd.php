@@ -56,11 +56,13 @@ function cdd_toggle(){
 			cadi_list_rfcomms();
 		});  
 	}
+//	alert(data);
 }
 
 function plugStateSet(plug, state){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug:plug, state:state}, function(data){
 		cadi_list_rfcomms();
+//		alert(data);
 	});  
 }
 

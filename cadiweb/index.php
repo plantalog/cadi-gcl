@@ -29,16 +29,7 @@ $(function() {
 	});
 });
 
-/* function cadi_mac_stream(){
-	var mac = $('#bind_mac').val();
 
-	alert('going to stream '+mac);
-	$.post('cm/cadi_bt_processor.php', {action: 'mac_stream', mac:mac}, function(data){
-		alert('streaming');
-		cadi_list_rfcomms();
-		$('#main_output').html(data);
-	});
-} */
 
 function bt_connect(){
 	var mac = $('#bind_mac').val();
@@ -72,7 +63,16 @@ function bt_disconnect(){
 
 function get_status_block(blockId){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:1}, function(data){
-		$('#status_block').html(data);
+		// $('#status_block').html(data);
+	});
+	$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
+		var n = data.indexOf("lock_id=1"); 
+		if (n>0) {		
+			out = data.split('lock_id=1')
+			$('#status_block').html(out[1]);
+		}
+		d = new Date();
+		$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
 	});
 }
 
@@ -138,9 +138,26 @@ function bt_setdd() {
 	});  
 }
 
+function cadi_status_stream(){
+	var state = $('#flag_status_stream').is(':checked');
+	if (state==1) {
+		var interval = setInterval(function(){get_status_block(1)},1000);
+		$('#status_stream_interval').val(interval);
+	}
+	if (state==0) {
+		var  interval = $('#status_stream_interval').val();
+//		alert(interval);
+		clearInterval(interval);
+
+	}
+
+}
+		
+
 </script>
 </head>
 <body>
+<input type="hidden" id="status_stream_interval" value="" />
 <div id="cadi_tabs">
 <ul>
 <li><a href="#tabs-1">Status</a></li>
@@ -157,41 +174,11 @@ function bt_setdd() {
 <button class="btn_ fr">Reload settings</button>
 </div>
 <div id="tabs-1">
-	<p>Cadi status</p>
-	<table>
-	<tr>
-		<td>Cadi Time</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>220V Plugs</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>12V plugs</td>
-		<td>%</td>
-	</tr>
-	<tr>
-		<td>Water levels</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>Temperature</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>Humidity</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>pH</td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>EC</td>
-		<td></td>
-	</tr>
-	</table>
+<input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS
+<div id="status_block">Status appears here
+	<?php include_once('cm/cadi_status.php'); ?>
+</div>
+
 	=================================================	
 	<br>
 	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div><br>
@@ -221,7 +208,6 @@ function bt_setdd() {
 <div onClick="plugStateSet('1','1')">Enable P1</div>
 <div onClick="plugStateSet('1','0')">Disable P1</div>
 <button onClick="get_status_block('1')">Get Status</button>
-<div id="status_block">Status appears here</div>
 </div>
 </div>
 </body>

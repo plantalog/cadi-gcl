@@ -1,7 +1,22 @@
 <?php
 
-unset($packet);
+ function crc_block_ord($input, $ord_arr, $length){	// $input is XORin init
+	for ($i=0; $i<$length; $i++) {
+		$input = 111;
+	}
+	return $input;
+}
 
+function crc_block($input, $packet, $length){	// $input is XORin init
+	for ($i=0; $i<$length; $i++) {
+		echo $input.' xor '.ord($packet[$i]).'              ';
+		$input ^= ord($packet[$i]);
+//		echo 'CRC output='.$input.'<br>';
+	}
+	return $input;
+} 
+
+unset($packet);
 // echo "packet processor included";
 if (isset($_POST['cmd'])) {
 	$packet_pref = "ZX2";
@@ -16,6 +31,8 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr($_POST['counter']);		// counter_id
 			$packet .= chr(intval($_POST['gw_amount']/256));	// first byte of uint16_t amount (of water)
 			$packet .= chr($_POST['gw_amount']%256);		// second byte
+			$packet .= chr($_POST['gw_amount']%256);		// second byte
+
 			break;
 		case 1:		// plugStateSet(8,8)
 			$packet .= chr(4);	// packet payload size
@@ -43,7 +60,7 @@ if (isset($_POST['cmd'])) {
 			break;
 		case 6:		// get_settings_block()
 			$packet .= chr(3);	// packet payload size (including this size byte)
-			$packet .= chr(5);	// command
+			$packet .= chr(6);	// command
 			$packet .= chr($_POST['block_id']);	// SETTINGS block id
 			break;
 		case 7:		// get_status_block();
@@ -53,6 +70,10 @@ if (isset($_POST['cmd'])) {
 			break;
 	}
 
+	$packet[3] = chr(ord($packet[3])+1);	// increase packet length byte for CRC use (TEMPORARY solution, use fixed values when stable)
+	$curcrc = chr(crc_block(0, $packet, (strlen($packet))));
+	$packet .= $curcrc;	// add CRC to packet
+	
 
 	unset($arguments);
 	for ($i=0; $i<=strlen($packet);$i++) {
@@ -60,6 +81,12 @@ if (isset($_POST['cmd'])) {
 	}
 	unset($packet);
 	$packet = $arguments;
+	$cadi_packet = $arguments;
+//	$cadi_packet = "nulevok";
+}
+
+else {
+	$cadi_packet = "huuuj";
 }
 
 $packet_crc = crcs($packet);

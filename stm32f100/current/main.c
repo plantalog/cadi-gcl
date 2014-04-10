@@ -479,14 +479,14 @@ uint16_t wfCalArray[WFM_AMOUNT];
 #define RXM_NONE						0
 #define RXM_CMD							4
 #define RXM_SET							3
-uint8_t cmdbuf[10];		// command packet buffer
+uint8_t cmdbuf[16];		// command packet buffer
 uint8_t cmdbufp=0;		// pointer
 uint8_t prefixDetectionIdx=0;
 uint8_t pb_pntr=0;			// packet buffer pointer
 uint8_t packet_length=0;
 uint8_t rxm_state=0;
 uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
-
+uint8_t rx_packet_crc = 0;	// cmdbuf and ZXn packet header CRC
 
 void hygroStatSettings(void);
 uint8_t readPercentVal(uint8_t value);
@@ -567,6 +567,8 @@ void startWp(void);
 uint16_t adjust16bit_fast(uint16_t val, uint8_t speed);
 char * utoa_fast_div(uint32_t value, char *buffer);
 
+// count crc starting from input and taking buffer from start_byte for length bytes
+uint8_t crc_block(uint8_t input, uint8_t *start_byte, uint8_t length);
 
 static void uart_task(void *pvParameters);
 static void prvSetupHardware( void );
@@ -806,6 +808,14 @@ void Lcd_write_16b(uint16_t tmp) {
 	Lcd_write_digit((uint16_t)tmp%100);
 }
 
+uint8_t crc_block(uint8_t input, uint8_t *start_byte, uint8_t length){
+	uint8_t i=0;
+	for (i=0; i<length; i++) {
+		input ^= start_byte[i];
+	}
+	return input;
+}
+
 
 void USART1_IRQHandler(void)
 {
@@ -829,15 +839,23 @@ void USART1_IRQHandler(void)
 
 	if (packet_ready==0) {
 		if (rxm_state==RXM_CMD) {
-			if (pb_pntr==0) {	// getting packet length
-				packet_length=RxByte;	// packet length
+			if (pb_pntr==0) {	// if packet buffer pointer is 0, it points to payload size (payload, including this size byte)
+				packet_length=RxByte;	// get packet length
 			}
-			cmdbuf[pb_pntr++]=RxByte;
+			cmdbuf[pb_pntr++]=RxByte;	// receive byte into cmd buffer and increase command packet buffer pointer
+			if (pb_pntr==packet_length) {	// if packet buffer pointer reached packet length (rely on RXM_NONE set later)
+				// crc count
+				rx_packet_crc = crc_block(48, &cmdbuf[0],packet_length);	// 48 is XOR of "ZX2"
+				// crc check
+				if (rx_packet_crc==0) {	//
+					packet_ready=1;	// packet received correctly and is ready to process
+				}
+				else {
+					rx_flush();	// discard broken packet
+				}
+				rxm_state=RXM_NONE; // RX machine state set to NONE, completes RX cycle
+				pb_pntr=0;			// packet buffer pointer to 0
 
-			if (packet_length==pb_pntr) {
-				packet_ready=1;
-				rxm_state=RXM_NONE;
-				pb_pntr=0;
 			}
 
 		}
@@ -872,6 +890,7 @@ void USART1_IRQHandler(void)
 static void uart_task(void *pvParameters){
 	while (1) {
 		if (packet_ready==1) {
+
 			run_uart_cmd();	// when
 			packet_ready=0;
 		}
@@ -894,7 +913,7 @@ void send_packet(){
 
 void rx_flush(){
 	uint8_t i=0;
-	for (i=0; i<7; i++){
+	for (i=0; i<16; i++){
 		cmdbuf[i] = 0;
 	}
 }
@@ -934,18 +953,19 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 	TxBuffer[0] = 90;	// Z
 	TxBuffer[1] = 88;	// X
 	TxBuffer[2] = 51;	// 3 (sending STATUS)
-	TxBuffer[3] = 15;	// packet size (ZX0+packet_size+payload). Payload is 8bytes
+	TxBuffer[3] = 16;	// packet size (ZX0+packet_size+payload+crc). Payload is 8bytes
 	if (blockId==1) {	// state block 1
 		TxBuffer[4] = comm_state;
 		TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
 		TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
 		TxBuffer[7] = valveFlags;
 		TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
-		TxBuffer[9] = blockId;
+		TxBuffer[9] = 99;	// test value
 		TxBuffer[10] = dht_data[0];
 		TxBuffer[11] = dht_data[1];
 		TxBuffer[12] = dht_data[2];
 		TxBuffer[13] = dht_data[3];
+		TxBuffer[14] = blockId;
 	}
 	if (blockId==2) {	// state block 2
 		uint32_t now = RTC_GetCounter();
@@ -959,6 +979,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
 		TxBuffer[12] = (uint8_t)(((adcAverage[2])>>0)&(0xFF));
 		TxBuffer[13] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
+		TxBuffer[14] = blockId;
 	}
 	if (blockId==3) {	// state block 3
 		TxBuffer[4] = (uint8_t)(GPIOA->IDR&(0xFF));
@@ -971,6 +992,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)(((GPIOB->IDR)>>24)&(0xFF));
 		TxBuffer[12] = dht_data[2];
 		TxBuffer[13] = dht_data[3];
+		TxBuffer[14] = blockId;
 	}
 
 	if (blockId==4) {	// state block 4
@@ -984,12 +1006,14 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
 		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
 		TxBuffer[13] = waterSensorStateFlags;
+		TxBuffer[14] = blockId;
 	}
-
+	TxBuffer[15] = crc_block(0, &TxBuffer[0],15);
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
 	txbuff_ne = 1;
 }
+
 
 void get_settings_block(block_number){
 	/* block_number is a number from 0 to N, where N is a
@@ -1001,7 +1025,7 @@ void get_settings_block(block_number){
 	TxBuffer[0] = "Z";
 	TxBuffer[1] = "X";
 	TxBuffer[2] = "0";	// sending settings
-	TxBuffer[3] = 13;	// packet size (ZX0+packet_size+payload). Payload is 8bytes
+	TxBuffer[3] = 13;	// packet size (ZX0+packet_size+payload). Payload is 8bytes. Here, packet size means only payload with size byte, not like in STATUS packets, where size means full packet size
 	TxBuffer[4] = block_number;
 	for (i=0; i<4; i++) {
 		// here goes EEPROM reading loop, that puts payload data into TX buff, equipped with appropriate packet header
@@ -3018,7 +3042,8 @@ void display_usart_rx(void){
 			Lcd_write_8b(RxBuffer[5]);
 			Lcd_write_8b(RxBuffer[6]);
 			Lcd_write_str(" ");
-			Lcd_write_digit(RxCounter);
+//			Lcd_write_digit(RxCounter);
+			Lcd_write_digit(rx_packet_crc);
 			copy_arr(&RxBuffer, &LCDLine2, 7,9);
 //			Lcd_write_arr(&RxBuffer, 7);
 			vTaskDelay(20);
