@@ -68,6 +68,10 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(7);	// command
 			$packet .= chr($_POST['block_id']);	// STATUS block_id
 			break;
+		case 10:		// get_status_block();
+			$packet .= chr(2);	// packet payload size (including this size byte)
+			$packet .= chr(10);	// command
+			break;
 	}
 
 	$packet[3] = chr(ord($packet[3])+1);	// increase packet length byte for CRC use (TEMPORARY solution, use fixed values when stable)

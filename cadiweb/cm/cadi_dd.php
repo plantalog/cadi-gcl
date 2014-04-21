@@ -28,6 +28,11 @@ function close_valve(valve){
 		$('#main_output').html(data);
 	});
 }
+function reset_valve_fails(){
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 10}, function(data){
+		$('#main_output').html(data);
+	});
+}
 
 function cadi_send_command(){
 	var mac = $('#bind_mac').val();
@@ -115,7 +120,7 @@ function plugStateSet(plug, state){
 	?>
 
 
-
+	<tr><td><button class="btn_" onClick="reset_valve_fails()">Fails=0</button></td></tr>
 
 
 	</table>
