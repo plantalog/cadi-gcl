@@ -1,3 +1,6 @@
+v2
+- refactored init process for using PA13 and PA14 pins properly to control solenoid valves, now STM32 chip flashing available with RESET button pressed (HOLD "Reset" button, click flash in CoIDE and release the "Reset button" for flashing start)
+
 v2 beta2
 - added response functions for Cadi STATUS reporting
 - valve feedback initialized on PA4 and PA8 (to avoid disabling HSE)

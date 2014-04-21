@@ -293,6 +293,7 @@ typedef struct
 } RTC_DateTime;
 
 RTC_Time toAdjust;
+uint8_t auto_flags=255;
 uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS
 
@@ -944,6 +945,17 @@ void run_uart_cmd(void){
 		case 7:
 			get_status_block(cmdbuf[2]);
 			break;
+		case 8:
+			if (comm_state==COMM_DIRECT_DRIVE) {
+				auto_flags=cmdbuf[2];	// set auto-processing flags
+			}
+			break;
+		case 9:
+			enable_dosing_pump(cmdbuf[2], cmdbuf[3]);
+			break;
+		case 10:
+			valve_failed = cmdbuf[2];
+			break;
 	}
 	rx_flush();
 }
@@ -960,7 +972,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
 		TxBuffer[7] = valveFlags;
 		TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
-		TxBuffer[9] = 99;	// test value
+		TxBuffer[9] = wpStateFlags;	// watering program run flags
 		TxBuffer[10] = dht_data[0];
 		TxBuffer[11] = dht_data[1];
 		TxBuffer[12] = dht_data[2];
@@ -1001,13 +1013,42 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[6] = phUnderOver+ecUnderOver*4;
 		TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
 		TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
-		TxBuffer[9] = wpStateFlags;
+		TxBuffer[9] = 00;		// EMPTY
 		TxBuffer[10] = dosingPumpStateFlags;
 		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
 		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
 		TxBuffer[13] = waterSensorStateFlags;
 		TxBuffer[14] = blockId;
 	}
+
+	if (blockId==5) {	// state block 5
+		TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+		TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+		TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+		TxBuffer[5] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+		TxBuffer[8] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
+		TxBuffer[9] = (uint8_t)((water_counter[0]>>8)&(0xFF));
+		TxBuffer[10] = (uint8_t)((water_counter[0]>>16)&(0xFF));
+		TxBuffer[11] = (uint8_t)((water_counter[0]>>24)&(0xFF));
+		TxBuffer[12] = valve_failed;		//
+		TxBuffer[13] = waterSensorStateFlags;
+		TxBuffer[14] = blockId;
+	}
+
+	if (blockId==6) {	// block 6
+		TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+		TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+		TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+		TxBuffer[5] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+		TxBuffer[8] = (uint8_t)(water_counter[1]&(0xFF));		// 2nd water flow meter counter
+		TxBuffer[9] = (uint8_t)((water_counter[1]>>8)&(0xFF));
+		TxBuffer[10] = (uint8_t)((water_counter[1]>>16)&(0xFF));
+		TxBuffer[11] = (uint8_t)((water_counter[1]>>24)&(0xFF));
+		TxBuffer[12] = (uint8_t)(wfCalArray[1]&(0xFF));
+		TxBuffer[13] = (uint8_t)((wfCalArray[1]>>8)&(0xFF));
+		TxBuffer[14] = blockId;
+	}
+
 	TxBuffer[15] = crc_block(0, &TxBuffer[0],15);
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
@@ -1021,16 +1062,18 @@ void get_settings_block(block_number){
 	 * 8 - is a default block size for this function
 	 */
 	uint8_t i=0;
-	uint16_t addr = 0;
+	uint16_t addr = 0, tmpbuf = 0;
 	TxBuffer[0] = "Z";
 	TxBuffer[1] = "X";
 	TxBuffer[2] = "0";	// sending settings
 	TxBuffer[3] = 13;	// packet size (ZX0+packet_size+payload). Payload is 8bytes. Here, packet size means only payload with size byte, not like in STATUS packets, where size means full packet size
 	TxBuffer[4] = block_number;
-	for (i=0; i<4; i++) {
+	for (i=0; i<4; i++) {	// 4 blocks x 2bytes = 8bytes
 		// here goes EEPROM reading loop, that puts payload data into TX buff, equipped with appropriate packet header
 		addr = SETTINGS_START_ADDR+block_number*4+i*2;	// address for
-		EE_ReadVariable(addr, &TxBuffer[5+i*2]);
+		EE_ReadVariable(addr, &tmpbuf);
+		TxBuffer[5+i*2] = (uint8_t)(tmpbuf*0xFF00)>>8;
+		TxBuffer[5+i*2+1] = (uint8_t)(tmpbuf*0xFF);
 	}
 	txbuff_ne=1;
 }
@@ -1076,7 +1119,7 @@ void bluetooth_init(void){
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
+//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
     NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
     NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
@@ -1140,8 +1183,10 @@ void StartDMAChannel4(unsigned int LengthBufer)
 
 void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control output
 
+		GPIO_InitTypeDef init_pin;
+
 #ifndef CADI_MB
-			GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+		GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
 	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF13;
@@ -1153,10 +1198,18 @@ void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control o
 #endif
 
 #ifdef CADI_MB
-	 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-	 //	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-	 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-	 	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+	 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
+	 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+//	 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+//	 	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+	 	init_pin.GPIO_Pin  = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
+		init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+		init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+		GPIO_Init(GPIOA, &init_pin);
+
+
+/*		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
+	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF14;
 	     GPIOA->CRH   |= GPIO_CRH_MODE14_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF13;
@@ -1164,7 +1217,7 @@ void valve_motor_control_init(void){		// init PA8-PA11 for valve motor control o
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF12;
 	     GPIOA->CRH   |= GPIO_CRH_MODE12_0;
 		 GPIOA->CRH      &= ~GPIO_CRH_CNF11;
-	     GPIOA->CRH   |= GPIO_CRH_MODE11_0;
+	     GPIOA->CRH   |= GPIO_CRH_MODE11_0; */
 
 #endif
 }
@@ -1247,9 +1300,7 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 	  TIM_OCInitTypeDef TIM_OCInitStruct;
 
 
-	    RCC_APB2PeriphClockCmd(
-	            RCC_APB2Periph_GPIOC |
-	            RCC_APB2Periph_AFIO, ENABLE );
+	    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE );
 
 	    RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
 
@@ -1259,7 +1310,7 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 	    GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9;
 	    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;            // Alt Function - Push Pull
-	    GPIO_Init( GPIOC, &GPIO_InitStructure );
+	    GPIO_Init(GPIOC, &GPIO_InitStructure );
 	    GPIO_PinRemapConfig( GPIO_FullRemap_TIM3, ENABLE );        // Map TIM3_CH3 to GPIOC.Pin8, TIM3_CH4 to GPIOC.Pin9
 
 	    // Let PWM frequency equal 100Hz.
@@ -1325,22 +1376,26 @@ void tankLevelStabSetup(void){
 
 void tankLevelStab(void){
 #ifdef TANK_STAB_ENABLE
-	if (sonar_read[0]>(tank_windows_top[0]+2)) {
-		open_valve(1);
-	}
-	if (sonar_read[0]<tank_windows_top[0]) {
-		close_valve(1);
+	if ((auto_flags&2)==1) {		// TANK STAB flag 1
+		if (sonar_read[0]>(tank_windows_top[0]+2)) {
+			open_valve(1);
+		}
+		if (sonar_read[0]<tank_windows_top[0]) {
+			close_valve(1);
+		}
 	}
 #endif
 }
 
 void psiStab(void){
 #ifdef PSI_STAB_ENABLE
-	if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
-		plugStateSet(psi_pump_load_id, 0);
-	}
-	if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
-		plugStateSet(psi_pump_load_id, 1);
+	if (auto_flags&1==1) {			// PSI STAB flag 0
+		if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
+			plugStateSet(psi_pump_load_id, 0);
+		}
+		if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
+			plugStateSet(psi_pump_load_id, 1);
+		}
 	}
 #endif
 }
@@ -1351,10 +1406,10 @@ void open_valve(uint8_t valveId){
 #ifdef USE_VALVES
 	uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
 	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
-	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
+	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
 	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 	cur_valve_failed>>=valveId;	// ostavit' toka flag
-	if (curstatus==0 && cur_valve_failed==0) {	// if no failure detected and current status is ok
+	if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
 		run_valve_motor(valveId);
 		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
 		while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
@@ -1379,6 +1434,9 @@ void open_valve(uint8_t valveId){
 		}
 		stop_valve_motor(valveId);
 	}
+	if (curstatus==0 && (valveId==2 || valveId==3)) {	// for solenoid valves
+		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+	}
 	valveFlags |= (1<<valveId);
 	vTaskDelay(5);
 #endif
@@ -1392,7 +1450,7 @@ void close_valve(uint8_t valveId){
 	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
 	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 	cur_valve_failed>>=valveId;	// ostavit' toka flag
-	if (curstatus==1 && cur_valve_failed==0) {	// if no failure detected and current status is ok
+	if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
 		while (duration<3 && timeout>0) {
 					// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
 					if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
@@ -1405,9 +1463,10 @@ void close_valve(uint8_t valveId){
 					timeout--;
 		}
 	}
-
-
 	stop_valve_motor(valveId);
+	if (curstatus==1 && (valveId==2 || valveId==3)) {	// for solenoid valves
+		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+	}
 	valveFlags &= ~(1<<valveId); // sbrosit' flag
 }
 
@@ -1531,6 +1590,61 @@ void valve_test2(void){
 	Lcd_clear();
 }
 
+void valve_test3(void){
+	uint8_t button=0, curvalve=2, i=0;
+	Lcd_clear();
+
+	while (button!=BUTTON_OK) {
+		vTaskDelay(20);
+		button=readButtons();
+#ifdef USE_VALVES
+		Lcd_goto(0,0);
+		Lcd_write_str("curvalve:");
+		Lcd_write_digit(curvalve);
+		if (button==BUTTON_FWD){
+			//open_valve(curvalve);
+			VALVE_MOTOR_PORT->BSRR |= (1<<(11+curvalve));
+			run_valve_motor(curvalve);
+		}
+		if (button==BUTTON_CNL){
+			//close_valve(curvalve);
+			VALVE_MOTOR_PORT->BRR |= (1<<(11+curvalve));
+			stop_valve_motor(curvalve);
+		}
+		if (button==BUTTON_BCK){
+			if (curvalve<4) {
+				curvalve++;
+			}
+			else {
+				curvalve=2;
+			}
+		}
+		vTaskDelay(1);
+		Lcd_goto(1,0);
+		Lcd_write_str("VF");
+		Lcd_write_digit(valveFlags);
+
+		vTaskDelay(1);
+
+		Lcd_write_str("States:");
+
+		if (GPIOA->ODR&(1<<13)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+		if (GPIOA->ODR&(1<<14)) {
+			Lcd_write_str("1");
+		}
+		else {
+			Lcd_write_str("0");
+		}
+
+#endif
+	}
+	Lcd_clear();
+}
 
 
 void valve_test(void){
@@ -1617,6 +1731,7 @@ void valve_test(void){
 	}
 	Lcd_clear();
 	valve_test2();
+	valve_test3();
 }
 
 void water_program_setup(progId){
@@ -4944,6 +5059,11 @@ void AdcInit(void)
 	// WARNING NTBU (needs to be updated)! shifting pins down to 0 from 1st, saves some space on discovery board
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
+    GPIOC->CRL      &= ~GPIO_CRL_CNF0;		// LOAD triggering from PC0...
+    GPIOC->CRL      &= ~GPIO_CRL_CNF1;
+    GPIOC->CRL      &= ~GPIO_CRL_CNF2;
+    GPIOC->CRL      &= ~GPIO_CRL_CNF3;
+
 	  GPIOA->CRL   &= ~GPIO_CRL_MODE0;
 	  GPIOA->CRL   &= ~GPIO_CRL_CNF0;
 
@@ -5025,6 +5145,9 @@ void prvSetupHardware()
 	        GPIOC->CRL   |= GPIO_CRL_MODE1_0;
 	        GPIOC->CRL   |= GPIO_CRL_MODE2_0;
 	        GPIOC->CRL   |= GPIO_CRL_MODE3_0;
+
+
+
 }
 
 
@@ -5129,48 +5252,30 @@ void setDutyCycle(void){
 
 int main(void)
 {
-//	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
+	// VALVE INIT
+	GPIO_InitTypeDef init_pin;
+ 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+ 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+ 	init_pin.GPIO_Pin  = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &init_pin);
+	// VALVE INIT
 	SystemInit();
 #ifdef USE_VALVES
-	valve_motor_control_init();
-	stop_valve_motor(0);
+	stop_valve_motor(0);	// ball valves
 	stop_valve_motor(1);
-	stop_valve_motor(2);
-	stop_valve_motor(3);
-
-
-/*
-	run_valve_motor(0);
-	run_valve_motor(1);
-	run_valve_motor(2);
-	run_valve_motor(3);
-*/
-
-	uint32_t i;
-	for (i=0; i<4000000; i++) {}
 #endif
 
-//	valve_status_updater();
+	uint32_t i;
 	dosing_motor_control_init();
-//	enable_dosing_pump(0, 0);
-//	enable_dosing_pump(1, 0);
-//	enable_dosing_pump(2, 0);
-//	enable_dosing_pump(3, 0);
-//	close_valve(0,1);
 	/* Unlock the Flash Program Erase controller */
 	FLASH_Unlock();
 	/* EEPROM Init */
 	EE_Init();
-/*	uint32_t tmp;		// pohodu, nenuzhnoe uzhe. 05.06.2013
-	char value[10];
-	tmp = EE_ReadWord(0x8000);
-	int32str(tmp, &value); */
 	AdcInit();
 	dht_init();
-//	Init_lcd();
-
-//	water_level_input_init();
-
 	RtcInit();		//init real time clock
 
 	DSTATUS resp=0;		// variable for status response from sd card init function
@@ -5184,7 +5289,14 @@ int main(void)
 #ifndef PAPA_EDITION
 	sonar_init();
 #endif
-
+	// SOLENOID VALVE RE-INIT
+ 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+ 	GPIO_PinRemapConfig(GPIO_Remap_SWJ_Disable, ENABLE);
+ 	init_pin.GPIO_Pin  = GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14;
+	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
+	init_pin.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOA, &init_pin);
+	// EOF SOLENOID VALVE RE-INIT
 	prvSetupHardware();
 
 	bluetooth_init();
@@ -5197,13 +5309,12 @@ int main(void)
 
 	Lcd_clear();
 
-		// setup gpio for load triggering and led indication
-// reinit valves HARDCODE
+	// setup gpio for load triggering and led indication
+	// reinit valves HARDCODE
 #ifdef USE_VALVES
 
 
 #endif
-
 
 
 	Lcd_clear();
@@ -5545,10 +5656,10 @@ void Init_pin_out()
 
 
 
-	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE);
 //	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
+//	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
+//	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
 	GPIO_InitTypeDef init_pin;
 	init_pin.GPIO_Pin  = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
 	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;

@@ -1,0 +1,6332 @@
+Bluetooth daemon for Cadi startedBluetooth daemon for Cadi startedArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiBluetooth daemon for Cadi startedArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiBluetooth daemon for Cadi startedArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => release
+    [1] => rfcomm0
+    [2] =>  
+)
+Got CMDservice bluetooth restartArray
+(
+    [0] => release
+    [1] => rfcomm0
+    [2] =>  
+)
+Got CMDservice bluetooth restartArray
+(
+    [0] => bind
+    [1] => rfcomm0
+    [2] => 20:13:06:19:15:11
+)
+Got CMDln -s /dev/rfcomm0 /dev/cadiArray
+(
+    [0] => stream
+    [1] => rfcomm0
+    [2] =>  
+)
+Got CMDcat /dev/rfcomm0 > serialresp.out &Array
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x03\x02\x31\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x03\x02\x31\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x03\x03\x30\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x03\x03\x30\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x03\x02\x31\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x03\x02\x31\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x01\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x01\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x01\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x01\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x01\x00\x35\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x01\x00\x35\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x01\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x01\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x01\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x01\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x01\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x01\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x01\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x01\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x01\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x01\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x01\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x01\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x01\x01\x34\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x01\x01\x34\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x01\x00\x35\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x01\x00\x35\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x03\x00\x37\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x03\x00\x37\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x05\x01\x02\x00\x36\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x05\x01\x02\x00\x36\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadiArray
+(
+    [0] => tx
+    [1] => cadi
+    [2] => \x5a\x58\x32\x04\x07\x01\x32\x00
+    [3] =>  
+)
+Got CMD/bin/echo -e '\x5a\x58\x32\x04\x07\x01\x32\x00' >> /dev/cadi

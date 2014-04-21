@@ -69,6 +69,16 @@ switch ($action) {
 	case 'get_status':
 		include_once('cadi_status.php');
 		break;
+	case 'get_ip':
+		array($output);
+		exec('/sbin/ifconfig -a', $output);
+		print_r($output);
+		echo $out;
+		echo 'Should be IFCONFIG output';
+		break;
+	case 'change_video':
+		change_video($_POST['new_video']);
+		break;
 /*	case 'stream_photo':
 		exec('fswebcam -d /dev/video1 -r 640x480 --jpeg 85 ../img/curimage.jpeg & >> /dev/null');
 		break;
@@ -87,6 +97,13 @@ function command_send($command, $mac){
 	$cmd = 'sudo echo '.time().': '.$command.' >> cadi_input';
 	exec($cmd, $out);
 	echo $cmd;
+}
+
+function change_video($video){
+		$toput = "change_video,".$video.", , ";
+		echo $toput;
+		file_put_contents('daemon_cmd', $toput);
+//		sleep(1);
 }
 
 function bt_tx($rfcomm, $data){

@@ -6,6 +6,7 @@
 echo "Bluetooth daemon for Cadi started";
 $photo_divider = 20;
 $cycle_counter = 0;
+$video = 0;
 while(1){
 	$cycle_counter++;
 	$command = file_get_contents('daemon_cmd');
@@ -13,7 +14,7 @@ while(1){
 	if(!empty($command)){
 		$cmd_arr = explode(",", $command);
 		print_r($cmd_arr);
-		echo 'Got CMD';
+		echo '('.date(DATE_RFC2822).') Got CMD ';
 		file_put_contents('daemon_cmd','');
 		switch ($cmd_arr[0]) {
 			case 'bind':
@@ -44,6 +45,10 @@ while(1){
 			case 'restart':
 				$execmd = "'./bt_restart.sh'";
 				break;
+			case 'change_video':
+				$execmd = "echo";
+				$video=$cmd_arr[1];
+				break;
 			case 'tx':		// send packet
 				$execmd = "/bin/echo -e '".$cmd_arr[2]."' >> /dev/".$cmd_arr[1];
 			break;
@@ -59,7 +64,7 @@ while(1){
 
 	usleep(100000);
 	if ($cycle_counter%$photo_divider==0) {	// photo_divider needed for making photo NOT every while() iteration
-		exec('fswebcam -d /dev/video1 -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
+		exec('fswebcam -d /dev/video'.$video.' -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
 	}
 	if ($cycle_counter>9999999){
 		$cycle_counter=0;

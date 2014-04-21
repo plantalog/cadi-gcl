@@ -81,7 +81,7 @@ void sonar_init(void){
       GPIOC->CRL   |= GPIO_CRL_MODE4_0;
 
 
-		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16 | RCC_APB2Periph_TIM17 | RCC_APB2Periph_GPIOB |RCC_APB2Periph_AFIO, ENABLE);
+		RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM16 | RCC_APB2Periph_TIM17 | RCC_APB2Periph_GPIOB, ENABLE);
 		GPIO_InitTypeDef GPIO_InitStructure;
 		GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8|GPIO_Pin_9;
 		GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;

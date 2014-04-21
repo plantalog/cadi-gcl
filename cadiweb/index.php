@@ -17,7 +17,6 @@
 
 <script>
 $(function() {
-	$( ".btn_" ).button();
 	$( "#cadi_tabs" ).tabs({
 		beforeLoad: function( event, ui ) {
 			ui.jqXHR.error(function() {
@@ -27,9 +26,23 @@ $(function() {
 			});
 		}
 	});
+
+	$( ".btn_" ).button();
 });
 
 
+function get_ip(){
+	$.post('cm/cadi_bt_processor.php', {action: 'get_ip'}, function(data){
+		alert(data);
+	});
+}
+
+function change_video(){
+	var new_video =$("#video_stream").val();
+	$.post('cm/cadi_bt_processor.php', {action: 'change_video', new_video:new_video}, function(data){
+		alert('new video='+new_video+' ----- '+data);
+	});
+}
 
 function bt_connect(){
 	var mac = $('#bind_mac').val();
@@ -67,9 +80,9 @@ function get_status_block(blockId){
 	});
 	$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
 	
-		var n = data.indexOf("lock_id=1"); 
+		var n = data.indexOf('--separator--'); 
 		if (n>0) {		
-			out = data.split('lock_id=1')
+			out = data.split('--separator--');
 			$('#status_block').html(out[1]);
 		}
 //		var i=0;
@@ -235,6 +248,9 @@ function cadi_status_stream(){
 <div onClick="plugStateSet('1','1')">Enable P1</div>
 <div onClick="plugStateSet('1','0')">Disable P1</div>  -->
 <button onClick="get_status_block('1')">Get Status</button>
+<button onClick="get_ip()">Get IP</button>
+<br>
+<input type="text" value="0" id="video_stream" title="this value is N in '/dev/videoN'" /><button onClick="change_video()">Change video</button>
 </div>
 </div>
 </body>
