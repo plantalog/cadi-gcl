@@ -1233,7 +1233,7 @@ void valve_feedback_init(void){		// init PA6-8 as input for 3V valve feedback
 	NVIC_InitTypeDef NVIC_InitStructure;
 //	GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
 	  // Enable GPIOA clock
-	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
+//	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
 
 	  // Configure PA5-7 pin as input pull-down
 	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
@@ -1405,22 +1405,23 @@ void open_valve(uint8_t valveId){
 	vTaskDelay(1);
 #ifdef USE_VALVES
 	uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
-	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
-	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
+	curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
+//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
 	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 	cur_valve_failed>>=valveId;	// ostavit' toka flag
 	if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
 		run_valve_motor(valveId);
 		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
 		while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
-			if(valveId==1){
-				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
-			}
-			else {
-
-			}
+//			if(valveId==1){
+				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);
+			//			   ((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)
+				//			}
+//			else {
+//				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
+//			}
 			//feedback = (VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId);
-			if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==1) {
+			if (curstatus==1) {
 				duration++;
 			}
 			else {
@@ -1434,7 +1435,7 @@ void open_valve(uint8_t valveId){
 		}
 		stop_valve_motor(valveId);
 	}
-	if (curstatus==0 && (valveId==2 || valveId==3)) {	// for solenoid valves
+	if (valveId==2 || valveId==3) {	// for solenoid valves
 		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 	}
 	valveFlags |= (1<<valveId);
@@ -1446,8 +1447,8 @@ void close_valve(uint8_t valveId){
 	run_valve_motor(valveId);
 	uint8_t duration=0, curstatus=0, cur_valve_failed=0;
 	uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
-	curstatus=VALVE_SENSOR_PORT->IDR&(1<<(VALVE_SENSOR_GPIO_SHIFT+valveId));	// check if valve flag active now
-	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
+	curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
+//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
 	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 	cur_valve_failed>>=valveId;	// ostavit' toka flag
 	if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
@@ -1464,7 +1465,7 @@ void close_valve(uint8_t valveId){
 		}
 	}
 	stop_valve_motor(valveId);
-	if (curstatus==1 && (valveId==2 || valveId==3)) {	// for solenoid valves
+	if (valveId==2 || valveId==3) {	// for solenoid valves
 		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 	}
 	valveFlags &= ~(1<<valveId); // sbrosit' flag
