@@ -11,6 +11,7 @@
 #ifdef SONAR_PINS_PB8_9
 #define SONAR_AMOUNT	2
 #define	SONAR1_TIM				TIM17
+#define	SONAR2_TIM				TIM16
 #define SONAR_ECHO_PORT			GPIOB
 #endif
 

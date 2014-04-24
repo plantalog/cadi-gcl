@@ -1025,7 +1025,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
 		TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
 		TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
-		TxBuffer[5] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+		TxBuffer[7] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
 		TxBuffer[8] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
 		TxBuffer[9] = (uint8_t)((water_counter[0]>>8)&(0xFF));
 		TxBuffer[10] = (uint8_t)((water_counter[0]>>16)&(0xFF));
@@ -1536,11 +1536,11 @@ void valve_test2(void){
 
 		if (button==BUTTON_FWD){
 			//open_valve(curvalve);
-			run_valve_motor(curvalve);
+			open_valve(curvalve);
 		}
 		if (button==BUTTON_CNL){
 			//close_valve(curvalve);
-			stop_valve_motor(curvalve);
+			close_valve(curvalve);
 		}
 		if (button==BUTTON_BCK){
 			if (curvalve<2) {
@@ -1657,10 +1657,13 @@ void valve_test(void){
 		button=readButtons();
 #ifdef USE_VALVES
 		Lcd_goto(0,0);
-		tmp=water_counter[0];
-		Lcd_write_16b(tmp);
+//		tmp=water_counter[0];
+//		Lcd_write_16b(tmp);
 
 		tmp=sonar_read[0];
+//		Lcd_write_digit(tmp/100);
+		Lcd_write_digit(tmp);
+		tmp=sonar_read[1];
 //		Lcd_write_digit(tmp/100);
 		Lcd_write_digit(tmp);
 		Lcd_write_str("cm");
@@ -2341,7 +2344,8 @@ void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
   /* Get the Input Capture value */
-//  sonar_read[0] = TIM16->CNT;
+  sonar_read[1] = TIM16->CNT;
+  TIM16->CNT = 0;
 }
 
 void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
