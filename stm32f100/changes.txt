@@ -1,3 +1,8 @@
+- Sonar init adapted to Cadi MB. Two sonars are driven
+- valve_busy flags to resolve access collisions
+- emergency stop packet
+
+
 v2
 - refactored init process for using PA13 and PA14 pins properly to control solenoid valves, now STM32 chip flashing available with RESET button pressed (HOLD "Reset" button, click flash in CoIDE and release the "Reset button" for flashing start)
 

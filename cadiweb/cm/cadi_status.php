@@ -3,11 +3,12 @@
 include_once('cm/cadi_response_parser.php');
 include_once('cadi_response_parser.php');
 	echo '
+	PHP time: '.date("Y-m-d H:i:s", time()).'
 	<p>Cadi status</p>
 	<table>
 	<tr>
 		<td>Cadi Time</td>
-		<td>'.$_SESSION['cadi_status']['time'].'</td>
+		<td>'.date("Y-m-d H:i:s", $_SESSION['cadi_status']['time']).'</td>
 	</tr>
 	<tr>
 		<td>220V Plugs</td>
@@ -19,12 +20,16 @@ include_once('cadi_response_parser.php');
 		<td>'.$_SESSION['cadi_status']['dosingPumpsFlags'].'</td>
 	</tr>
 	<tr>
+		<td>Valve states</td>
+		<td>'.$_SESSION['cadi_status']['valves'].'</td>
+	</tr>
+	<tr>
 		<td>Water levels</td>
-		<td>sonar data</td>
+		<td>'.$_SESSION['cadi_status']['sonar_read'][0].' / '.$_SESSION['cadi_status']['sonar_read'][1].'</td>
 	</tr>
 	<tr>
 		<td>Temperature</td>
-		<td>'.(($dht[2]*256+$dht[3])/10).' C</td>
+		<td>'.$_SESSION['cadi_status']['dht']['temp'].' C</td>
 	</tr>
 	<tr>
 		<td>Humidity</td>

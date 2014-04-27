@@ -1,6 +1,6 @@
 /*
  *  Use this code free of charge, but leave this text box here, 
- *  This code is distributed as is with no warranties.
+ *  This code is distributed "as is" with no warranties.
  *  https://github.com/plantalog/ is main repository hub for Cadi project.
  *
  *	27.08.2013 changed the virtaddvartab usage to copying the whole row or variables 0x05C0-0x0679
@@ -73,6 +73,7 @@ uint32_t water_counter[WFM_AMOUNT];
 // Valve variables
 uint8_t valveFlags;
 uint8_t valve_failed;
+uint8_t valve_busy=0;
 #endif	// EOF VALVES DEFINITIONS
 
 
@@ -91,13 +92,16 @@ uint8_t valve_failed;
 
 /* Private variables ---------------------------------------------------------*/
 // uint8_t TxBuffer[] = "\n\rCadi sends HELLO!\n\r";
-uint8_t RxBuffer[10];
-uint8_t TxBuffer[16];
+#define PRODUCTION_BUILD
+#ifndef PRODUCTION_BUILD
+uint8_t RxBuffer[16];
+#endif
+uint8_t TxBuffer[24];
 uint8_t RxByte;
-uint8_t TxByte;
+//uint8_t TxByte;
 uint8_t comm_state=48;	// communication state
-uint8_t TxDataReady;
-uint8_t RxDataReady;
+//uint8_t TxDataReady;
+//uint8_t RxDataReady;
 uint8_t NbrOfDataToTransfer = 16;
 //uint8_t NbrOfDataToRead = RxBufferSize
 uint8_t txbuff_ne = 0;
@@ -124,7 +128,7 @@ typedef struct
 __IO uint16_t IC2Value = 0;
 __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
-uint8_t dht_shifter=DHT_DATA_START_POINTER;
+uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
 TIM_ICInitTypeDef  TIM_ICInitStructure;
 // digital humidity and temperature data
 //uint8_t dht_bit_array[50];
@@ -137,7 +141,7 @@ uint8_t		dht_data_ready = 0;
 uint8_t  dht_byte_pointer;
 uint8_t  dht_bit_pointer;
 uint8_t 	dht_rh_str[4], dht_t_str[4];
-uint16_t	capture1=0, capture2=0;
+// uint16_t	capture1=0;
 volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
 uint16_t rhWindowTop, rhWindowBottom;
 uint8_t rhUnderOver = 0;
@@ -166,30 +170,6 @@ uint8_t rhUnderOver = 0;
 #define d5_1		GPIOC->BSRRL |= (GPIO_Pin_11);
 #define d4_0		GPIOC->BSRRH |= (GPIO_Pin_12);
 #define d4_1		GPIOC->BSRRL |= (GPIO_Pin_12);
-
-/*  reverse
-#define d7_1		GPIOA->BSRRH |= (GPIO_Pin_15);
-#define d7_0		GPIOA->BSRRL |= (GPIO_Pin_15);
-#define d6_1		GPIOC->BSRRH |= (GPIO_Pin_10);
-#define d6_0		GPIOC->BSRRL |= (GPIO_Pin_10);
-#define d5_1		GPIOC->BSRRH |= (GPIO_Pin_11);
-#define d5_0		GPIOC->BSRRL |= (GPIO_Pin_11);
-#define d4_1		GPIOC->BSRRH |= (GPIO_Pin_12);
-#define d4_0		GPIOC->BSRRL |= (GPIO_Pin_12);
-
-*/
-
-
-/*
-#define e_0 	GPIOD->ODR |=  GPIO_Pin_2
-#define e_1		GPIOD->ODR &=~ GPIO_Pin_2
-#define rw_0	GPIOB->ODR |=  GPIO_Pin_3
-#define rw_1	GPIOB->ODR &=~ GPIO_Pin_3
-#define rs_0	GPIOB->ODR |=  GPIO_Pin_4
-#define rs_1	GPIOB->ODR &=~ GPIO_Pin_4
-*/
-
-
 
 #define e_1 	GPIOD->ODR |=  GPIO_Pin_2
 #define e_0		GPIOD->ODR &=~ GPIO_Pin_2
@@ -397,6 +377,7 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define WATER_TANK_TOP			0x0622
 #define WATER_TANK_BOTTOM		0x0632
 #define WFM_CAL_OFFSET			0x0642
+#define WATER_TANK_SUPPLY_VALVE	0x0644
 
 #define DAY						1
 #define NIGHT					0
@@ -414,11 +395,11 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define JDR_BUFFER_SIZE 10
 
 
-#define PSI_SENSOR_0PSI			0x0643
-#define PSI_SENSOR_32PSI		0x0644
-#define PSI_SENSOR_TOP			0x0645
-#define PSI_SENSOR_BTM			0x0646
-#define PSI_PUMP_LOAD_ID		0x0647
+#define PSI_SENSOR_0PSI			0x0645
+#define PSI_SENSOR_32PSI		0x0646
+#define PSI_SENSOR_TOP			0x0647
+#define PSI_SENSOR_BTM			0x0648
+#define PSI_PUMP_LOAD_ID		0x0649
 uint8_t psi_pump_load_id=0;
 uint8_t psi_underOver=0;
 uint16_t psi_pump_top_level=0;
@@ -827,7 +808,9 @@ void USART1_IRQHandler(void)
 	if (USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET) {
 //			RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
 			RxByte = USART_ReceiveData(BT_USART);	// get byte from Data Register
+#ifndef		PRODUCTION_BUILD
 			RxBuffer[RxCounter++] = RxByte;			// write it into RxBuffer
+#endif
 			USART1->SR &= ~USART_FLAG_RXNE;			// clear Rx Not Empty flag
 	}
 	BT_USART->SR &= ~USART_SR_TC;
@@ -956,6 +939,22 @@ void run_uart_cmd(void){
 		case 10:
 			valve_failed = cmdbuf[2];
 			break;
+		case 11:	// stop all processes and force manual control
+			auto_flags=0;
+			comm_state=COMM_DIRECT_DRIVE;
+			auto_flags = 0;
+			plugStateSet(0,0);
+			plugStateSet(1,0);
+			plugStateSet(2,0);
+			plugStateSet(3,0);
+			close_valve(2);
+			close_valve(3);
+			close_valve(0);
+			close_valve(1);
+			break;
+		case 12:
+			RTC_SetCounter(cmdbuf[2]*16777216+cmdbuf[3]*65536+cmdbuf[4]*256+cmdbuf[5]);
+			break;
 	}
 	rx_flush();
 }
@@ -965,7 +964,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 	TxBuffer[0] = 90;	// Z
 	TxBuffer[1] = 88;	// X
 	TxBuffer[2] = 51;	// 3 (sending STATUS)
-	TxBuffer[3] = 16;	// packet size (ZX0+packet_size+payload+crc). Payload is 8bytes
+	TxBuffer[3] = 24;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
 	if (blockId==1) {	// state block 1
 		TxBuffer[4] = comm_state;
 		TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
@@ -977,7 +976,15 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = dht_data[1];
 		TxBuffer[12] = dht_data[2];
 		TxBuffer[13] = dht_data[3];
-		TxBuffer[14] = blockId;
+		TxBuffer[14] = (uint8_t)(RTC->CNTH&(0xFF));	// RTC unixtime
+		TxBuffer[15] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
+		TxBuffer[16] = (uint8_t)(RTC->CNTL&(0xFF));
+		TxBuffer[17] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
+		TxBuffer[18] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+		TxBuffer[19] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+		TxBuffer[20] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+		TxBuffer[21] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+		TxBuffer[22] = blockId;
 	}
 	if (blockId==2) {	// state block 2
 		uint32_t now = RTC_GetCounter();
@@ -1049,7 +1056,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[14] = blockId;
 	}
 
-	TxBuffer[15] = crc_block(0, &TxBuffer[0],15);
+	TxBuffer[23] = crc_block(0, &TxBuffer[0],23);
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
 	txbuff_ne = 1;
@@ -1341,7 +1348,14 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 void tankLevelStabSetup(void){
 	Lcd_clear();
 	uint16_t curlevel=0;
-	uint8_t button=0;
+	uint8_t button=0, tmp=0;
+	Lcd_clear();
+	Lcd_write_str("Supply valve ID");
+	EE_ReadVariable(WATER_TANK_SUPPLY_VALVE, &tmp);
+	tmp = adjust8bit(tmp);
+	EE_WriteVariable(WATER_TANK_SUPPLY_VALVE, tmp);
+	printOk();
+	vTaskDelay(10);
 	Lcd_clear();
 	Lcd_write_str("Set tank top lvl");
 	while (button!=BUTTON_OK) {
@@ -1357,7 +1371,8 @@ void tankLevelStabSetup(void){
 	printOk();
 	vTaskDelay(2000);
 	Lcd_write_str("Set btm lvl");
-	while (button!=BUTTON_OK) {
+	button = 0;
+/*	while (button!=BUTTON_OK) {
 		button = readButtons();
 		curlevel = sonar_read[0];
 		vTaskDelay(5);
@@ -1369,19 +1384,24 @@ void tankLevelStabSetup(void){
 	vTaskDelay(10);
 	EE_WriteVariable(WATER_TANK_BOTTOM, curlevel);
 	printOk();
-	vTaskDelay(2000);
+	vTaskDelay(2000); */
 	Lcd_clear();
 	loadSettings();
 }
 
 void tankLevelStab(void){
 #ifdef TANK_STAB_ENABLE
-	if ((auto_flags&2)==1) {		// TANK STAB flag 1
+	uint16_t tmp=0;
+	uint8_t supply_valve=0;
+	EE_ReadVariable(WATER_TANK_SUPPLY_VALVE,&tmp);
+	supply_valve = (uint8_t)(tmp&0x00FF);
+	if (((auto_flags&2)>>1)==1 && supply_valve<4) {		// TANK STAB flag 1
+
 		if (sonar_read[0]>(tank_windows_top[0]+2)) {
-			open_valve(1);
+			open_valve(supply_valve);
 		}
 		if (sonar_read[0]<tank_windows_top[0]) {
-			close_valve(1);
+			close_valve(supply_valve);
 		}
 	}
 #endif
@@ -1389,14 +1409,14 @@ void tankLevelStab(void){
 
 void psiStab(void){
 #ifdef PSI_STAB_ENABLE
-	if (auto_flags&1==1) {			// PSI STAB flag 0
+/*	if (auto_flags&1==1) {			// PSI STAB flag 0
 		if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
 			plugStateSet(psi_pump_load_id, 0);
 		}
 		if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
 			plugStateSet(psi_pump_load_id, 1);
 		}
-	}
+	} */
 #endif
 }
 
@@ -1404,71 +1424,82 @@ void psiStab(void){
 void open_valve(uint8_t valveId){
 	vTaskDelay(1);
 #ifdef USE_VALVES
-	uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
-	curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
-//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
-	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
-	cur_valve_failed>>=valveId;	// ostavit' toka flag
-	if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
-		run_valve_motor(valveId);
-		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
-		while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
-//			if(valveId==1){
-				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);
-			//			   ((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)
-				//			}
-//			else {
-//				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
-//			}
-			//feedback = (VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId);
-			if (curstatus==1) {
-				duration++;
+	uint8_t valvebusy = 0;
+	valvebusy = (valve_busy>>valveId) & 1;
+	if (valvebusy==0) {
+		valve_busy|=(1<<valveId);
+		uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
+		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
+	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
+		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
+		cur_valve_failed>>=valveId;	// ostavit' toka flag
+		if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
+			run_valve_motor(valveId);
+			uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
+			while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
+	//			if(valveId==1){
+					curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);
+				//			   ((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)
+					//			}
+	//			else {
+	//				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
+	//			}
+				//feedback = (VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId);
+				if (curstatus==1) {
+					duration++;
+				}
+				else {
+					duration=0;
+				}
+				vTaskDelay(1);
+				timeout--;
 			}
-			else {
-				duration=0;
+			if (timeout==0) {
+				valve_failed |= (1<<valveId);
 			}
-			vTaskDelay(1);
-			timeout--;
+			stop_valve_motor(valveId);
 		}
-		if (timeout==0) {
-			valve_failed |= (1<<valveId);
+		if (valveId==2 || valveId==3) {	// for solenoid valves
+			VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 		}
-		stop_valve_motor(valveId);
+		valveFlags |= (1<<valveId);
+		vTaskDelay(5);
+		valve_busy&= ~(1<<valveId);
 	}
-	if (valveId==2 || valveId==3) {	// for solenoid valves
-		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-	}
-	valveFlags |= (1<<valveId);
-	vTaskDelay(5);
 #endif
 }
 
 void close_valve(uint8_t valveId){
-	run_valve_motor(valveId);
-	uint8_t duration=0, curstatus=0, cur_valve_failed=0;
-	uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
-	curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
-//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
-	cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
-	cur_valve_failed>>=valveId;	// ostavit' toka flag
-	if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
-		while (duration<3 && timeout>0) {
-					// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
-					if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
-						duration++;
-					}
-					else {
-						duration=0;
-					}
-					vTaskDelay(1);
-					timeout--;
+	uint8_t valvebusy = 0;
+	valvebusy = (valve_busy>>valveId) & 1;
+	if (valvebusy==0) {
+		run_valve_motor(valveId);
+		uint8_t duration=0, curstatus=0, cur_valve_failed=0;
+		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
+		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
+	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
+		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
+		cur_valve_failed>>=valveId;	// ostavit' toka flag
+		if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
+			while (duration<3 && timeout>0) {
+						// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
+						if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
+							duration++;
+						}
+						else {
+							duration=0;
+						}
+						vTaskDelay(1);
+						timeout--;
+			}
 		}
+		stop_valve_motor(valveId);
+		if (valveId==2 || valveId==3) {	// for solenoid valves
+			VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+		}
+		valveFlags &= ~(1<<valveId); // sbrosit' flag
+		valve_busy&= ~(1<<valveId);
 	}
-	stop_valve_motor(valveId);
-	if (valveId==2 || valveId==3) {	// for solenoid valves
-		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-	}
-	valveFlags &= ~(1<<valveId); // sbrosit' flag
 }
 
 
@@ -3139,8 +3170,6 @@ void display_usart_rx2(void){	// another usart test fr displaying cmdbuf content
 			Lcd_write_digit(RxCounter);
 			Lcd_write_digit(prefixDetectionIdx);
 			Lcd_write_digit(packet_length);
-//			copy_arr(&RxBuffer, &LCDLine2, 7,9);
-//			Lcd_write_arr(&RxBuffer, 7);
 			vTaskDelay(20);
 		}
 		Lcd_clear();
@@ -3154,17 +3183,23 @@ void display_usart_rx(void){
 			button=readButtons();
 			Lcd_goto(0,0);
 			vTaskDelay(2);
+#ifndef PRODUCTION_BUILD
 			for (i=0; i<5;i++) {
 				Lcd_write_8b(RxBuffer[i]);
 			}
+#endif
 			vTaskDelay(1);
 			Lcd_goto(1,0);
+#ifndef PRODUCTION_BUILD
 			Lcd_write_8b(RxBuffer[5]);
 			Lcd_write_8b(RxBuffer[6]);
 			Lcd_write_str(" ");
+#endif
 //			Lcd_write_digit(RxCounter);
 			Lcd_write_digit(rx_packet_crc);
+#ifndef PRODUCTION_BUILD
 			copy_arr(&RxBuffer, &LCDLine2, 7,9);
+#endif
 //			Lcd_write_arr(&RxBuffer, 7);
 			vTaskDelay(20);
 		}
@@ -3848,7 +3883,7 @@ void plugStateTrigger(void  *pvParameters){
 	//				plugTimerId-=35;
 				}
 				if (plugTimerId>79 && plugTimerId<81){	// 80 - PSI stab
-					plugType=4;
+					plugType=5;
 	//				plugTimerId-=35;
 				}
 
@@ -3889,6 +3924,14 @@ void plugStateTrigger(void  *pvParameters){
 					// watering and circulation pumps for watering controller
 				}
 				else if (plugType==5) {
+					if (auto_flags&1==1) {			// PSI STAB flag 0
+						if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
+							plugStateSet(psi_pump_load_id, 0);
+						}
+						if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
+							plugStateSet(psi_pump_load_id, 1);
+						}
+					}
 									// psi pump pressure stabilizer
 				}
 				else {

@@ -74,32 +74,30 @@ function bt_disconnect(){
 	});
 }
 
-function get_status_block(blockId){
-	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:1}, function(data){
-		// $('#status_block').html(data);
-	});
-	$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
+function get_status_block(){
+//	alert('lala');
+	var blocks = $('#status_block_ids').val();
+//	alert(blocks);
+	var block_ids = blocks.split(',');
+//	alert(block_ids.length);
+	for (i=0; i<block_ids.length;i++){
+//		alert(i+'='+block_ids[i]);
+//		$.ajaxSetup({async:false});
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:block_ids[i]}, function(data){
+			// $('#status_block').html(data);
+		});
+//		$.ajaxSetup({async:true});
+		$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
 	
-		var n = data.indexOf('--separator--'); 
-		if (n>0) {		
-			out = data.split('--separator--');
-			$('#status_block').html(out[1]);
-		}
-//		var i=0;
-//		for(i=0; i<4;i++) {
-//			$('#valve'+i+'_radio1').attr('checked','checked');
-//		}
-//		alert('shas spoju');
-		
-		// for="plug3_radio2" role="button" aria-disabled="false" aria-pressed="true"
-	//	$(":input").attr('checked','checked');
-
-		d = new Date();
-//		image.load(function(){	// http://stackoverflow.com/questions/5789222/wait-with-image-replace-until-image-is-loaded
-//			 image.show();
-//		});
-		$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
-	});
+			var n = data.indexOf('--separator--'); 
+			if (n>0) {		
+				out = data.split('--separator--');
+				$('#status_block').html(out[1]);
+			}
+			d = new Date();
+			$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+		});
+	}
 }
 
 function check_plug(){
@@ -175,10 +173,11 @@ function bt_setdd() {
 	});  
 }
 
+
 function cadi_status_stream(){
 	var state = $('#flag_status_stream').is(':checked');
 	if (state==1) {
-		var interval = setInterval(function(){get_status_block(1)},1200);
+		var interval = setInterval(function(){get_status_block()},1200);
 		$('#status_stream_interval').val(interval);
 	}
 	if (state==0) {
@@ -247,7 +246,10 @@ function cadi_status_stream(){
 
 <div onClick="plugStateSet('1','1')">Enable P1</div>
 <div onClick="plugStateSet('1','0')">Disable P1</div>  -->
-<button onClick="get_status_block('1')">Get Status</button>
+<br>
+<input type="text" value="1" id="status_block_ids" />
+<button onClick="get_status_block()">Get Status</button>
+<br>
 <button onClick="get_ip()">Get IP</button>
 <br>
 <input type="text" value="0" id="video_stream" title="this value is N in '/dev/videoN'" /><button onClick="change_video()">Change video</button>

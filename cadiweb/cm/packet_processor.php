@@ -68,9 +68,28 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(7);	// command
 			$packet .= chr($_POST['block_id']);	// STATUS block_id
 			break;
+		case 8:		// set auto_flags
+			$packet .= chr(3);	// packet payload size (including this size byte)
+			$packet .= chr(8);	// command
+			$packet .= chr($_POST['flags']);	// new auto_flags byte
+			break;
 		case 10:		// get_status_block();
 			$packet .= chr(2);	// packet payload size (including this size byte)
 			$packet .= chr(10);	// command
+			break;
+		case 11:		// get_status_block();
+			$packet .= chr(2);	// packet payload size (including this size byte)
+			$packet .= chr(11);	// command
+			break;
+		case 12:		// get_status_block();
+			$packet .= chr(6);	// packet payload size (including this size byte)
+			$packet .= chr(12);	// command
+			$curtime = time();
+			$packet .= chr(floor($curtime/16777216));	// command
+			$packet .= chr((($curtime%16777216)/65536));	// command
+			$packet .= chr((($curtime%65536)/256));	// command
+			$packet .= chr($curtime%256);	// command
+			echo $curtime;
 			break;
 	}
 

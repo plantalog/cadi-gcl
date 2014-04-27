@@ -124,7 +124,7 @@ void sonar_init(void){
 		  SONAR1_TIM->CR1  =  TIM_CR1_CEN;
 
 		  // SONAR2_TIM setup
-		  RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;    //enable SONAR1_TIM clock
+		  RCC->APB2ENR |= RCC_APB2ENR_TIM16EN;    //enable SONAR2_TIM clock
 		  SONAR2_TIM->PSC	= 800-1;                //set divider
 	//	  SONAR1_TIM->ARR     = 500;                   //2hz = 500ms
 		  //enable reload and interrupt

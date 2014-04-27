@@ -4,7 +4,7 @@
 
 
 echo "Bluetooth daemon for Cadi started";
-$photo_divider = 20;
+$photo_divider = 80;
 $cycle_counter = 0;
 $video = 0;
 while(1){
@@ -62,7 +62,7 @@ while(1){
 		exec($execmd);
 	}
 
-	usleep(100000);
+	usleep(25000);
 	if ($cycle_counter%$photo_divider==0) {	// photo_divider needed for making photo NOT every while() iteration
 		exec('fswebcam -d /dev/video'.$video.' -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
 	}

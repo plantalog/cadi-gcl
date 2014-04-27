@@ -17,6 +17,12 @@ function bt_setdd(state) {
 	}
 } 
 
+function auto_flags(flags){	// set new auto_flags byte
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 8, flags:flags}, function(data){
+		$('#main_output').html(data);
+	});
+}
+
 function open_valve(valve){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 4, valve:valve}, function(data){
 		$('#main_output').html(data);
@@ -30,6 +36,11 @@ function close_valve(valve){
 }
 function reset_valve_fails(){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 10}, function(data){
+		$('#main_output').html(data);
+	});
+}
+function cadi_txcmd(cmd){
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: cmd}, function(data){
 		$('#main_output').html(data);
 	});
 }
@@ -120,8 +131,15 @@ function plugStateSet(plug, state){
 	?>
 
 
-	<tr><td><button class="btn_" onClick="reset_valve_fails()">Fails=0</button></td></tr>
-
+	<tr><td colspan="2">
+		<button class="btn_" onClick="reset_valve_fails()">Fails=0</button>
+		<button class="btn_" onClick="auto_flags(0)">Auto=0</button><br>
+		<button class="btn_" onClick="auto_flags(255)">Auto=255</button>
+		<button class="btn_" onClick="cadi_txcmd(11)">Force DOWN</button><br>
+		<button class="btn_" onClick="cadi_txcmd(12)">Set time</button><br>
+	</td></tr>
+	<tr><td></td></tr>
+	<tr><td></td></tr>
 
 	</table>
 	</div>
