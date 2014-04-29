@@ -96,7 +96,12 @@ uint8_t valve_busy=0;
 #ifndef PRODUCTION_BUILD
 uint8_t RxBuffer[16];
 #endif
+#ifdef PRODUCTION_BUILD
+uint8_t TxBuffer[40];
+#endif
+#ifndef PRODUCTION_BUILD
 uint8_t TxBuffer[24];
+#endif
 uint8_t RxByte;
 //uint8_t TxByte;
 uint8_t comm_state=48;	// communication state
@@ -408,7 +413,7 @@ uint16_t psi_cur_adc_value=0;
 
 #define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
 #define AVG_ADC_PH		2			// adcAverage[2]
-#define AVG_ADC_PSI		2			// adcAverage[3]
+#define AVG_ADC_PSI		2			// adcAverage[2]
 
 
 uint16_t tank_windows_top[1];
@@ -964,7 +969,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 	TxBuffer[0] = 90;	// Z
 	TxBuffer[1] = 88;	// X
 	TxBuffer[2] = 51;	// 3 (sending STATUS)
-	TxBuffer[3] = 24;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
+	TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
 	if (blockId==1) {	// state block 1
 		TxBuffer[4] = comm_state;
 		TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
@@ -984,21 +989,38 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[19] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
 		TxBuffer[20] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
 		TxBuffer[21] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
-		TxBuffer[22] = blockId;
+		TxBuffer[22] = (uint8_t)(adcAverage[0]&(0xFF));	// ADC1 average reading
+		TxBuffer[23] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
+		TxBuffer[24] = (uint8_t)(adcAverage[1]&(0xFF));	// ADC2 average reading
+		TxBuffer[25] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
+		TxBuffer[26] = (uint8_t)(adcAverage[2]&(0xFF));	// ADC3 average reading
+		TxBuffer[27] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
+		TxBuffer[28] = (uint8_t)(adcAverage[3]&(0xFF));	// ADC4 average reading
+		TxBuffer[29] = (uint8_t)(((adcAverage[3])>>8)&(0xFF));
+		TxBuffer[30] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
+		TxBuffer[31] = (uint8_t)((water_counter[0]>>8)&(0xFF));
+		TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
+		TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
+		TxBuffer[34] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+		TxBuffer[35] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+		TxBuffer[36] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+		TxBuffer[37] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+//		adcAverage[AVG_ADC_PSI]>psi_pump_top_level
+		TxBuffer[38] = blockId;
 	}
 	if (blockId==2) {	// state block 2
 		uint32_t now = RTC_GetCounter();
-		TxBuffer[4] = (uint8_t)(RTC->CNTH&(0xFF));
-		TxBuffer[5] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
-		TxBuffer[6] = (uint8_t)(RTC->CNTL&(0xFF));
-		TxBuffer[7] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
-		TxBuffer[8] = (uint8_t)(adcAverage[0]&(0xFF));
+		TxBuffer[4] = (uint8_t)(psi_pump_top_level&(0xFF));
+		TxBuffer[5] = (uint8_t)((psi_pump_top_level>>8)&(0xFF));
+		TxBuffer[6] = (uint8_t)(psi_pump_btm_level&(0xFF));
+		TxBuffer[7] = (uint8_t)(((psi_pump_btm_level)>>8)&(0xFF));
+		TxBuffer[8] = (uint8_t)0;
 		TxBuffer[9] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
 		TxBuffer[10] = (uint8_t)(((adcAverage[1])>>0)&(0xFF));
 		TxBuffer[11] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
 		TxBuffer[12] = (uint8_t)(((adcAverage[2])>>0)&(0xFF));
 		TxBuffer[13] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
-		TxBuffer[14] = blockId;
+		TxBuffer[38] = blockId;
 	}
 	if (blockId==3) {	// state block 3
 		TxBuffer[4] = (uint8_t)(GPIOA->IDR&(0xFF));
@@ -1011,7 +1033,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)(((GPIOB->IDR)>>24)&(0xFF));
 		TxBuffer[12] = dht_data[2];
 		TxBuffer[13] = dht_data[3];
-		TxBuffer[14] = blockId;
+		TxBuffer[38] = blockId;
 	}
 
 	if (blockId==4) {	// state block 4
@@ -1025,7 +1047,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
 		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
 		TxBuffer[13] = waterSensorStateFlags;
-		TxBuffer[14] = blockId;
+		TxBuffer[38] = blockId;
 	}
 
 	if (blockId==5) {	// state block 5
@@ -1039,7 +1061,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)((water_counter[0]>>24)&(0xFF));
 		TxBuffer[12] = valve_failed;		//
 		TxBuffer[13] = waterSensorStateFlags;
-		TxBuffer[14] = blockId;
+		TxBuffer[38] = blockId;
 	}
 
 	if (blockId==6) {	// block 6
@@ -1053,10 +1075,10 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[11] = (uint8_t)((water_counter[1]>>24)&(0xFF));
 		TxBuffer[12] = (uint8_t)(wfCalArray[1]&(0xFF));
 		TxBuffer[13] = (uint8_t)((wfCalArray[1]>>8)&(0xFF));
-		TxBuffer[14] = blockId;
+		TxBuffer[22] = blockId;
 	}
 
-	TxBuffer[23] = crc_block(0, &TxBuffer[0],23);
+	TxBuffer[39] = crc_block(0, &TxBuffer[0],39);
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
 	txbuff_ne = 1;
@@ -1396,12 +1418,15 @@ void tankLevelStab(void){
 	EE_ReadVariable(WATER_TANK_SUPPLY_VALVE,&tmp);
 	supply_valve = (uint8_t)(tmp&0x00FF);
 	if (((auto_flags&2)>>1)==1 && supply_valve<4) {		// TANK STAB flag 1
-
-		if (sonar_read[0]>(tank_windows_top[0]+2)) {
-			open_valve(supply_valve);
-		}
-		if (sonar_read[0]<tank_windows_top[0]) {
-			close_valve(supply_valve);
+		uint8_t valvebusy = 0;
+		valvebusy = (valve_busy>>supply_valve) & 1;
+		if (valvebusy==0) {
+			if (sonar_read[0]>(tank_windows_top[0]+2)) {
+				open_valve(supply_valve);
+			}
+			if (sonar_read[0]<tank_windows_top[0]) {
+				close_valve(supply_valve);
+			}
 		}
 	}
 #endif
@@ -1428,9 +1453,10 @@ void open_valve(uint8_t valveId){
 	valvebusy = (valve_busy>>valveId) & 1;
 	if (valvebusy==0) {
 		valve_busy|=(1<<valveId);
-		uint8_t curstatus=0, cur_valve_failed=0, duration=0;;
+		uint8_t curstatus=0, cur_valve_failed=0, duration=0;
 		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
 	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
+		vTaskDelay(1);
 		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 		cur_valve_failed>>=valveId;	// ostavit' toka flag
 		if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
@@ -1457,15 +1483,17 @@ void open_valve(uint8_t valveId){
 			if (timeout==0) {
 				valve_failed |= (1<<valveId);
 			}
-			stop_valve_motor(valveId);
 		}
-		if (valveId==2 || valveId==3) {	// for solenoid valves
-			VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-		}
-		valveFlags |= (1<<valveId);
+		stop_valve_motor(valveId);
+		valveFlags &= ~(1<<valveId); // sbrosit' flag
+		valveFlags |= (curstatus<<valveId);
 		vTaskDelay(5);
 		valve_busy&= ~(1<<valveId);
 	}
+	if (valveId==2 || valveId==3) {	// for solenoid valves
+		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+	}
+	vTaskDelay(1);
 #endif
 }
 
@@ -1473,14 +1501,16 @@ void close_valve(uint8_t valveId){
 	uint8_t valvebusy = 0;
 	valvebusy = (valve_busy>>valveId) & 1;
 	if (valvebusy==0) {
-		run_valve_motor(valveId);
+		valve_busy|=(1<<valveId);
 		uint8_t duration=0, curstatus=0, cur_valve_failed=0;
 		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
 		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
 	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
 		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
+		vTaskDelay(1);
 		cur_valve_failed>>=valveId;	// ostavit' toka flag
 		if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
+			run_valve_motor(valveId);
 			while (duration<3 && timeout>0) {
 						// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
 						if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
@@ -1494,11 +1524,12 @@ void close_valve(uint8_t valveId){
 			}
 		}
 		stop_valve_motor(valveId);
-		if (valveId==2 || valveId==3) {	// for solenoid valves
-			VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-		}
 		valveFlags &= ~(1<<valveId); // sbrosit' flag
+		valveFlags |= (curstatus<<valveId);
 		valve_busy&= ~(1<<valveId);
+	}
+	if (valveId==2 || valveId==3) {	// for solenoid valves
+		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 	}
 }
 

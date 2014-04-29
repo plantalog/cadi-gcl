@@ -45,12 +45,16 @@ switch ($packet_type) {
 
 
 
-				$cadi_ta[2] = ord($last_packet[12]);		// TxBuffer[4] = (uint8_t)(RTC->CNTH&(0xFF));
-				$cadi_ta[3] = ord($last_packet[13]);		// TxBuffer[5] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
-				$cadi_ta[0] = ord($last_packet[14]);		// TxBuffer[6] = (uint8_t)(RTC->CNTL&(0xFF));
-				$cadi_ta[1] = ord($last_packet[15]);		// TxBuffer[7] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
+				$cadi_ta[2] = ord($last_packet[12]);		// TxBuffer[14] = (uint8_t)(RTC->CNTH&(0xFF));
+				$cadi_ta[3] = ord($last_packet[13]);		// TxBuffer[15] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
+				$cadi_ta[0] = ord($last_packet[14]);		// TxBuffer[16] = (uint8_t)(RTC->CNTL&(0xFF));
+				$cadi_ta[1] = ord($last_packet[15]);		// TxBuffer[17] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
 				$cadi_time = $cadi_ta[3]*16777216+$cadi_ta[2]*65536+$cadi_ta[1]*256+$cadi_ta[0];
 
+				$adc_avg[0] = ord($last_packet[20])+ord($last_packet[21])*256;
+				$adc_avg[1] = ord($last_packet[22])+ord($last_packet[23])*256;
+				$adc_avg[2] = ord($last_packet[24])+ord($last_packet[25])*256;
+				$adc_avg[3] = ord($last_packet[26])+ord($last_packet[27])*256;
 
 				$crc = ord($last_packet[($packet_size-3)]);
 				$counted_crc = crc_block(2, $last_packet, ($packet_size-3));	// 90 xor 88 = 2
@@ -67,6 +71,11 @@ switch ($packet_type) {
 					$_SESSION['cadi_status']['sonar_read'][0] = $sonar_read[0];	// sonar1 distance
 					$_SESSION['cadi_status']['sonar_read'][1] = $sonar_read[1];	// sonar2 distance
 					$_SESSION['cadi_status']['time'] = $cadi_time;
+					$_SESSION['cadi_status']['adc_avg'][0] = $adc_avg[0];	// ADC average value
+					$_SESSION['cadi_status']['adc_avg'][1] = $adc_avg[1];	// ADC average value
+					$_SESSION['cadi_status']['adc_avg'][2] = $adc_avg[2];	// ADC average value
+					$_SESSION['cadi_status']['adc_avg'][3] = $adc_avg[3];	// ADC average value
+					$_SESSION['cadi_status']['psi'] = round((($adc_avg[2]-230)/470), 2);
 				}
 				else {
 					echo 'CRC broken';

@@ -36,12 +36,24 @@ include_once('cadi_response_parser.php');
 		<td>'.$_SESSION['cadi_status']['dht']['rh'].' %</td>
 	</tr>
 	<tr>
-		<td>pH</td>
-		<td></td>
+		<td>Pressure</td>
+		<td>'.$_SESSION['cadi_status']['psi'].' bar</td>
 	</tr>
 	<tr>
-		<td>EC</td>
-		<td></td>
+		<td>ADC1</td>
+		<td>'.$_SESSION['cadi_status']['adc_avg'][0].'</td>
+	</tr>
+	<tr>
+		<td>ADC2</td>
+		<td>'.$_SESSION['cadi_status']['adc_avg'][1].'</td>
+	</tr>
+	<tr>
+		<td>ADC3</td>
+		<td>'.$_SESSION['cadi_status']['adc_avg'][2].'</td>
+	</tr>
+	<tr>
+		<td>ADC4</td>
+		<td>'.$_SESSION['cadi_status']['adc_avg'][3].'</td>
 	</tr>
 	</table>';
 

@@ -136,7 +136,7 @@ function plugStateSet(plug, state){
 		<button class="btn_" onClick="auto_flags(0)">Auto=0</button><br>
 		<button class="btn_" onClick="auto_flags(255)">Auto=255</button>
 		<button class="btn_" onClick="cadi_txcmd(11)">Force DOWN</button><br>
-		<button class="btn_" onClick="cadi_txcmd(12)">Set time</button><br>
+		<button class="btn_" onClick="cadi_txcmd(12)">Set time</button>
 	</td></tr>
 	<tr><td></td></tr>
 	<tr><td></td></tr>
@@ -144,7 +144,7 @@ function plugStateSet(plug, state){
 	</table>
 	</div>
 </div>
-
+<!--
 <div>
 	<h1>Get water</h1>
 Valve: 	<select id="f_gw_valve_id">
@@ -164,4 +164,5 @@ Counter: 	<select id="f_gw_counter_id">
 <input type="text" title="enter amount of water you want to get (in CL, integer value from 0 to 65535)" id="f_gw_amount" />
 <button>Get water</button>
 </div>
-
+-->
+=====================
