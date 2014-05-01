@@ -58,3 +58,6 @@ $(function() {
 	
 	</table>
 </div>
+
+<?php include_once('btds/cadi_btd_tuning.php'); ?>
+

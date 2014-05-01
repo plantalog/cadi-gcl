@@ -2,8 +2,8 @@
 
 // echo 'CRParser included';
 $fp = fopen('serialresp.out', 'rb');
-fseek($fp, -50, SEEK_END); // It needs to be negative
-$data = fread($fp, 50);
+fseek($fp, -150, SEEK_END); // It needs to be negative to seek from the file end
+$data = fread($fp, 150);
 $packets_arr = explode('ZX', $data);
 $last_packet_id = count($packets_arr)-1;
 // echo 'Count='.$last_packet_id;
@@ -75,7 +75,8 @@ switch ($packet_type) {
 					$_SESSION['cadi_status']['adc_avg'][1] = $adc_avg[1];	// ADC average value
 					$_SESSION['cadi_status']['adc_avg'][2] = $adc_avg[2];	// ADC average value
 					$_SESSION['cadi_status']['adc_avg'][3] = $adc_avg[3];	// ADC average value
-					$_SESSION['cadi_status']['psi'] = round((($adc_avg[2]-230)/470), 2);
+					$_SESSION['cadi_status']['psi'] = round((($adc_avg[2]-600)/470), 2);
+					build_svg();
 				}
 				else {
 					echo 'CRC broken';
@@ -201,5 +202,62 @@ switch ($packet_type) {
 					//echo $hexpacket; 					
 	break;
 }
+
+
+	$_SESSION['cadi_status']['plain_status'] =  '
+		PHP time: '.date("Y-m-d H:i:s", time()).'
+		<table>
+		<tr>
+			<td>Cadi Time</td>
+			<td>'.date("Y-m-d H:i:s", $_SESSION['cadi_status']['time']).'</td>
+		</tr>
+		<tr>
+			<td>220V Plugs</td>
+			<input type="hidden" value="'.$_SESSION['cadi_status']['plugs'].'" />
+			<td>'.$_SESSION['cadi_status']['plugs'].'</td>
+		</tr>
+		<tr>
+			<td>12V plugs</td>
+			<td>'.$_SESSION['cadi_status']['dosingPumpsFlags'].'</td>
+		</tr>
+		<tr>
+			<td>Valve states</td>
+			<td>'.$_SESSION['cadi_status']['valves'].'</td>
+		</tr>
+		<tr>
+			<td>Water levels</td>
+			<td>'.$_SESSION['cadi_status']['sonar_read'][0].' / '.$_SESSION['cadi_status']['sonar_read'][1].'</td>
+		</tr>
+		<tr>
+			<td>Temperature</td>
+			<td>'.$_SESSION['cadi_status']['dht']['temp'].' C</td>
+		</tr>
+		<tr>
+			<td>Humidity</td>
+			<td>'.$_SESSION['cadi_status']['dht']['rh'].' %</td>
+		</tr>
+		<tr>
+			<td>Pressure</td>
+			<td>'.$_SESSION['cadi_status']['psi'].' bar</td>
+		</tr>
+		<tr>
+			<td>ADC1</td>
+			<td>'.$_SESSION['cadi_status']['adc_avg'][0].'</td>
+		</tr>
+		<tr>
+			<td>ADC2</td>
+			<td>'.$_SESSION['cadi_status']['adc_avg'][1].'</td>
+		</tr>
+		<tr>
+			<td>ADC3</td>
+			<td>'.$_SESSION['cadi_status']['adc_avg'][2].'</td>
+		</tr>
+		<tr>
+			<td>ADC4</td>
+			<td>'.$_SESSION['cadi_status']['adc_avg'][3].'</td>
+		</tr>
+		</table>';
+
+
 
 ?>

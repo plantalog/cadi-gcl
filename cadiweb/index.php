@@ -15,178 +15,185 @@
 <script src="js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js"></script>
 
 
+
 <script>
-$(function() {
-	$( "#cadi_tabs" ).tabs({
-		beforeLoad: function( event, ui ) {
-			ui.jqXHR.error(function() {
-			ui.panel.html(
-			"Couldn't load this tab. We'll try to fix this as soon as possible. " +
-			"If this wouldn't be a demo." );
+
+	$(function() {
+		$( "#cadi_tabs" ).tabs({
+			beforeLoad: function( event, ui ) {
+				ui.jqXHR.error(function() {
+				ui.panel.html(
+				"Couldn't load this tab. We'll try to fix this as soon as possible. " +
+				"If this wouldn't be a demo." );
+				});
+			}
+		});
+
+		$( ".btn_" ).button();
+	});
+
+	function get_ip(){
+		$.post('cm/cadi_bt_processor.php', {action: 'get_ip'}, function(data){
+			alert(data);
+		});
+	}
+
+	function change_video(){
+		var new_video =$("#video_stream").val();
+		$.post('cm/cadi_bt_processor.php', {action: 'change_video', new_video:new_video}, function(data){
+			alert('new video='+new_video+' ----- '+data);
+		});
+	}
+
+	function bt_connect(){
+		var mac = $('#bind_mac').val();
+		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
+		alert('going to connect '+mac);
+		$.post('cm/cadi_bt_processor.php', {action: 'bt_connect', mac:mac, rfcomm: rfcomm}, function(data){
+			alert('connected'+data);
+			cadi_list_rfcomms();
+			$('#main_output').html(data);
+		});
+	}
+
+	function bt_restart(){
+		alert('restarting');
+		$.post('cm/cadi_bt_processor.php', {action: 'bt_restart'}, function(data){
+			alert('restarted');
+			cadi_list_rfcomms();
+			$('#main_output').html(data);
+		});
+	}
+
+	function bt_disconnect(){
+		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
+		$.post('cm/cadi_bt_processor.php', {action: 'bt_disconnect', rfcomm:rfcomm}, function(data){
+			alert('disconnected');
+			cadi_list_rfcomms();
+			$('#main_output').html(data);
+	
+		});
+	}
+
+	function get_status_block(){
+		var blocks = $('#status_block_ids').val();
+		var block_ids = blocks.split(',');
+		for (i=0; i<block_ids.length;i++){
+			$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:block_ids[i]}, function(data){
+			});
+			$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
+				blocks = data.split('---socalledseparator---');
+				$('#status_block').html(blocks[0]);
+				$('#system_view_2').html(blocks[1]);
+				d = new Date();
+				$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
 			});
 		}
-	});
+	}
 
-	$( ".btn_" ).button();
-});
-
-
-function get_ip(){
-	$.post('cm/cadi_bt_processor.php', {action: 'get_ip'}, function(data){
-		alert(data);
-	});
-}
-
-function change_video(){
-	var new_video =$("#video_stream").val();
-	$.post('cm/cadi_bt_processor.php', {action: 'change_video', new_video:new_video}, function(data){
-		alert('new video='+new_video+' ----- '+data);
-	});
-}
-
-function bt_connect(){
-	var mac = $('#bind_mac').val();
-	var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
-	alert('going to connect '+mac);
-	$.post('cm/cadi_bt_processor.php', {action: 'bt_connect', mac:mac, rfcomm: rfcomm}, function(data){
-		alert('connected'+data);
-		cadi_list_rfcomms();
-		$('#main_output').html(data);
-	});
-}
-
-function bt_restart(){
-	alert('restarting');
-	$.post('cm/cadi_bt_processor.php', {action: 'bt_restart'}, function(data){
-		alert('restarted');
-		cadi_list_rfcomms();
-		$('#main_output').html(data);
-	});
-}
-
-function bt_disconnect(){
-	var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
-	$.post('cm/cadi_bt_processor.php', {action: 'bt_disconnect', rfcomm:rfcomm}, function(data){
-		alert('disconnected');
-		cadi_list_rfcomms();
-		$('#main_output').html(data);
-	
-	});
-}
-
-function get_status_block(){
-//	alert('lala');
-	var blocks = $('#status_block_ids').val();
-//	alert(blocks);
-	var block_ids = blocks.split(',');
-//	alert(block_ids.length);
-	for (i=0; i<block_ids.length;i++){
-//		alert(i+'='+block_ids[i]);
-//		$.ajaxSetup({async:false});
-		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:block_ids[i]}, function(data){
-			// $('#status_block').html(data);
-		});
-//		$.ajaxSetup({async:true});
-		$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
-	
-			var n = data.indexOf('--separator--'); 
-			if (n>0) {		
-				out = data.split('--separator--');
-				$('#status_block').html(out[1]);
-			}
-			d = new Date();
-			$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+	function check_plug(){
+		alert("checking!");
+		$(function(){
+			$('#radio_plug1').attr('checked','checked');
+			$('#plug1_radio').attr('checked','checked');
+			$('#plug1_radio1').attr('checked','true');
+			$("radio_").buttonset("refresh");
+			$("#radio_plug1").buttonset("refresh");
 		});
 	}
-}
 
-function check_plug(){
-	alert("checking!");
-	$(function(){
-		$('#radio_plug1').attr('checked','checked');
-		$('#plug1_radio').attr('checked','checked');
-		$('#plug1_radio1').attr('checked','true');
-		$("radio_").buttonset("refresh");
-		$("#radio_plug1").buttonset("refresh");
-	});
-}
-
-function cadi_bt_scan(){
-//	$('#main_output').html('scanning..');
-	$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_scan'}, function(data){
-		$('#bind_mac').html(data);
-		alert('Scanning complete!');
-		alert(data);
-//		cadi_list_rfcomms();
-	});  
-}
-
-function cw_reboot(){	// reboots the machine, running CadiWeb server
-	$.post('cm/cadi_bt_processor.php', {action: 'reboot'}, function(data){
-	});  
-}
-
-function cadi_list_rfcomms(){
-//	alert('listing binds');
-	$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_list_binded'}, function(data){
-		$('#binded_rfcomms').html(data);
-	});
-}
-
-function stopSerialRead(psid){
-//alert('call'+psid);
-	$.post('cm/cadi_bt_processor.php', {action: 'stop_serial_read', process:psid}, function(data){
-		cadi_list_rfcomms();
-//		alert('kill -9 sent');
-	});  
-}
-
-function bt_tx_packet() {
-	var data = $('#tx_data_packet').val();
-	$.post('cm/cadi_bt_processor.php', {action: 'tx', data: data}, function(data){
-		cadi_list_rfcomms();
-		alert(data);
-	});  
-}
-
-
-function bt_tx() {
-	var data = $('#tx_data').val();
-	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug_id:'1', state:data}, function(data){
-		cadi_list_rfcomms();
-//		alert('kill -9 sent');
-	});  
-}
-
-function plugStateSet(plug, state){
-//	alert('oga');
-	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug:plug, state:state}, function(data){
-		cadi_list_rfcomms();
-//		alert(data);
-	});  
-}
-
-function bt_setdd() {
-	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '2'}, function(data){
-		cadi_list_rfcomms();
-//		alert(data);
-	});  
-}
-
-
-function cadi_status_stream(){
-	var state = $('#flag_status_stream').is(':checked');
-	if (state==1) {
-		var interval = setInterval(function(){get_status_block()},1200);
-		$('#status_stream_interval').val(interval);
+	function cadi_bt_scan(){
+	//	$('#main_output').html('scanning..');
+		$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_scan'}, function(data){
+			$('#bind_mac').html(data);
+			alert('Scanning complete!');
+			alert(data);
+	//		cadi_list_rfcomms();
+		});  
 	}
-	if (state==0) {
-		var  interval = $('#status_stream_interval').val();
-//		alert(interval);
-		clearInterval(interval);
+
+	function cw_reboot(){	// reboots the machine, running CadiWeb server
+		$.post('cm/cadi_bt_processor.php', {action: 'reboot'}, function(data){
+		});  
 	}
+
+	function cadi_list_rfcomms(){
+	//	alert('listing binds');
+		$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_list_binded'}, function(data){
+			$('#binded_rfcomms').html(data);
+		});
+	}
+
+	function stopSerialRead(psid){
+	//alert('call'+psid);
+		$.post('cm/cadi_bt_processor.php', {action: 'stop_serial_read', process:psid}, function(data){
+			cadi_list_rfcomms();
+	//		alert('kill -9 sent');
+		});  
+	}
+
+	function bt_tx_packet() {
+		var data = $('#tx_data_packet').val();
+		$.post('cm/cadi_bt_processor.php', {action: 'tx', data: data}, function(data){
+			cadi_list_rfcomms();
+			alert(data);
+		});  
+	}
+
+
+	function bt_tx() {
+		var data = $('#tx_data').val();
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug_id:'1', state:data}, function(data){
+			cadi_list_rfcomms();
+	//		alert('kill -9 sent');
+		});  
+	}
+
+	function plugStateSet(plug, state){
+	//	alert('oga');
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug:plug, state:state}, function(data){
+			cadi_list_rfcomms();
+	//		alert(data);
+		});  
+	}
+
+	function bt_setdd() {
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '2'}, function(data){
+			cadi_list_rfcomms();
+	//		alert(data);
+		});  
+	}
+
+
+	function cadi_status_stream(){
+		var state = $('#flag_status_stream').is(':checked');
+		if (state==1) {
+			var interval = setInterval(function(){get_status_block()},1200);
+			$('#status_stream_interval').val(interval);
+		}
+		if (state==0) {
+			var  interval = $('#status_stream_interval').val();
+	//		alert(interval);
+			clearInterval(interval);
+		}
+	}
+
+	
+function cadi_view(viewId){
+	switch (viewId) {
+		case 1:
+			$("#system_view_1").show();
+			$("#system_view_2").hide();
+			break;
+		case 2:
+			$("#system_view_2").show();
+			$("#system_view_1").hide();
+			break;
+	} 
+
 }
-		
+
+
 
 </script>
 </head>
@@ -209,14 +216,30 @@ function cadi_status_stream(){
 </div>
 <div id="tabs-1">
 <input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS
+<button class="btn_" id="cadi_view_cam" onClick="cadi_view(1)">Cam</button>
+<button class="btn_" id="cadi_view_map" onClick="cadi_view(2)">Map</button>
 <br>
-<div style="display:block; float:right;">
-	<?php include_once('cm/cadi_dd.php'); ?>
-	<div id="status_block">Status appears here
-		<?php include_once('cm/cadi_status.php'); ?>
-	</div>
-</div>
-<img id="cadi_img" style="float:left;" src="img/curimage.jpeg?" />
+<table>
+	<tr>
+		<td style="vertical-align:top;">
+			<div id="system_view_1">
+				<div id="status_block" style="float:left;">
+					<?php include_once('cm/status_view_1.php'); ?>
+				</div>
+				<img id="cadi_img" style="float:right;" src="img/curimage.jpeg?" />
+			</div>
+			<div id="system_view_2" style="border: 1px solid blue;">
+				<?php include_once('cm/cadi_status.svg'); ?>
+			</div>
+		</td>
+		<td>
+			<div style="float:right; border: 1px solid blue;">
+				<?php include_once('cm/cadi_dd.php'); ?>
+			</div>
+		</td>
+	</tr>	
+</table>
+
 	=================================================	
 	<br>
 <!--	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div>  -->

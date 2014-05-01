@@ -1,0 +1,4 @@
+ac_loads,Light,PSI pump,NC,NC
+ac_loads_hints,Enables light next to camera,High pressure diaphragm pump,,
+valves,FWI valve,WI valve,Drain valve,Cherry
+valves_hints,Fresh (or Filtered) Water Intake valve,Water Intake valve,Drain valve,Tomatoes Cherry watering line

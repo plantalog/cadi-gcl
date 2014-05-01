@@ -291,7 +291,7 @@
 </editorArea>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="D:/repos/cadi-gcl/stm32f100/current/main.c" title="main.c" tooltip="D:/repos/cadi-gcl/stm32f100/current/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hellow4/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="49799" selectionTopPixel="30400"/>
+<editorState selectionHorizontalPixel="0" selectionLength="16" selectionOffset="28340" selectionTopPixel="19220"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="eeprom.c" partName="eeprom.c" path="D:/repos/cadi-gcl/stm32f100/current/stm_lib/src/eeprom.c" title="eeprom.c" tooltip="D:/repos/cadi-gcl/stm32f100/current/stm_lib/src/eeprom.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hellow4/stm_lib/src/eeprom.c"/>
@@ -619,30 +619,6 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/main.c"/>
 </editors>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="182989" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="44654" y="18"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="43748" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="11981" y="14"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="45824" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="45852" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="45864" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="45998" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
 <position info="not_deleted" x="46435" y="10"/>
 </item>
 <item historyLabel="main.c" index="0">
@@ -765,8 +741,32 @@
 <item historyLabel="main.c" index="0">
 <position info="not_deleted" x="46093" y="0"/>
 </item>
-<item active="true" historyLabel="main.c" index="0">
+<item historyLabel="main.c" index="0">
 <position info="not_deleted" x="46540" y="10"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="17039" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="61899" y="20"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="66480" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="46540" y="10"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="46176" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="46622" y="10"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="27615" y="0"/>
+</item>
+<item active="true" historyLabel="main.c" index="0">
+<position info="not_deleted" x="28340" y="16"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>

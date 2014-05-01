@@ -84,17 +84,29 @@ function plugStateSet(plug, state){
 
 </script>
 
+
 <div id="cadi_dd_accordion">
 <h3>Direct drive</h3>
 	<div>	
 	<input type="checkbox" id="cdd_enabled" onClick="cdd_toggle(this)"> Cadi Direct Drive enabled
 	<table>
 	<?php
+
+	$row = 1;
+	if (($handle = fopen("cm/cadi_settings_201306191511", "r")) !== FALSE) {
+	    while (($_SESSION['settings_data'][$row] = fgetcsv($handle, 1000, ",")) !== FALSE) {
+		$num = count($_SESSION['settings_data'][$row]);
+		$row++;
+	    }
+	    fclose($handle);
+	}
+
+
 	$plug_amount = 4;
 	for ($i=0; $i<$plug_amount; $i++) {
 		echo '
-		<tr>
-			<td>Lights zone '.$i.'</td>
+		<tr title="'.$_SESSION['settings_data'][2][$i+1].'">
+			<td>'.$_SESSION['settings_data'][1][$i+1].'</td>
 			<td>
 				<form class="c_inline">
 				<div id="radio_plug1" class="radio_">
@@ -113,10 +125,13 @@ function plugStateSet(plug, state){
 	<table>
 	<?php
 	$valves_amount = 4;
-	for ($i=0; $i<$plug_amount; $i++) {
+
+	
+
+	for ($i=0; $i<$valves_amount; $i++) {
 		echo '
-		<tr>
-			<td>Valve '.$i.'</td>
+		<tr title="'.$_SESSION['settings_data'][4][$i+1].'">
+			<td>'.$_SESSION['settings_data'][3][$i+1].'</td>
 			<td>
 				<form class="c_inline">
 				<div id="radio_plug1" class="radio_">

@@ -917,6 +917,7 @@ void run_uart_cmd(void){
 			break;
 		case 2:
 			comm_state=COMM_DIRECT_DRIVE;
+			plugStateSet(psi_pump_load_id, 0);	// disables PSI pump when entered CDD mode
 			break;
 		case 3:
 			comm_state=COMM_MONITOR_MODE;
@@ -1492,6 +1493,7 @@ void open_valve(uint8_t valveId){
 	}
 	if (valveId==2 || valveId==3) {	// for solenoid valves
 		VALVE_MOTOR_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+		valveFlags |= (1<<valveId); // set flag
 	}
 	vTaskDelay(1);
 #endif
@@ -1530,6 +1532,7 @@ void close_valve(uint8_t valveId){
 	}
 	if (valveId==2 || valveId==3) {	// for solenoid valves
 		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
+		valveFlags &= ~(1<<valveId); // reset flag
 	}
 }
 

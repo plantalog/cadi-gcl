@@ -67,7 +67,11 @@ switch ($action) {
 		command_send($_POST['command'], $_POST['mac']);
 		break;
 	case 'get_status':
-		include_once('cadi_status.php');
+//		include_once('cadi_status.php');
+		
+		include_once('status_view_1.php');
+		echo '---socalledseparator---';
+		include_once('status_view_2.php');
 		break;
 	case 'get_ip':
 		array($output);
@@ -79,17 +83,14 @@ switch ($action) {
 	case 'change_video':
 		change_video($_POST['new_video']);
 		break;
-/*	case 'stream_photo':
-		exec('fswebcam -d /dev/video1 -r 640x480 --jpeg 85 ../img/curimage.jpeg & >> /dev/null');
+	case 'btd_apply_settings':		// save settings to file
+		btd_apply_settings($_POST['settings']);
 		break;
-	case 'stream_video_stop':
-		$videostreams = exec('ps aux |grep fswebcam');
-		echo $videostreams;
-		print_r($videostreams);
-		break;
- */
-		
+}
 
+function btd_apply_settings($settings){
+	file_put_contents('btds/btd.conf',$settings);
+	file_put_contents('daemon_cmd','reload_settings,');	// force Cadi BTDaemon to reload settings file
 }
 
 function command_send($command, $mac){

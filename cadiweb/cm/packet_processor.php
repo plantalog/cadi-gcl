@@ -9,19 +9,15 @@
 
 function crc_block($input, $packet, $length){	// $input is XORin init
 	for ($i=0; $i<$length; $i++) {
-//		echo $input.' xor '.ord($packet[$i]).'              ';
 		$input ^= ord($packet[$i]);
-//		echo 'CRC output='.$input.'<br>';
 	}
 	return $input;
 } 
 
 unset($packet);
-// echo "packet processor included";
 if (isset($_POST['cmd'])) {
 	$packet_pref = "ZX2";
 	$packet.=$packet_pref;
-//	print_r($_POST);
 	$cmd = $_POST['cmd'];
 	switch($cmd) {
 		case 0:		// get_water(8,8,16)
@@ -105,11 +101,10 @@ if (isset($_POST['cmd'])) {
 	unset($packet);
 	$packet = $arguments;
 	$cadi_packet = $arguments;
-//	$cadi_packet = "nulevok";
 }
 
 else {
-	$cadi_packet = "huuuj";
+	$cadi_packet = "empty packet";
 }
 
 $packet_crc = crcs($packet);
