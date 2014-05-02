@@ -1527,7 +1527,7 @@ void close_valve(uint8_t valveId){
 		}
 		stop_valve_motor(valveId);
 		valveFlags &= ~(1<<valveId); // sbrosit' flag
-		valveFlags |= (curstatus<<valveId);
+//		valveFlags |= ((((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1))<<valveId);
 		valve_busy&= ~(1<<valveId);
 	}
 	if (valveId==2 || valveId==3) {	// for solenoid valves
@@ -5347,7 +5347,7 @@ int main(void)
 	SystemInit();
 #ifdef USE_VALVES
 	stop_valve_motor(0);	// ball valves
-	stop_valve_motor(1);
+	stop_valve_motor(1);;
 #endif
 
 	uint32_t i;
@@ -5394,7 +5394,7 @@ int main(void)
 	// setup gpio for load triggering and led indication
 	// reinit valves HARDCODE
 #ifdef USE_VALVES
-
+	//
 
 #endif
 

@@ -10,7 +10,8 @@ function apply_btd_settings(){
 			$("#cadi_set_fsd").val(),
 			$("#cadi_set_rpd").val(),
 			$("#cadi_set_cn").val(),
-			$("#cadi_set_srtrs").val()];
+			$("#cadi_set_srtrs").val(),
+			$("#cadi_set_sppd").val()];
 	settings = arr.join();
 	alert(arr);
 	$.post('cm/cadi_bt_processor.php', {action: 'btd_apply_settings', settings:settings}, function(data){
@@ -69,6 +70,13 @@ Cadi Bluetooth daemon tuning
 			title="Data amount to be read from the end "
 			type="text"
 			value="<?php echo $temparr[5]; ?>" />
+	</li>
+	<li>Status packet ping divider, N
+		<input
+			id="cadi_set_sppd"
+			title="Send status request packet to Cadi every N iteration of daemon main loop"
+			type="text"
+			value="<?php echo $temparr[6]; ?>" />
 	</li>
 </ul>
 <button class="btn_" onClick="apply_btd_settings()">Apply new settings</button>

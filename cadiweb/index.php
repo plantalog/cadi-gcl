@@ -30,6 +30,9 @@
 		});
 
 		$( ".btn_" ).button();
+		$("#system_view_1").hide();
+		get_status_block();
+		cadi_list_rfcomms();
 	});
 
 	function get_ip(){
@@ -79,8 +82,8 @@
 		var blocks = $('#status_block_ids').val();
 		var block_ids = blocks.split(',');
 		for (i=0; i<block_ids.length;i++){
-			$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:block_ids[i]}, function(data){
-			});
+//			$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 7, block_id:block_ids[i]}, function(data){
+//			});
 			$.post('cm/cadi_bt_processor.php', {action: 'get_status'}, function(data){
 				blocks = data.split('---socalledseparator---');
 				$('#status_block').html(blocks[0]);

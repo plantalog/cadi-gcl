@@ -1,14 +1,11 @@
 <?php
 
-
-
-
 echo "Bluetooth daemon for Cadi started";
 $btd_cmd_file = 'daemon_cmd';
 
 // initial Cadi BTDaemon settings load
 file_put_contents($btd_cmd_file,'reload_settings,');
-
+$ping_delay = 0;
 $cycle_counter = 0;
 $video = 0;
 $status_stream_enabled=0;		// shows if status stream enabled
@@ -37,6 +34,7 @@ while(1){
 				$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
 	//			exec($execmd);
 				$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
+				$respfs = 0;
 				break;
 			case 'release':
 				$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
@@ -55,6 +53,8 @@ while(1){
 				$video=$cmd_arr[1];
 				break;
 			case 'tx':		// send packet
+				$ping_delay = 10;
+				usleep($csd_value*$sppd_value);
 				$execmd = "/bin/echo -e '".$cmd_arr[2]."' >> /dev/".$cmd_arr[1];
 			break;
 			case 'reboot':
@@ -72,6 +72,7 @@ while(1){
 				    	$photo_divider  = $data[0];
 				    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
 				    	$srtrs_value  = $data[5];	// Serial response tail read size
+					$sppd_value = $data[6];	// Status packet ping divider
 					if (!($srtrs_value>40 && $srtrs_value<1000)) {
 						$srtrs_value = 100;	// force default size if not in range [40..1000] bytes
 					}
@@ -79,6 +80,7 @@ while(1){
 					echo PHP_EOL.' new Photoshot divider value ='.$photo_divider.PHP_EOL;
 					echo PHP_EOL.' new FileSizeDifference value ='.$fsd_value.PHP_EOL;
 					echo PHP_EOL.' new Serial response tail read size value ='.$srtrs_value.PHP_EOL;
+					echo PHP_EOL.' new Status packet ping divider ='.$sppd_value.PHP_EOL;
 				    fclose($handle);
 				}
 				else {
@@ -86,6 +88,7 @@ while(1){
 					// using default values
 					$photo_divider = 80;
 					$csd_value = 25000;
+					$sppd_value = 80;
 				}
 				$execmd = "echo";
 				break;
@@ -95,7 +98,7 @@ while(1){
 		exec($execmd);
 	}
 
-	usleep(25000);
+	usleep($csd_value);
 	if ($cycle_counter%$photo_divider==0) {	// photo_divider needed for making photo NOT every while() iteration
 		exec('fswebcam -d /dev/video'.$video.' -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
 	}
@@ -104,16 +107,34 @@ while(1){
 	}
 	$curespfs = filesize('serialresp.out');	// current response file size
 	clearstatcache();				// refresh file size
+
 	if ($curespfs>($respfs+$fsd_value)) {	// compare new and old values if they match. if not, file changed (35 for minimum file difference)
 		$respfs = $curespfs;		// update old file size value
 		parse_response($srtrs_value);		// parse response if change detected
+	}
+
+	if ($cycle_counter%$sppd_value==0 && $ping_delay==0) {
+		echo '#CadiBTD# Cadi, Ping!';
+		$ping_packet = "\x5a\x58\x32\x04\x07\x01\x32\x00";
+		$command = "/bin/echo -e '";
+		for ($i=0; $i<strlen($ping_packet);$i++) {
+			$command .= sprintf("\\x%02x",ord($ping_packet[$i]));
+		}
+		// $command .= sprintf("\\x%02x",ord($ping_packet));
+		$command .= "' >> /dev/cadi";
+//		echo $ping_packet.PHP_EOL.$command.PHP_EOL;
+		exec($command);
+	}
+	
+	if ($ping_delay>0) {
+		$ping_delay--;
 	}
 
 //	exec('streamer -f jpeg -o ../img/curimage.jpeg');
 }
 
 function parse_response($srtrs){
-	echo PHP_EOL.'Attempting to parse response'.PHP_EOL;
+	echo PHP_EOL.'Trying parse response'.PHP_EOL;
 	// create file pointer
 	$fp = fopen('serialresp.out', 'rb');
 	fseek($fp, ($srtrs*(-1)), SEEK_END); // It needs to be negative to seek from the file end
@@ -137,7 +158,7 @@ function parse_response($srtrs){
 
 	$packet_size = ord($last_packet[1]);
 
-	if ($packet_type==3) {
+	if ($packet_type==3 && strlen($last_packet)>37) {
 		// STATUS data provider
 		print_r($last_packet);
 		$block_id = ord($last_packet[36]);
@@ -273,7 +294,52 @@ function build_svg($statarr){
 			$valve_fill[$i] = "green";
 		}
 	}
-	$tank4_height = (70*$statarr['sonar_read'][0])/10;
+	$tank3['top'] = 14;
+	$tank3['bottom'] = 100;
+	$tank3['svg']['height'] = 400;
+	$tank3['svg']['tank_top'] = 20;
+
+	$tank4['top'] = 7;
+	$tank4['bottom'] = 47;
+	$tank4['svg']['height'] = 430;
+	$tank4['svg']['tank_top'] = 300;
+
+	// Volume: 0% - 100cm, 100% - 14cm
+	// Range: 86cm.Resolution:1cm
+	// if SVG has height of 400units (let's call this value - $tank['svg']['height'] ), then 1cm = 400/86 ~= 4.65.
+	// To draw SVG polygon we use the shifting of 3 top points up/down depending on sonar_read value, displaying current tank volume
+	// X - fixed, Y = svg_tank_top_y_coord + (400/86)*(sonar_read - 14)
+	// now let's write an equation for this calculation:
+	// Y = svg_tank_top_y_coord + ($tank['svg']['height']/($tank3['bottom']-$tank3['top']))*(sonar_read - $tank['top'])
+
+	$tank3['svg']['y'] = $tank3['svg']['tank_top']+($tank3['svg']['height']/($tank3['bottom']-$tank3['top']))*($statarr['sonar_read'][0] - $tank3['top']);
+	$tank4['svg']['y'] = $tank4['svg']['tank_top']+($tank4['svg']['height']/($tank4['bottom']-$tank4['top']))*($statarr['sonar_read'][1] - $tank4['top']);
+
+
+
+	if ($statarr['sonar_read'][1]>$tank3['bottom']) {
+		$tank3_txt_color = "red";
+	}
+	else {
+		$tank3_txt_color = "white";
+	}
+
+	$tank4_txt_color = "white";
+
+//	$tank3_height = (44*$statarr['sonar_read'][0])/10;
+	$tank4_height = (8*$statarr['sonar_read'][1]);
+
+	for ($i=0;$i<4;$i++) {
+		if ($statarr['plugs'][(3-$i)] == 0){
+			$plugs['svg']['colors'][$i] = "red";
+		}
+		else {
+			$plugs['svg']['colors'][$i] = "green";
+		}
+	}
+	$plugs['svg']['x'] = 2000;
+	$plugs['svg']['y'] = 1100;
+
 	$svg = '';
 	$svg .= '<div style="float:left;"><img src="img/cadi_watering_hptl(high_pressure_two_lines).jpg" /></div>';
 	$svg .= '<div id="svg_container" style="display:block; float:left; position: absolute; border:1px solid red;">
@@ -282,11 +348,67 @@ function build_svg($statarr){
 				<circle cx="1670" cy="130" r="60" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[1].'" />
 				<circle cx="1345" cy="990" r="40" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[2].'" />
 				<circle cx="1345" cy="910" r="40" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[3].'" />
-				<text style="font-size:50px; font-weight:bold;" x="760" y="1180" fill="red" >Pressure@7.2 = '.$statarr['psi'].' bar</text>
-				<text style="font-size:50px; font-weight:bold;" x="760" y="300" fill="red" >Temperature: '.$statarr['dht']['temp'].' C</text>
-				<text style="font-size:50px; font-weight:bold;" x="760" y="240" fill="red" >Humidity: '.$statarr['dht']['temp'].' C</text>
-				<polygon fill="blue" stroke="blue" stroke-width="10" points="1920,'.(200+8*$statarr['sonar_read'][1]).'  2000,'.(60+8*$statarr['sonar_read'][1]).'  2300,'.(60+8*$statarr['sonar_read'][1]).'  2300,420  2200,580 1920,580" />
-				<polygon fill="blue" stroke="blue" stroke-width="10" points="1490,'.(700+$tank4_height).'  1570,'.(560+$tank4_height).'  1850,'.(560+$tank4_height).'  1850,1050  1770,1170  1490,1170" />
+
+				<text style="font-size:50px; font-weight:bold;" x="760" y="300" fill="green" >Temp: '.$statarr['dht']['temp'].' C</text>
+				<text style="font-size:50px; font-weight:bold;" x="760" y="240" fill="blue" >Humidity: '.$statarr['dht']['rh'].' %</text>
+				<text style="font-size:50px; font-weight:bold;" x="760" y="240" fill="blue" >Humidity: '.$statarr['dht']['rh'].' %</text>
+
+				<text style="font-size:50px; font-weight:bold;" x="400" y="70" fill="red" >Cadi time: '.(date("Y-m-d H:i:s", $statarr['time'])).'</text>
+
+
+
+				<text style="font-size:30px; font-weight:bold;" x="100" y="150" fill="green" >
+					'.$tank4['svg']['tank_top'].'
+					'.$tank4['svg']['height'].'
+					'.$tank4['bottom'].'
+					'.$tank4['top'].'
+					'.$statarr['sonar_read'][1].'
+				</text>
+			
+
+				<polygon fill="blue" stroke="blue" stroke-width="10" points="1920,'.(140+$tank3['svg']['tank_top']+$tank3['svg']['y']).'  2000,'.($tank3['svg']['tank_top']+$tank3['svg']['y']).'  2300,'.($tank3['svg']['tank_top']+$tank3['svg']['y']).'  2300,420  2200,580 1920,580" />
+
+				<polygon fill="blue" stroke="blue" stroke-width="10" points="1490,'.(140+$tank4['svg']['tank_top']+$tank4['svg']['y']).'  1570,'.($tank4['svg']['tank_top']+$tank4['svg']['y']).'  1850,'.($tank4['svg']['tank_top']+$tank4['svg']['y']).'  1850,1050  1770,1170  1490,1170" />
+
+
+
+
+			<text style="font-size:52px; font-weight:bold;" x="'.($plugs['svg']['x']+15).'" y="'.($plugs['svg']['y']-10).'" fill="red" >Loads</text>
+
+
+
+			<polygon fill="'.$plugs['svg']['colors'][0].'" stroke="blue" stroke-width="1" points="
+				'.$plugs['svg']['x'].','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+50).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+50).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']).','.($plugs['svg']['y']+50).' 
+			" />
+				
+			<polygon fill="'.$plugs['svg']['colors'][1].'" stroke="blue" stroke-width="1" points="
+				'.($plugs['svg']['x']+55).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+105).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+105).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+55).','.($plugs['svg']['y']+50).' 
+			" />
+
+		<polygon fill="'.$plugs['svg']['colors'][2].'" stroke="blue" stroke-width="1" points="
+				'.($plugs['svg']['x']+110).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+160).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+160).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+110).','.($plugs['svg']['y']+50).' 
+			" />
+
+		<polygon fill="'.$plugs['svg']['colors'][3].'" stroke="blue" stroke-width="1" points="
+				'.($plugs['svg']['x']+165).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+215).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+215).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+165).','.($plugs['svg']['y']+50).' 
+			" />
+
+
+				<text style="font-size:40px; font-weight:bold;" x="1505" y="900" fill="'.$tank4_txt_color.'" title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][1].' cm</text>
+
+				<text style="font-size:40px; font-weight:bold;" x="1925" y="520" fill="'.$tank3_txt_color.'" title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][0].' cm</text>
 
 			</svg>
 
