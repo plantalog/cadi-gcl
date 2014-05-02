@@ -5,6 +5,7 @@ $btd_cmd_file = 'daemon_cmd';
 
 // initial Cadi BTDaemon settings load
 file_put_contents($btd_cmd_file,'reload_settings,');
+$respfs = 0;
 $ping_delay = 0;
 $cycle_counter = 0;
 $video = 0;
@@ -62,7 +63,8 @@ while(1){
 			//	echo $execmd;
 				break;
 			case 'stream_status':
-				$status_stream_enabled = $cmdarr[1];
+				echo 'Going to stream status locally';
+				$status_stream_enabled = $cmd_arr[1];
 				break;
 			case 'reload_settings':	// read settings file fetching the daemon settings
 				echo PHP_EOL.' reloading Cadi BTDaemon settings'.PHP_EOL;
@@ -113,7 +115,7 @@ while(1){
 		parse_response($srtrs_value);		// parse response if change detected
 	}
 
-	if ($cycle_counter%$sppd_value==0 && $ping_delay==0) {
+	if ($cycle_counter%$sppd_value==0 && $ping_delay==0 && $status_stream_enabled==1) {
 		echo '#CadiBTD# Cadi, Ping!';
 		$ping_packet = "\x5a\x58\x32\x04\x07\x01\x32\x00";
 		$command = "/bin/echo -e '";

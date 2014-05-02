@@ -31,6 +31,10 @@ switch ($action) {
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
+	case 'btd_stream_start':
+		$toput = "stream_status,".$_POST['status'].", ";
+		file_put_contents('daemon_cmd', $toput);
+		break;
 	case 'reboot':
 		$toput = "reboot, , ";
 		echo $toput;
