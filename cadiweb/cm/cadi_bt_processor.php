@@ -41,6 +41,9 @@ switch ($action) {
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
+	case 'cadi_reset':
+		bt_tx('cadi', $cadi_packet);
+		break;
 	case 'bt_restart':
 		$toput = "restart,";
 		echo $toput;

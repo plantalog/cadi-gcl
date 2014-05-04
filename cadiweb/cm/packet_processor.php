@@ -69,7 +69,13 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(8);	// command
 			$packet .= chr($_POST['flags']);	// new auto_flags byte
 			break;
-		case 10:		// get_status_block();
+		case 9:		// dosing pump enable/disable
+			$packet .= chr(4);	// packet payload size (including this size byte)
+			$packet .= chr(9);	// command
+			$packet .= chr($_POST['pump_id']);	// pumpId for doser
+			$packet .= chr($_POST['state']);	// new state for doser
+			break;
+		case 10:		// set new valve_failed 8bit value
 			$packet .= chr(2);	// packet payload size (including this size byte)
 			$packet .= chr(10);	// command
 			break;
@@ -77,7 +83,7 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(2);	// packet payload size (including this size byte)
 			$packet .= chr(11);	// command
 			break;
-		case 12:		// get_status_block();
+		case 12:		// set time
 			$packet .= chr(6);	// packet payload size (including this size byte)
 			$packet .= chr(12);	// command
 			$curtime = time();
@@ -86,6 +92,10 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr((($curtime%65536)/256));	// command
 			$packet .= chr($curtime%256);	// command
 			echo $curtime;
+			break;
+		case 13:		// get_status_block();
+			$packet .= chr(2);	// packet payload size (including this size byte)
+			$packet .= chr(13);	// command
 			break;
 	}
 

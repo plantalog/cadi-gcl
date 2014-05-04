@@ -142,12 +142,10 @@ uint8_t		dht_data[5];
 uint8_t		dht_data2[5];
 uint8_t dht_bit_position = 0;
 uint8_t dht_bit_ready = 0;
-uint8_t		dht_data_ready = 0;
+uint8_t	dht_data_ready = 0;
 uint8_t  dht_byte_pointer;
 uint8_t  dht_bit_pointer;
 uint8_t 	dht_rh_str[4], dht_t_str[4];
-// uint16_t	capture1=0;
-volatile uint8_t capture_is_first = 1, capture_is_ready = 0;
 uint16_t rhWindowTop, rhWindowBottom;
 uint8_t rhUnderOver = 0;
 #endif						// EOF DHT DEFINITIONS
@@ -278,7 +276,7 @@ typedef struct
 } RTC_DateTime;
 
 RTC_Time toAdjust;
-uint8_t auto_flags=255;
+uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
 uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS
 
@@ -419,7 +417,6 @@ uint16_t psi_cur_adc_value=0;
 uint16_t tank_windows_top[1];
 uint16_t tank_windows_bottom[1];
 
-uint8_t log_inc=0;
 char log_str[64];
 
 
@@ -449,7 +446,8 @@ uint16_t phWindowTop, phWindowBottom;
 uint16_t ecWindowTop, ecWindowBottom;
 uint32_t lastWriteTime=0;
 uint8_t wpStateFlags;
-uint8_t dosingPumpStateFlags;
+uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
+uint8_t dosingPumpStateFlags2;
 uint8_t waterSensorStateFlags;
 // uint8_t wsl_buff[3];
 uint16_t wfCalArray[WFM_AMOUNT];
@@ -480,6 +478,7 @@ uint8_t readPercentVal(uint8_t value);
 uint32_t measureDelay(void);
 void phMonSettings(void);
 void setTimer(uint8_t timerId);
+//void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos);
 void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos);
 void Lcd_write_arr(uc8 *STRING, uint8_t chars);
 void Lcd_write_digit(uint8_t numb);
@@ -543,12 +542,12 @@ void displayAdcValues(void);
 void EXTI0_IRQHandler(void);
 void EXTI1_IRQHandler(void);
 
-void water_program_setup(progId);
+void water_program_setup(uint8_t progId);
 void fertilization_setup(void);
 void watering_setup(void);
-void fertilizer_mixing_program_setup(progId);
-void run_watering_program(progId);
-void run_fertilizer_mixer(progId);
+void fertilizer_mixing_program_setup(uint8_t progId);
+void run_watering_program(uint8_t progId);
+void run_fertilizer_mixer(uint8_t progId);
 // void calibratEc(void);
 void startWp(void);
 uint16_t adjust16bit_fast(uint16_t val, uint8_t speed);
@@ -589,7 +588,7 @@ void dosing_motor_control_init(void);
 void valve_motor_control_init(void);
 void EXTI15_10_IRQHandler(void);
 void water_level_input_init(void);
-void fertilizer_mixing_program_setup(progId);
+void fertilizer_mixing_program_setup(uint8_t progId);
 uint16_t adjust16bit(uint16_t val);
 void enable_dosing_pump(uint8_t pumpId, uint8_t state);
 void valveMotorStateSet(uint8_t valveId, uint8_t state);
@@ -961,6 +960,9 @@ void run_uart_cmd(void){
 		case 12:
 			RTC_SetCounter(cmdbuf[2]*16777216+cmdbuf[3]*65536+cmdbuf[4]*256+cmdbuf[5]);
 			break;
+		case 13:
+			NVIC_SystemReset();
+			break;
 	}
 	rx_flush();
 }
@@ -1002,7 +1004,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[31] = (uint8_t)((water_counter[0]>>8)&(0xFF));
 		TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
 		TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
-		TxBuffer[34] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+		TxBuffer[34] = dosingPumpStateFlags2;		// dosing pump flags (dosingPumpStateFlags overwritten by some part of FW)
 		TxBuffer[35] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
 		TxBuffer[36] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
 		TxBuffer[37] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
@@ -1044,7 +1046,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
 		TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
 		TxBuffer[9] = 00;		// EMPTY
-		TxBuffer[10] = dosingPumpStateFlags;
+		TxBuffer[10] = dosingPumpStateFlags2;
 		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
 		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
 		TxBuffer[13] = waterSensorStateFlags;
@@ -1454,40 +1456,44 @@ void open_valve(uint8_t valveId){
 	valvebusy = (valve_busy>>valveId) & 1;
 	if (valvebusy==0) {
 		valve_busy|=(1<<valveId);
-		uint8_t curstatus=0, cur_valve_failed=0, duration=0;
-		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
-	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' tolko flag
-		vTaskDelay(1);
-		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
-		cur_valve_failed>>=valveId;	// ostavit' toka flag
-		if (curstatus==0 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok, for ball valves with feedback
-			run_valve_motor(valveId);
-			uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
-			while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
-	//			if(valveId==1){
-					curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);
-				//			   ((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)
-					//			}
-	//			else {
-	//				curstatus=(((VALVE_SENSOR_PORT->IDR)>>VALVE_SENSOR_GPIO_SHIFT+valveId) & 1);
-	//			}
-				//feedback = (VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId);
-				if (curstatus==1) {
-					duration++;
-				}
-				else {
-					duration=0;
-				}
-				vTaskDelay(1);
-				timeout--;
+		if (valveId==0 || valveId==1) {
+			uint8_t curstatus=0, cur_valve_failed=0, duration=0;
+			if (valveId==0) {
+				curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>4) & 1);
 			}
-			if (timeout==0) {
-				valve_failed |= (1<<valveId);
+			else {
+				curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>8) & 1);
 			}
+			vTaskDelay(1);
+			cur_valve_failed=(valve_failed>>valveId)&1;	// check if valve failure flag is off
+			if (curstatus==0 && cur_valve_failed==0) {	// if no failure detected and current status is ok, for ball valves with feedback
+				run_valve_motor(valveId);
+				uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// valve failure timeout
+				while (duration<3 && timeout>0) {		// HARDCODE. duration needed for sure-read of valve feedback
+					if (valveId==0) {
+						curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>4) & 1);
+					}
+					else {
+						curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>8) & 1);
+					}
+					if (curstatus==1) {
+						duration++;
+					}
+					else {
+						duration=0;
+					}
+					vTaskDelay(1);
+					timeout--;
+				}
+				if (timeout==0) {
+					valve_failed |= (1<<valveId);
+				}
+			}
+			stop_valve_motor(valveId);
+			valveFlags &= ~(1<<valveId); // sbrosit' flag
+			valveFlags |= (curstatus<<valveId);
 		}
-		stop_valve_motor(valveId);
-		valveFlags &= ~(1<<valveId); // sbrosit' flag
-		valveFlags |= (curstatus<<valveId);
+
 		vTaskDelay(5);
 		valve_busy&= ~(1<<valveId);
 	}
@@ -1506,23 +1512,33 @@ void close_valve(uint8_t valveId){
 		valve_busy|=(1<<valveId);
 		uint8_t duration=0, curstatus=0, cur_valve_failed=0;
 		uint16_t timeout=VALVE_FAILURE_TIMEOUT;	// uint8_t fixed to uint16_t
-		curstatus=((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1);	// check if valve flag active now
-	//	curstatus>>=valveId+VALVE_SENSOR_GPIO_SHIFT;	// ostavit' toka flag
+		if (valveId==0) {
+			curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>4) & 1);
+		}
+		else {
+			curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>8) & 1);
+		}
 		cur_valve_failed=valve_failed&(1<<valveId);	// check if valve failure flag is off
 		vTaskDelay(1);
 		cur_valve_failed>>=valveId;	// ostavit' toka flag
 		if (curstatus==1 && cur_valve_failed==0 && (valveId==0 || valveId==1)) {	// if no failure detected and current status is ok
 			run_valve_motor(valveId);
 			while (duration<3 && timeout>0) {
-						// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
-						if (((VALVE_SENSOR_PORT->IDR)>>(VALVE_SENSOR_GPIO_SHIFT+valveId*4) & 1)==0) {
-							duration++;
-						}
-						else {
-							duration=0;
-						}
-						vTaskDelay(1);
-						timeout--;
+				if (valveId==0) {
+					curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>4) & 1);
+				}
+				else {
+					curstatus=(uint8_t)(((VALVE_SENSOR_PORT->IDR)>>8) & 1);
+				}
+				// this if statement filters occasional "0"s on GPIO (more needed for "1"s on open_valve())
+				if (curstatus==0) {
+					duration++;
+				}
+				else {
+					duration=0;
+				}
+				vTaskDelay(1);
+				timeout--;
 			}
 		}
 		stop_valve_motor(valveId);
@@ -1803,7 +1819,7 @@ void valve_test(void){
 	valve_test3();
 }
 
-void water_program_setup(progId){
+void water_program_setup(uint8_t progId){
 	uint16_t addr=0, tempvalue=0;
 	uint32_t tmp32, interval;
 
@@ -1951,7 +1967,7 @@ void watering_setup(void){
 }
 
 // set fertilizer mixing programs
-void fertilizer_mixing_program_setup(progId){
+void fertilizer_mixing_program_setup(uint8_t progId){
 	uint16_t addr=0, tempvalue=0;
 
 	// choose dosing pump to use
@@ -2040,7 +2056,7 @@ void startWp(void){
 	vTaskDelay(200);
 }
 
-void run_watering_program(progId){
+void run_watering_program(uint8_t progId){
 	wpStateFlags|=(1<<progId);	// set active flag for this program
 	close_valve(DRAIN_VALVE_ID);	// close drain valve
 //	valveFlags=0;	// all valves to off;
@@ -2137,7 +2153,7 @@ void run_watering_program(progId){
 	vTaskDelay(200);
 }
 
-void run_fertilizer_mixer(progId){
+void run_fertilizer_mixer(uint8_t progId){
 	uint16_t dosingTime, dosingPumpId, circulationMixingTime, addr;
 	uint32_t dosingEndTime=0;
 
@@ -2169,7 +2185,8 @@ void run_circulation_pump(uint16_t time){
 	plugStateSet(circulationPumpId, 0);
 }
 
-void enable_dosing_pump(uint8_t pumpId, uint8_t state){
+
+void enable_dosing_pump2(uint8_t pumpId, uint8_t state){
 	if (state==1) {
 		dosingPumpStateFlags |= (1<<pumpId);
 	}
@@ -2192,6 +2209,38 @@ void enable_dosing_pump(uint8_t pumpId, uint8_t state){
 		TIM3->CCR4 = state*1000;
 	}
 }
+
+void enable_dosing_pump(uint8_t pumpId, uint8_t state){
+//	uint8_t prcnt = 0;
+	if (state>0) {
+		dosingPumpStateFlags2 |= (1<<pumpId);
+	}
+	else {
+		dosingPumpStateFlags2 &= ~(1<<pumpId);
+	}
+
+	if (state==1) {
+		state = 0;
+	}
+	else {
+		state = 100 - state;	// 0 - running motor, 100 - stopped
+	}
+
+	if (pumpId==0) {
+		TIM3->CCR1 = state*10;
+	}
+	if (pumpId==1) {
+		TIM3->CCR2 = state*10;
+	}
+	if (pumpId==2) {
+		TIM3->CCR3 = state*10;
+	}
+	if (pumpId==3) {
+		TIM3->CCR4 = state*10;
+	}
+}
+
+
 
 void watering_program_trigger(void *pvParameters){
 	uint32_t curtime, lastRun, interval, diff, startTime, endTime;
@@ -3374,18 +3423,17 @@ static void sdLog(void *pvParameters){	// store current device data into log
 
 	    	log_str[54]=44;	// ascii comma
 
-	    	for (i=0; i<3; i++) {
-	    		flg = dosingPumpStateFlags & (1<<i); // dosing pump flags
-	    		flg>>=i;
-	    		log_str[i+55]=flg+48;
-	    	}
+	    	// for (i=0; i<3; i++) {
+	    		// flg = dosingPumpStateFlags2;
+	    		log_str[55]=dosingPumpStateFlags2+48;
+	    	// }
 
 	    	log_str[58]=44;	// ascii comma
-	    	for (i=0; i<3; i++) {
-	    		flg = wpStateFlags & (1<<i); // watering program state flags
-	    		flg>>=i;
-	    		log_str[i+59]=flg+48;
-	    	}
+//	    	for (i=0; i<3; i++) {
+//	    		flg = wpStateFlags & (1<<i); // watering program state flags
+//	    		flg>>=i;
+	    		log_str[i+59]=wpStateFlags+48;
+//	    	}
 
 
 
@@ -5072,7 +5120,7 @@ void displayClock(void *pvParameters)
 	    		flg=timerStateFlags&(1<<i);
 
 //	    		flg=wpStateFlags&(1<<i);
-//	    		flg=dosingPumpStateFlags&(1<<i);
+//	    		flg=dosingPumpStateFlags2&(1<<i);
 	    		flg>>=i;
 	    		LCDLine1[i+10]=flg+48;
 	    	}
@@ -5347,11 +5395,14 @@ int main(void)
 	SystemInit();
 #ifdef USE_VALVES
 	stop_valve_motor(0);	// ball valves
-	stop_valve_motor(1);;
+	stop_valve_motor(1);
 #endif
 
 	uint32_t i;
 	dosing_motor_control_init();
+	for (i=0;i<4;i++) {
+		enable_dosing_pump(i,0);	// startup disable dosing pumps
+	}
 	/* Unlock the Flash Program Erase controller */
 	FLASH_Unlock();
 	/* EEPROM Init */

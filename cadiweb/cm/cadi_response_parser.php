@@ -67,7 +67,7 @@ switch ($packet_type) {
 					$_SESSION['cadi_status']['valves'] = decbin(ord($last_packet[5]));
 					$_SESSION['cadi_status']['plugs'] = decbin(ord($last_packet[6]));
 					$_SESSION['cadi_status']['wpStateFlags'] = decbin(ord($last_packet[7]));
-					$_SESSION['cadi_status']['dosingPumpsFlags'] = '&nbsp;';
+					$_SESSION['cadi_status']['dosingPumpsFlags'] = $last_packet[32]);
 					$_SESSION['cadi_status']['sonar_read'][0] = $sonar_read[0];	// sonar1 distance
 					$_SESSION['cadi_status']['sonar_read'][1] = $sonar_read[1];	// sonar2 distance
 					$_SESSION['cadi_status']['time'] = $cadi_time;

@@ -1,4 +1,7 @@
-ac_loads,Light,PSI pump,NC,NC
+ac_loads,Light,PSI pump,Mixer pump,NC
 ac_loads_hints,Enables light next to camera,High pressure diaphragm pump,,
-valves,FWI valve,WI valve,Drain valve,Cherry
+valves,10 FWI valve,8 WI valve,6.2 Drain valve,6.1 Cherry
 valves_hints,Fresh (or Filtered) Water Intake valve,Water Intake valve,Drain valve,Tomatoes Cherry watering line
+dosing_pumps, ,RootJuice, GHE Bloom, GHE Grow
+dosers_hints, ,BioBizz RootJuice root stimulator,GHE FloraDuo Bloom fertilizer (2ml/sec), GHE FloraDuo Grow fertilizer (1ml/sec)
+dosers_pwm_duty_cycles, 90,100,80,100

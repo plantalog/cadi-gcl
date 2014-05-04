@@ -68,6 +68,12 @@
 		});
 	}
 
+	function rcmd(cmd){		// packet created directly in packet processor
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: cmd}, function(data){
+			$('#main_output').html(data);
+		});
+	}
+
 	function bt_disconnect(){
 		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
 		$.post('cm/cadi_bt_processor.php', {action: 'bt_disconnect', rfcomm:rfcomm}, function(data){
@@ -110,14 +116,22 @@
 		$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_scan'}, function(data){
 			$('#bind_mac').html(data);
 			alert('Scanning complete!');
-			alert(data);
+	//		alert(data);
 	//		cadi_list_rfcomms();
 		});  
 	}
 
 	function cw_reboot(){	// reboots the machine, running CadiWeb server
-		$.post('cm/cadi_bt_processor.php', {action: 'reboot'}, function(data){
-		});  
+		if (confirm('Reboot Cadi server?')) {
+			$.post('cm/cadi_bt_processor.php', {action: 'reboot'}, function(data){
+			}); 
+		}
+	}
+
+	function cadi_reset(){
+		if (confirm('Reset Cadi?')) {
+			rcmd(13);
+		}
 	}
 
 	function cadi_list_rfcomms(){
@@ -196,6 +210,13 @@ function cadi_view(viewId){
 
 }
 
+function btd_stream_status(newStatus){
+		alert();
+		$.post('cm/cadi_bt_processor.php', {action: 'btd_stream_start', status: newStatus}, function(data){
+	//		cadi_list_rfcomms();
+			alert(data);
+		});  
+}
 
 
 </script>
@@ -218,7 +239,7 @@ function cadi_view(viewId){
 <button class="btn_ fr">Reload settings</button>
 </div>
 <div id="tabs-1">
-<input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS
+<input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS (from server cache)
 <button class="btn_" id="cadi_view_cam" onClick="cadi_view(1)">Cam</button>
 <button class="btn_" id="cadi_view_map" onClick="cadi_view(2)">Map</button>
 <br>
@@ -247,13 +268,15 @@ function cadi_view(viewId){
 	<br>
 <!--	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div>  -->
 	<br> 
-	<div onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</div><br>
-	<div onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</div>
+	<button onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</button><br>
+	<button onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</button>
 	<select id="bind_mac" name="bind_mac">
 	<option>Scan to get the list</option>
 	</select>
-	<div onClick=bt_connect() style="display:inline; border: 1px solid red;">Connect</div>
+	<button onClick=bt_connect() style="display:inline; border: 1px solid red;">Connect</button>
 	<div id="binded_rfcomms"></div>
+	<button class="btn_" onClick="btd_stream_status(1);">BTD status stream ON</button>
+	<button class="btn_" onClick="btd_stream_status(0);">BTD status stream OFF</button>
 <!--	<div title="use this field to send the data to Cadi while connected" id="tx_form">
 		<input type="text" name="tx_data" id="tx_data" />
 		<div onClick="bt_tx_packet()">Send</div>	
@@ -266,7 +289,11 @@ function cadi_view(viewId){
 	</div> -->
 
 	RFCOMM NUMBER:
-	<input type="text" value="0" id="rfcomm_nr" />
+	<input type="text" value="0" id="rfcomm_nr" /><br>
+
+	<input type="text" value="254" id="auto_flags" />
+	<button onClick=auto_flags(256)>Set new flags</button>
+	<br>
 
 <!--  <div onClick="bt_setdd()">Set DD</div>	
 
@@ -277,6 +304,8 @@ function cadi_view(viewId){
 <button onClick="get_status_block()">Get Status</button>
 <br>
 <button onClick="get_ip()">Get IP</button>
+<button onClick="cw_reboot()">Reboot server</button>
+<button onClick="cadi_reset()">Cadi reset</button>
 <br>
 <input type="text" value="0" id="video_stream" title="this value is N in '/dev/videoN'" /><button onClick="change_video()">Change video</button>
 </div>

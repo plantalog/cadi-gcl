@@ -18,6 +18,9 @@ function bt_setdd(state) {
 } 
 
 function auto_flags(flags){	// set new auto_flags byte
+	if (flags == 256) {
+		flags = $('#auto_flags').val();
+	}
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 8, flags:flags}, function(data){
 		$('#main_output').html(data);
 	});
@@ -72,23 +75,28 @@ function cdd_toggle(){
 			cadi_list_rfcomms();
 		});  
 	}
-//	alert(data);
 }
 
 function plugStateSet(plug, state){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '1', plug:plug, state:state}, function(data){
 		cadi_list_rfcomms();
+	});  
+}
+
+function enable_dosing_pump(pumpId, state){
+		$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '9', pump_id:pumpId, state:state}, function(data){
+		cadi_list_rfcomms();
 //		alert(data);
 	});  
+
 }
 
 </script>
 
 
 <div id="cadi_dd_accordion">
-<h3>Direct drive</h3>
 	<div>	
-	<input type="checkbox" id="cdd_enabled" onClick="cdd_toggle(this)"> Cadi Direct Drive enabled
+	<input type="checkbox" id="cdd_enabled" onClick="cdd_toggle(this)"> CDD: Cadi Direct Drive enabled
 	<table>
 	<?php
 
@@ -143,6 +151,26 @@ function plugStateSet(plug, state){
 			<td></td>
 		</tr>';
 	}
+
+
+	$dosers_amount = 4;
+	for ($i=0; $i<$dosers_amount; $i++) {
+		echo '
+		<tr title="'.$_SESSION['settings_data'][6][$i+1].'">
+			<td>'.$_SESSION['settings_data'][5][$i+1].'</td>
+			<td>
+				<form class="c_inline">
+				<div id="radio_doser'.$i.'" class="radio_">
+				<input type="radio" id="doser'.$i.'_radio1" name="doser'.$i.'_radio"><label for="doser'.$i.'_radio1" onClick="enable_dosing_pump('.$i.','.$_SESSION['settings_data'][7][$i+1].')">Run</label>
+				<input type="radio" id="doser'.$i.'_radio2" name="doser'.$i.'_radio" checked="checked"><label for="doser'.$i.'_radio2" onClick="enable_dosing_pump('.$i.',0)">Stop</label>
+				</div>
+				</form>
+			</td>
+			<td></td>
+		</tr>';
+	}
+
+
 	?>
 
 
@@ -152,6 +180,11 @@ function plugStateSet(plug, state){
 		<button class="btn_" onClick="auto_flags(255)">Auto=255</button>
 		<button class="btn_" onClick="cadi_txcmd(11)">Force DOWN</button><br>
 		<button class="btn_" onClick="cadi_txcmd(12)">Set time</button>
+		<br>
+
+		<input type="text" value="254" id="auto_flags" />
+		<button onClick=auto_flags(256)>Set auto flags</button>
+
 	</td></tr>
 	<tr><td></td></tr>
 	<tr><td></td></tr>
