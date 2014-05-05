@@ -1,6 +1,10 @@
 - Sonar init adapted to Cadi MB. Two sonars are driven
 - valve_busy flags to resolve access collisions
 - emergency stop packet
+- Cadi reset command
+- remote RTC adjust command
+- 40bytes status packets
+- auto_flags startup value = 254
 
 
 v2
