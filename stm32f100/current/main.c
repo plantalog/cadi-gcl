@@ -111,7 +111,7 @@ uint8_t NbrOfDataToTransfer = 16;
 //uint8_t NbrOfDataToRead = RxBufferSize
 uint8_t txbuff_ne = 0;
 uint8_t TxCounter = 0;
-uint16_t RxCounter = 0;
+uint8_t RxCounter = 0;
 uint8_t logstr_crc=0;
 #endif				// EOF BLUETOOTH USART DEFINITIONS
 
@@ -513,6 +513,7 @@ void setCTimer(uint8_t timerId);
 uint32_t CTimerAdjust(uint32_t time);
 void plugStateSet(uint8_t plug, uint8_t state);
 void getPh();
+void getEc(void);
 FRESULT string2log(char* str, int bytes);
 FRESULT sdLog2(void);
 uint8_t adjust8bit(uint8_t val);
@@ -560,13 +561,13 @@ static void uart_task(void *pvParameters);
 static void prvSetupHardware( void );
 static void displayClock( void *pvParameters );
 static void timerStateTrigger(void *pvParameters);
-static void plugStateTrigger(void  *pvParameters);
+static void plugStateTrigger(void *pvParameters);
 static void sdLog(void *pvParameters);
 static void phMonitor(void  *pvParameters);
 static void vTaskLCDdraw(void *pvParameters);
 static void watering_program_trigger(void *pvParameters);
 // static void valveManager(void);
-static void valve_status_updater(void);
+// static void valve_status_updater(void);
 void bluetooth_init(void);
 void display_usart_rx(void);
 void display_usart_tx(void);
@@ -608,6 +609,16 @@ void send_packet();
 void setTimerSelector(void);
 uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid);
 void printOk(void);
+void get_fertilizer(uint8_t fertId, uint8_t secs);
+void get_settings_block(uint8_t block_number);
+void rx_flush(void);
+void adcAverager(void);
+void get_status_block(uint8_t blockId);
+void run_circulation_pump(uint16_t time);
+void send_ee_addr(uint16_t addr, uint8_t type);
+void rx_ee(uint16_t addr, uint8_t type);
+
+
 
 void device_open_valve(uint8_t device_id){
 	open_valve(device_id-20);
@@ -707,7 +718,7 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 {
 	uint32_t cnt_to_reach=0;
 	cnt_to_reach = ((uint32_t)amount*(uint32_t)wfCalArray[0])/10;
-	uint8_t button=0;
+//	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<cnt_to_reach) {
@@ -728,7 +739,7 @@ void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
 }
 
 void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount){	// amount in CL (10ml) max 65535x10=650L
-	uint32_t cnt_to_reach=0, cnt1=0, cnt2=0;
+	uint32_t cnt_to_reach=0;
 	uint16_t volume=0;
 	uint8_t button=0;
 	Lcd_clear();
@@ -899,12 +910,13 @@ void send_packet(){
 	txbuff_ne=0;	// packet sent, reset tx not empty flag
 }
 
-void rx_flush(){
+void rx_flush(void){
 	uint8_t i=0;
 	for (i=0; i<16; i++){
 		cmdbuf[i] = 0;
 	}
 }
+
 
 void run_uart_cmd(void){
 	switch (cmdbuf[1]) {
@@ -963,8 +975,80 @@ void run_uart_cmd(void){
 		case 13:
 			NVIC_SystemReset();
 			break;
+		case 14:
+			get_fertilizer(cmdbuf[2], cmdbuf[3]);
+			break;
+		case 15:	// receive 16 bit value to store into EEPROM
+			rx_ee((cmdbuf[2]&(cmdbuf[3]<<8)), 1);
+			break;
+		case 16:	// receive 32 bit value to store into EEPROM
+			rx_ee((cmdbuf[2]&(cmdbuf[3]<<8)), 2);
+			break;
+		case 17:	// send 16 bit EEPROM value
+			send_ee_addr(cmdbuf[2]+cmdbuf[3]*256, 1);
+			break;
+		case 18:	// send 32 bit EEPROM value
+			send_ee_addr(cmdbuf[2]+cmdbuf[3]*256, 2);
+			break;
+		case 19:
+			loadSettings();
+			break;
+		case 20:
+			valve_busy=0;
+			break;
 	}
 	rx_flush();
+}
+
+void rx_ee(uint16_t addr, uint8_t type){
+	//addr=(cmdbuf[2]+cmdbuf[3]*256);
+	uint32_t val32 = 0;
+	uint16_t val16 = 0;
+	if (type==1) {
+		val16=(cmdbuf[4]&(cmdbuf[5]<<8));
+		EE_WriteVariable(addr,val16);
+	}
+	if (type==2) {
+		val32=(cmdbuf[4]&(cmdbuf[5]<<8)&(cmdbuf[6]<<16)&(cmdbuf[7]<<24));
+		EE_WriteWord(addr,val32);
+	}
+}
+
+
+void send_ee_addr(uint16_t addr, uint8_t type){	// sends EEPROM cell contents via BT-USART
+	uint16_t val16;
+	uint32_t val32;
+	// types: 0 - 8 bit, 1 - 16bit, 2 - 32bit
+	if (type==1) {
+		addr=(cmdbuf[2]&(cmdbuf[3]<<8));
+		EE_ReadVariable(addr, &val16);
+		TxBuffer[0] = 90;	// "Z"
+		TxBuffer[1] = 88;	// "X"
+		TxBuffer[2] = 49;	// "1"
+		TxBuffer[3] = 9;
+		TxBuffer[4] = cmdbuf[2];
+		TxBuffer[5] = cmdbuf[3];
+		TxBuffer[6] = (uint8_t)(val16&0xFF);
+		TxBuffer[7] = (uint8_t)((val16>>8)&0xFF);
+	}
+	if (type==2) {
+		addr=(cmdbuf[2]&(cmdbuf[3]<<8));
+		val32 = EE_ReadWord(addr);
+		TxBuffer[0] = 90;	// "Z"
+		TxBuffer[1] = 88;	// "X"
+		TxBuffer[2] = 49;	// "1"
+		TxBuffer[3] = 11;	// ZX1+size+4bytepayload+crc
+		TxBuffer[4] = cmdbuf[2];
+		TxBuffer[5] = cmdbuf[3];
+		TxBuffer[6] = (uint8_t)(val32&0xFF);
+		TxBuffer[7] = (uint8_t)((val32>>8)&0xFF);
+		TxBuffer[8] = (uint8_t)((val32>>16)&0xFF);
+		TxBuffer[9] = (uint8_t)((val32>>24)&0xFF);
+	}
+	TxBuffer[39] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
+	NbrOfDataToTransfer = TxBuffer[3];
+	TxCounter=0;
+	txbuff_ne = 1;
 }
 
 void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
@@ -1005,14 +1089,14 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 		TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
 		TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
 		TxBuffer[34] = dosingPumpStateFlags2;		// dosing pump flags (dosingPumpStateFlags overwritten by some part of FW)
-		TxBuffer[35] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+		TxBuffer[35] = auto_flags;	// first sonar higher byte
 		TxBuffer[36] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
 		TxBuffer[37] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
 //		adcAverage[AVG_ADC_PSI]>psi_pump_top_level
 		TxBuffer[38] = blockId;
 	}
 	if (blockId==2) {	// state block 2
-		uint32_t now = RTC_GetCounter();
+//		uint32_t now = RTC_GetCounter();
 		TxBuffer[4] = (uint8_t)(psi_pump_top_level&(0xFF));
 		TxBuffer[5] = (uint8_t)((psi_pump_top_level>>8)&(0xFF));
 		TxBuffer[6] = (uint8_t)(psi_pump_btm_level&(0xFF));
@@ -1088,7 +1172,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 }
 
 
-void get_settings_block(block_number){
+void get_settings_block(uint8_t block_number){
 	/* block_number is a number from 0 to N, where N is a
 	 * Settings memory array length / 8
 	 * 8 - is a default block size for this function
@@ -1147,16 +1231,16 @@ void DMA1_Channel5_IRQHandler (void)
 }
 
 void bluetooth_init(void){
-	NVIC_InitTypeDef NVIC_InitStructure;
+//	NVIC_InitTypeDef NVIC_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
 
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 //    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
-    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+//    NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
+//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
 //    NVIC_Init(&NVIC_InitStructure);
 
     // Tx on PA9 as alternate function push-pull
@@ -1261,8 +1345,8 @@ void valve_feedback_init(void){		// init PA6-8 as input for 3V valve feedback
 
 // PA5-7 setup
 	GPIO_InitTypeDef GPIO_InitStructure;
-	EXTI_InitTypeDef EXTI_InitStructure;
-	NVIC_InitTypeDef NVIC_InitStructure;
+//	EXTI_InitTypeDef EXTI_InitStructure;
+//	NVIC_InitTypeDef NVIC_InitStructure;
 //	GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
 	  // Enable GPIOA clock
 //	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
@@ -1416,9 +1500,11 @@ void tankLevelStabSetup(void){
 
 void tankLevelStab(void){
 #ifdef TANK_STAB_ENABLE
+	vTaskDelay(1);
 	uint16_t tmp=0;
 	uint8_t supply_valve=0;
 	EE_ReadVariable(WATER_TANK_SUPPLY_VALVE,&tmp);
+	vTaskDelay(1);
 	supply_valve = (uint8_t)(tmp&0x00FF);
 	if (((auto_flags&2)>>1)==1 && supply_valve<4) {		// TANK STAB flag 1
 		uint8_t valvebusy = 0;
@@ -1506,6 +1592,7 @@ void open_valve(uint8_t valveId){
 }
 
 void close_valve(uint8_t valveId){
+	vTaskDelay(1);
 	uint8_t valvebusy = 0;
 	valvebusy = (valve_busy>>valveId) & 1;
 	if (valvebusy==0) {
@@ -1550,6 +1637,7 @@ void close_valve(uint8_t valveId){
 		VALVE_MOTOR_PORT->BSRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
 		valveFlags &= ~(1<<valveId); // reset flag
 	}
+	vTaskDelay(1);
 }
 
 
@@ -1602,7 +1690,7 @@ void EXTI9_5_IRQHandler(void)
 }
 
 void valve_test2(void){
-	uint8_t button=0, curvalve=0, i=0;
+	uint8_t button=0, curvalve=0;
 	Lcd_clear();
 
 	while (button!=BUTTON_OK) {
@@ -1673,7 +1761,7 @@ void valve_test2(void){
 }
 
 void valve_test3(void){
-	uint8_t button=0, curvalve=2, i=0;
+	uint8_t button=0, curvalve=2;
 	Lcd_clear();
 
 	while (button!=BUTTON_OK) {
@@ -1730,7 +1818,7 @@ void valve_test3(void){
 
 
 void valve_test(void){
-	uint8_t button=0, curState=0, i=0, curvalve=0;
+	uint8_t button=0;
 	uint16_t tmp=0;
 	Lcd_clear();
 	while (button!=BUTTON_OK) {
@@ -2240,7 +2328,20 @@ void enable_dosing_pump(uint8_t pumpId, uint8_t state){
 	}
 }
 
-
+void get_fertilizer(uint8_t fertId, uint8_t secs){	// secs - number of seconds to run the fertId pump
+	uint32_t reach = 0;
+	// to make counting more precise wait until the next second STARTS
+	reach = RTC_GetCounter()+1;
+	while (RTC_GetCounter()<reach) {
+		vTaskDelay(2);
+	}
+	reach = RTC_GetCounter()+secs;
+	enable_dosing_pump(fertId,1);	// enable dosing pump
+	while (RTC_GetCounter()<reach) {	// now dose the fertilizer within secs seconds
+		vTaskDelay(2);		//
+	}
+	enable_dosing_pump(fertId,0);
+}
 
 void watering_program_trigger(void *pvParameters){
 	uint32_t curtime, lastRun, interval, diff, startTime, endTime;
@@ -2501,9 +2602,6 @@ void dht_get_data(void){	// function starts getting data from DHT22 sensor
 }
 
 void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and strings of T and rH
-	uint8_t i, i2;
-//	uint16_t caps1[45];
-//	uint16_t zero_ticks, one_ticks;
 	vTaskDelay(10);
 	if (dht_data_ready==1) {
 
@@ -2542,7 +2640,6 @@ void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and 
 void dht_arr_displayer(void){
 //	dht_get_data();
 	uint8_t button=0;
-	uint8_t arr_pointer=0;
 	while (button!=BUTTON_OK) {
 //		dht_get_data();
 		vTaskDelay(30);
@@ -3259,7 +3356,7 @@ void display_usart_rx2(void){	// another usart test fr displaying cmdbuf content
 }
 
 void display_usart_rx(void){
-		uint8_t button=0, i=0;
+		uint8_t button=0;
 		Lcd_clear();
 		vTaskDelay(500);
 		while (button!=BUTTON_OK){
@@ -3579,7 +3676,7 @@ void calibratePh(){
 
 void calibrateEc(void){
 	int button = 0;
-	uint16_t ec;
+//	uint16_t ec;
 //	char phstr[4];
 	char buffer[5];
 //	char *pbuffer;
@@ -3682,11 +3779,8 @@ void adcAverager(void){
 }
 
 void getPh() {	// current PH, please!
-	uint32_t total=0, total2=0, ph;
+	uint32_t ph;
 	vTaskDelay(5);
-	uint8_t i;
-
-
 
     // count pH underOver flag
 	if (adcAverage[AVG_ADC_PH]>phWindowTop) {
@@ -3937,7 +4031,7 @@ void timerStateTrigger(void *pvParameters){
 	}
 }
 
-void plugStateTrigger(void  *pvParameters){
+void plugStateTrigger(void *pvParameters){
 	uint8_t plugStateFlag, plugTimerId, plugType;
 	uint8_t i;
 	while (1) {
@@ -4010,6 +4104,7 @@ void plugStateTrigger(void  *pvParameters){
 						if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
 							plugStateSet(psi_pump_load_id, 0);
 						}
+						vTaskDelay(1);
 						if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
 							plugStateSet(psi_pump_load_id, 1);
 						}
@@ -4024,13 +4119,13 @@ void plugStateTrigger(void  *pvParameters){
 						plugStateSet(i, 0);	// disable plug
 					}
 				}
-
+				vTaskDelay(1);
 			}
 		}
 		vTaskDelay(1);
 #ifdef USE_VALVES
-		uint8_t valveId=0, valveMotorStateFlag=0;
-		for (valveId=0; valveId<3; valveId++) {
+//		uint8_t valveId=0, valveMotorStateFlag=0;
+//		for (valveId=0; valveId<3; valveId++) {
 //			valveMotorStateFlag=valveMotorStateFlags&(1<<valveId);	// check if timer active now
 //			valveMotorStateFlag>>=valveId;	// ostavit' toka flag
 //			if (valveMotorStateFlag==1) {
@@ -4039,7 +4134,7 @@ void plugStateTrigger(void  *pvParameters){
 //			else {
 //				valveMotorStateSet(valveId,2);
 //			}
-		}
+//		}
 #endif
 //		vTaskDelay(1);
 //		valveManager();
