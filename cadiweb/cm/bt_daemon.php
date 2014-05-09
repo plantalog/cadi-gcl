@@ -10,6 +10,49 @@ $ping_delay = 0;
 $cycle_counter = 0;
 $video = 0;
 $status_stream_enabled=0;		// shows if status stream enabled
+$tank = '';
+
+// load SVG display settings
+	if (($handle = fopen("btds/svg_layer.conf", "r")) !== FALSE) {
+	    	$data = fgetcsv($handle, 1000, ",");
+	    	$csd_value = $data[1];
+	    	$photo_divider  = $data[0];
+	    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
+	    	$srtrs_value  = $data[5];	// Serial response tail read size
+		$sppd_value = $data[6];	// Status packet ping divider
+
+		// setting tank water polygon parameters (loaded from file)
+		$GLOBALS['tank'][3]['top'] = $data[1];	// Maximum water level (distance in cm to sonar installed on top of the water tank)
+		$GLOBALS['tank'][3]['bottom'] = $data[2];	// minimum water level
+		$GLOBALS['tank'][3]['svg']['height'] = $data[3];	// SVG water polygon height
+		$GLOBALS['tank'][3]['svg']['tank_top'] = $data[4];	// SVG water polygon top offset
+
+		// next line
+		$data = fgetcsv($handle, 1000, ",");
+		$GLOBALS['tank'][4]['top'] = $data[1];
+		$GLOBALS['tank'][4]['bottom'] = $data[2];
+		$GLOBALS['tank'][4]['svg']['height'] = $data[3];
+		$GLOBALS['tank'][4]['svg']['tank_top'] = $data[4];
+
+		fclose($handle);
+	}
+	else {
+		echo 'Loading SVG tank defaults'.PHP_EOL;
+		// setting tank water polygon parameters (defaults) SVG
+		$GLOBALS['tank'][3]['top'] = 14;	// Maximum water level (distance in cm to sonar installed on top of the water tank)
+		$GLOBALS['tank'][3]['bottom'] = 100;	// minimum water level
+		$GLOBALS['tank'][3]['svg']['height'] = 400;	// SVG water polygon height
+		$GLOBALS['tank'][3]['svg']['tank_top'] = 20;	// SVG water polygon top offset
+
+		$GLOBALS['tank'][4]['top'] = 7;
+		$GLOBALS['tank'][4]['bottom'] = 47;
+		$GLOBALS['tank'][4]['svg']['height'] = 430;
+		$GLOBALS['tank'][4]['svg']['tank_top'] = 300;
+		print_r($tank);
+	}
+
+print_r($tank);
+
 while(1){
 	$cycle_counter++;
 	$command = file_get_contents($btd_cmd_file);
@@ -212,7 +255,7 @@ function parse_response($srtrs){
 				$statarr['adc_avg'][2] = $adc_avg[2];	// ADC average value
 				$statarr['adc_avg'][3] = $adc_avg[3];	// ADC average value
 				$statarr['psi'] = round((($adc_avg[2]-600)/470), 2); 
-			
+				$statarr['comm_state'] = ord($last_packet[2]);
 				
 
 				$statstr = 'PHP time: '.date("Y-m-d H:i:s", time()).'
@@ -300,49 +343,6 @@ function build_svg($statarr){
 	}
 
 
-	if (($handle = fopen("btds/svg_layer.conf", "r")) !== FALSE) {
-	    	$data = fgetcsv($handle, 1000, ",");
-	    	$csd_value = $data[1];
-	    	$photo_divider  = $data[0];
-	    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
-	    	$srtrs_value  = $data[5];	// Serial response tail read size
-		$sppd_value = $data[6];	// Status packet ping divider
-		if (!($srtrs_value>40 && $srtrs_value<1000)) {
-			$srtrs_value = 100;	// force default size if not in range [40..1000] bytes
-		}
-		echo PHP_EOL.' new CSD value ='.$csd_value;
-		echo PHP_EOL.' new Photoshot divider value ='.$photo_divider.PHP_EOL;
-		echo PHP_EOL.' new FileSizeDifference value ='.$fsd_value.PHP_EOL;
-		echo PHP_EOL.' new Serial response tail read size value ='.$srtrs_value.PHP_EOL;
-		echo PHP_EOL.' new Status packet ping divider ='.$sppd_value.PHP_EOL;
-
-		// setting tank water polygon parameters (loaded from file)
-		$tank[3]['top'] = $data[1];	// Maximum water level (distance in cm to sonar installed on top of the water tank)
-		$tank[3]['bottom'] = $data[2];	// minimum water level
-		$tank[3]['svg']['height'] = $data[3];	// SVG water polygon height
-		$tank[3]['svg']['tank_top'] = $data[4];	// SVG water polygon top offset
-
-		// next line
-		$data = fgetcsv($handle, 1000, ",");
-		$tank[4]['top'] = $data[1];
-		$tank[4]['bottom'] = $data[2];
-		$tank[4]['svg']['height'] = $data[3];
-		$tank[4]['svg']['tank_top'] = $data[4];
-
-		fclose($handle);
-	}
-	else {
-		// setting tank water polygon parameters (defaults)
-		$tank[3]['top'] = 14;	// Maximum water level (distance in cm to sonar installed on top of the water tank)
-		$tank[3]['bottom'] = 100;	// minimum water level
-		$tank[3]['svg']['height'] = 400;	// SVG water polygon height
-		$tank[3]['svg']['tank_top'] = 20;	// SVG water polygon top offset
-
-		$tank[4]['top'] = 7;
-		$tank[4]['bottom'] = 47;
-		$tank[4]['svg']['height'] = 430;
-		$tank[4]['svg']['tank_top'] = 300;
-	}
 
 	// Volume: 0% - 100cm, 100% - 14cm
 	// Range: 86cm.Resolution:1cm
@@ -350,21 +350,21 @@ function build_svg($statarr){
 	// To draw SVG polygon we use the shifting of 3 top points up/down depending on sonar_read value, displaying current tank volume
 	// X - fixed, Y = svg_tank_top_y_coord + (400/86)*(sonar_read - 14)
 	// now let's write an equation for this calculation:
-	// Y = svg_tank_top_y_coord + ($tank['svg']['height']/($tank[3]['bottom']-$tank[3]['top']))*(sonar_read - $tank['top'])
+	// Y = svg_tank_top_y_coord + ($tank['svg']['height']/($GLOBALS['tank'][3]['bottom']-$GLOBALS['tank'][3]['top']))*(sonar_read - $tank['top'])
 
-	$tank[3]['svg']['y'] = $tank[3]['svg']['tank_top']+($tank[3]['svg']['height']/($tank[3]['bottom']-$tank[3]['top']))*($statarr['sonar_read'][0] - $tank[3]['top']);
-	$tank[4]['svg']['y'] = $tank[4]['svg']['tank_top']+($tank[4]['svg']['height']/($tank[4]['bottom']-$tank[4]['top']))*($statarr['sonar_read'][1] - $tank[4]['top']);
+	$GLOBALS['tank'][3]['svg']['y'] = $GLOBALS['tank'][3]['svg']['tank_top']+($GLOBALS['tank'][3]['svg']['height']/($GLOBALS['tank'][3]['bottom']-$GLOBALS['tank'][3]['top']))*($statarr['sonar_read'][0] - $GLOBALS['tank'][3]['top']);
+	$GLOBALS['tank'][4]['svg']['y'] = $GLOBALS['tank'][4]['svg']['tank_top']+($GLOBALS['tank'][4]['svg']['height']/($GLOBALS['tank'][4]['bottom']-$GLOBALS['tank'][4]['top']))*($statarr['sonar_read'][1] - $GLOBALS['tank'][4]['top']);
 
 
 
-	if ($statarr['sonar_read'][0]>$tank[3]['bottom']) {
-		$tank[3]['txt_color'] = "red";
+	if ($statarr['sonar_read'][0]>$GLOBALS['tank'][3]['bottom']) {
+		$GLOBALS['tank'][3]['txt_color'] = "red";
 	}
 	else {
-		$tank[3]['txt_color'] = "white";
+		$GLOBALS['tank'][3]['txt_color'] = "white";
 	}
 
-	$tank[4]['txt_color'] = "white";
+	$GLOBALS['tank'][4]['txt_color'] = "white";
 
 	for ($i=0;$i<4;$i++) {
 		if ($statarr['plugs'][(3-$i)] == 0){
@@ -384,7 +384,16 @@ function build_svg($statarr){
 		}
 	}
 
-	$plugs['svg']['x'] = 2000;
+	if ($statarr['comm_state']==51) {	// CDD enabled
+		$cdd_string = "CDD Enabled";
+		$cdd_color = "green";
+	}
+	else {	// CDD enabled
+		$cdd_string = "CDD Disabled";
+		$cdd_color = "red";
+	}
+
+	$plugs['svg']['x'] = 1850;
 	$plugs['svg']['y'] = 1100;
 
 	// dosingPumpsFlags
@@ -397,8 +406,8 @@ function build_svg($statarr){
 	$svg .= '<div style="float:left;"><img src="img/cadi_watering_hptl(high_pressure_two_lines).jpg" /></div>';
 	$svg .= '<div id="svg_container" style="display:block; float:left; position: absolute; border:1px solid red;">
 			<svg opacity="0.5" width="850px" height="400px" viewBox="0 0 2000 1200" xmlns="http://www.w3.org/2000/svg" version="1.1">
-				<circle cx="2085" cy="635" r="60" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[0].'" />
-				<circle cx="1670" cy="130" r="60" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[1].'" />
+				<circle cx="2085" cy="635" r="60" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[1].'" />
+				<circle cx="1670" cy="130" r="60" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[0].'" />
 				<circle cx="1345" cy="990" r="40" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[2].'" />
 				<circle cx="1345" cy="910" r="40" stroke="black" stroke-width="3" opacity="0.7" fill="'.$valve_fill[3].'" />
 
@@ -409,53 +418,43 @@ function build_svg($statarr){
 				<text style="font-size:50px; font-weight:bold;" x="400" y="70" fill="red" >Cadi time: '.(date("Y-m-d H:i:s", $statarr['time'])).'</text>
 
 
+				<polygon fill="blue" stroke="blue" stroke-width="10" points="1920,'.(140+$GLOBALS['tank'][3]['svg']['tank_top']+$GLOBALS['tank'][3]['svg']['y']).'  2000,'.($GLOBALS['tank'][3]['svg']['tank_top']+$GLOBALS['tank'][3]['svg']['y']).'  2300,'.($GLOBALS['tank'][3]['svg']['tank_top']+$GLOBALS['tank'][3]['svg']['y']).'  2300,420  2200,580 1920,580" />
 
-				<text style="font-size:30px; font-weight:bold;" x="100" y="150" fill="green" >
-					'.$tank[4]['svg']['tank_top'].'
-					'.$tank[4]['svg']['height'].'
-					'.$tank[4]['bottom'].'
-					'.$tank[4]['top'].'
-					'.$statarr['sonar_read'][1].'
-				</text>
-			
-
-				<polygon fill="blue" stroke="blue" stroke-width="10" points="1920,'.(140+$tank[3]['svg']['tank_top']+$tank[3]['svg']['y']).'  2000,'.($tank[3]['svg']['tank_top']+$tank[3]['svg']['y']).'  2300,'.($tank[3]['svg']['tank_top']+$tank[3]['svg']['y']).'  2300,420  2200,580 1920,580" />
-
-				<polygon fill="blue" stroke="blue" stroke-width="10" points="1490,'.(140+$tank[4]['svg']['tank_top']+$tank[4]['svg']['y']).'  1570,'.($tank[4]['svg']['tank_top']+$tank[4]['svg']['y']).'  1850,'.($tank[4]['svg']['tank_top']+$tank[4]['svg']['y']).'  1850,1050  1770,1170  1490,1170" />
+				<polygon fill="blue" stroke="blue" stroke-width="10" points="1490,'.(140+$GLOBALS['tank'][4]['svg']['tank_top']+$GLOBALS['tank'][4]['svg']['y']).'  1570,'.($GLOBALS['tank'][4]['svg']['tank_top']+$GLOBALS['tank'][4]['svg']['y']).'  1850,'.($GLOBALS['tank'][4]['svg']['tank_top']+$GLOBALS['tank'][4]['svg']['y']).'  1850,1050  1770,1170  1490,1170" />
 
 
 
 
-			<text style="font-size:52px; font-weight:bold;" x="'.($plugs['svg']['x']+15).'" y="'.($plugs['svg']['y']-10).'" fill="red" >Loads</text>
+			<text style="font-size:52px; font-weight:bold;" x="'.($plugs['svg']['x']+45).'" y="'.($plugs['svg']['y']-10).'" fill="red" >Loads</text>
 
-
+			<text style="font-size:52px; font-weight:bold;" x="400" y="140" fill="'.$cdd_color.'" >'.$cdd_string.'</text>
 
 			<polygon fill="'.$plugs['svg']['colors'][0].'" stroke="blue" stroke-width="1" points="
 				'.$plugs['svg']['x'].','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+50).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+50).','.($plugs['svg']['y']+50).' 
-				'.($plugs['svg']['x']).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+100).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+100).','.($plugs['svg']['y']+100).' 
+				'.($plugs['svg']['x']).','.($plugs['svg']['y']+100).' 
 			" />
 				
 			<polygon fill="'.$plugs['svg']['colors'][1].'" stroke="blue" stroke-width="1" points="
-				'.($plugs['svg']['x']+55).','.$plugs['svg']['y'].' 
 				'.($plugs['svg']['x']+105).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+105).','.($plugs['svg']['y']+50).' 
-				'.($plugs['svg']['x']+55).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+205).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+205).','.($plugs['svg']['y']+100).' 
+				'.($plugs['svg']['x']+105).','.($plugs['svg']['y']+100).' 
 			" />
 
 		<polygon fill="'.$plugs['svg']['colors'][2].'" stroke="blue" stroke-width="1" points="
-				'.($plugs['svg']['x']+110).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+160).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+160).','.($plugs['svg']['y']+50).' 
-				'.($plugs['svg']['x']+110).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+210).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+310).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+310).','.($plugs['svg']['y']+100).' 
+				'.($plugs['svg']['x']+210).','.($plugs['svg']['y']+100).' 
 			" />
 
 		<polygon fill="'.$plugs['svg']['colors'][3].'" stroke="blue" stroke-width="1" points="
-				'.($plugs['svg']['x']+165).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+215).','.$plugs['svg']['y'].' 
-				'.($plugs['svg']['x']+215).','.($plugs['svg']['y']+50).' 
-				'.($plugs['svg']['x']+165).','.($plugs['svg']['y']+50).' 
+				'.($plugs['svg']['x']+315).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+415).','.$plugs['svg']['y'].' 
+				'.($plugs['svg']['x']+415).','.($plugs['svg']['y']+100).' 
+				'.($plugs['svg']['x']+315).','.($plugs['svg']['y']+100).' 
 			" />
 
 			<polygon fill="'.$dosers['svg']['colors'][1].'" stroke="blue" stroke-width="1" points="
@@ -483,9 +482,9 @@ function build_svg($statarr){
 		
 
 
-				<text style="font-size:50px; font-weight:bold;" x="1495" y="900" fill="'.$tank[4]['txt_color'].'" stroke="black" stroke-width="3"  title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][1].' cm</text>
+				<text style="font-size:50px; font-weight:bold;" x="1495" y="900" fill="'.$GLOBALS['tank'][4]['txt_color'].'" stroke="black" stroke-width="3"  title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][1].' cm</text>
 
-				<text style="font-size:50px; font-weight:bold;" x="1915" y="520" fill="'.$tank[3]['txt_color'].'" stroke="black" stroke-width="3"  title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][0].' cm</text>
+				<text style="font-size:50px; font-weight:bold;" x="1915" y="520" fill="'.$GLOBALS['tank'][3]['txt_color'].'" stroke="black" stroke-width="3"  title="Distance to sonar installed on top" >2Top: '.$statarr['sonar_read'][0].' cm</text>
 
 			</svg>
 

@@ -84,9 +84,9 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(11);	// command
 			break;
 		case 12:		// set time
+			$curtime = time();
 			$packet .= chr(6);	// packet payload size (including this size byte)
 			$packet .= chr(12);	// command
-			$curtime = time();
 			$packet .= chr(floor($curtime/16777216));	// command
 			$packet .= chr((($curtime%16777216)/65536));	// command
 			$packet .= chr((($curtime%65536)/256));	// command
@@ -96,6 +96,12 @@ if (isset($_POST['cmd'])) {
 		case 13:		// get_status_block();
 			$packet .= chr(2);	// packet payload size (including this size byte)
 			$packet .= chr(13);	// command
+			break;
+		case 13:		// get_status_block();
+			$packet .= chr(4);	// packet payload size (including this size byte)
+			$packet .= chr(18);	// command
+			$packet .= chr($_POST['addr']%256);	// command
+			$packet .= chr(floor($_POST['addr']/256));	// command
 			break;
 	}
 

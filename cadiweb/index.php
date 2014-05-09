@@ -51,7 +51,7 @@
 	function bt_connect(){
 		var mac = $('#bind_mac').val();
 		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
-		alert('going to connect '+mac);
+//		alert('going to connect '+mac);
 		$.post('cm/cadi_bt_processor.php', {action: 'bt_connect', mac:mac, rfcomm: rfcomm}, function(data){
 			alert('connected'+data);
 			cadi_list_rfcomms();
@@ -115,7 +115,7 @@
 	//	$('#main_output').html('scanning..');
 		$.post('cm/cadi_bt_processor.php', {action: 'rfcomm_scan'}, function(data){
 			$('#bind_mac').html(data);
-			alert('Scanning complete!');
+	//		alert('Scanning complete!');
 	//		alert(data);
 	//		cadi_list_rfcomms();
 		});  
@@ -211,13 +211,40 @@ function cadi_view(viewId){
 }
 
 function btd_stream_status(newStatus){
-		alert();
+	//	alert();
 		$.post('cm/cadi_bt_processor.php', {action: 'btd_stream_start', status: newStatus}, function(data){
 	//		cadi_list_rfcomms();
-			alert(data);
+			alert('Streaming to server cache');
 		});  
 }
 
+function eeRead() {
+	var addr = $('#ee_addr').val();
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd:18, addr:addr}, function(data){
+		alert('EEPROM value read');
+		var out = data.split('seppy');
+		$('ee16bit_value').val(out[0]);
+		$('ee32bit_value').val(out[1]);
+	});  
+}
+
+function eeWrite(dataType) {
+	var addr = $('#ee_addr').val();
+	var cmd=0;
+	switch ($dataType) {
+		case 1:
+			var value = $('#ee16bit_value').val();
+			cmd = 15;
+			break;
+		case 2:
+			var value = $('#ee32bit_value').val();
+			cmd = 16;
+			break;
+	}
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', data_type:dataType, value:value, cmd:cmd}, function(data){
+		alert('EEPROM value sent');
+	});  
+}
 
 </script>
 </head>
@@ -304,9 +331,25 @@ function btd_stream_status(newStatus){
 <button onClick="get_status_block()">Get Status</button>
 <br>
 <button onClick="get_ip()">Get IP</button>
-<button onClick="cw_reboot()">Reboot server</button>
-<button onClick="cadi_reset()">Cadi reset</button>
+<button onClick="cw_reboot()">Reboot server</button><br>
+<button onClick="cadi_reset()">Cadi reset</button><br>
+
+<!-- 
+EEPROM read/write section
+-->
+
+EEPROM<br>
+Address: <input type="text" id="ee_addr" /><br>
+16bit:
+<input type="text" id="ee16bit_value" /><br>
+<button onClick="eeRead()">Read</button>
+<button onClick="eeWrite(1)">Write</button><br>
+32bit:
+<input type="text" id="ee32bit_value" /><br>
+<button onClick="eeRead()">Read</button>
+<button onClick="eeWrite(2)">Write</button>
 <br>
+
 <input type="text" value="0" id="video_stream" title="this value is N in '/dev/videoN'" /><button onClick="change_video()">Change video</button>
 </div>
 </div>
