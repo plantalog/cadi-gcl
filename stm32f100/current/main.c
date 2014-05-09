@@ -587,6 +587,7 @@ void valve_test(void);
 void valve_feedback_init(void);
 void dosing_motor_control_init(void);
 void valve_motor_control_init(void);
+void valve_init(void);		// startup valve config
 void EXTI15_10_IRQHandler(void);
 void water_level_input_init(void);
 void fertilizer_mixing_program_setup(uint8_t progId);
@@ -1513,6 +1514,7 @@ void tankLevelStab(void){
 			if (sonar_read[0]>(tank_windows_top[0]+2)) {
 				open_valve(supply_valve);
 			}
+			vTaskDelay(1);
 			if (sonar_read[0]<tank_windows_top[0]) {
 				close_valve(supply_valve);
 			}
@@ -2343,13 +2345,19 @@ void get_fertilizer(uint8_t fertId, uint8_t secs){	// secs - number of seconds t
 	enable_dosing_pump(fertId,0);
 }
 
+void valve_init(void){
+	close_valve(3);
+	close_valve(4);
+	close_valve(0);
+	close_valve(1);
+}
+
 void watering_program_trigger(void *pvParameters){
 	uint32_t curtime, lastRun, interval, diff, startTime, endTime;
 	uint16_t addr;
 	uint8_t wpStateFlag=0, progId, enabled;
 	// reinit valves
-	open_valve(DRAIN_VALVE_ID);
-	close_valve(0);
+	valve_init();
 
 	while (1) {
 //
@@ -4063,6 +4071,15 @@ void plugStateTrigger(void *pvParameters){
 	//				plugTimerId-=35;
 				}
 
+				if (plugTimerId==99) {	//always on
+					plugType=255;
+					plugStateSet(i, 1);
+				}
+				if (plugTimerId==98) {	// always off
+					plugType=254;
+					plugStateSet(i, 0);
+				}
+
 				if (plugTimerId>31 && plugTimerId<64) {
 				//	plugType=1;
 					// CTimer
@@ -4111,13 +4128,19 @@ void plugStateTrigger(void *pvParameters){
 					}
 									// psi pump pressure stabilizer
 				}
+				if (plugType==254) {
+
+				}
+				if (plugType==255) {
+
+				}
 				else {
-					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0) {
-						plugStateSet(i, 1);	// enable plug
-					}
-					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
-						plugStateSet(i, 0);	// disable plug
-					}
+	//				if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0) {
+	//					plugStateSet(i, 1);	// enable plug
+	//				}
+	//				if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
+	//					plugStateSet(i, 0);	// disable plug
+	//				}
 				}
 				vTaskDelay(1);
 			}

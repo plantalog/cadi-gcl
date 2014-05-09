@@ -1,3 +1,8 @@
+v2.1.1 (08.05.2014)
+- new commands and functions to read and write emulated EEPROM values remotely
+- new command to force loadSettings() call
+
+v2.1 (05.05.2014)
 - Sonar init adapted to Cadi MB. Two sonars are driven
 - valve_busy flags to resolve access collisions
 - emergency stop packet
