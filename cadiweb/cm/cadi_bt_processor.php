@@ -80,6 +80,10 @@ switch ($action) {
 		echo '---socalledseparator---';
 		include_once('status_view_2.php');
 		break;
+	case 'get_status_csv':
+		$csv = file_get_contents('cadi_status.csv');
+		echo $csv;
+		break;
 	case 'get_ip':
 		array($output);
 		exec('/sbin/ifconfig -a', $output);

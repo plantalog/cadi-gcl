@@ -256,7 +256,28 @@ function parse_response($srtrs){
 				$statarr['adc_avg'][3] = $adc_avg[3];	// ADC average value
 				$statarr['psi'] = round((($adc_avg[2]-600)/470), 2); 
 				$statarr['comm_state'] = ord($last_packet[2]);
+
+				$tofile[0] = $cadi_time;
+				$tofile[1] = $statarr['dht']['temp'];
+				$tofile[2] = $statarr['dht']['rh'];
+				$tofile[3] = $statarr['timerStateFlags'];
+				$tofile[4] = $statarr['cTimerStateFlags'];
+				$tofile[5] = $statarr['valves'];
+				$tofile[6] = $statarr['plugs'];
+				$tofile[7] = $statarr['wpStateFlags'];
+				$tofile[8] = $statarr['sonar_read'][0];
+				$tofile[9] = $statarr['sonar_read'][1];
+				$tofile[10] = $statarr['adc_avg'][0];
+				$tofile[11] = $statarr['adc_avg'][1];
+				$tofile[12] = $statarr['adc_avg'][2];
+				$tofile[13] = $statarr['adc_avg'][3];
+				$tofile[14] = $statarr['psi'];
+				$tofile[15] = $statarr['comm_state'];
+				$tofile[16] = $statarr['dosingPumpsFlags'];
 				
+				$csv_string = implode(",", $tofile);
+				file_put_contents('cadi_status.csv', '');
+				file_put_contents('cadi_status.csv',$csv_string);
 
 				$statstr = 'PHP time: '.date("Y-m-d H:i:s", time()).'
 					<table>

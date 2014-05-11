@@ -13,6 +13,9 @@
 <link rel="stylesheet" href="js/jquery-ui-1.10.3.custom/css/smoothness/jquery-ui-1.10.3.custom.css">
 <script src="js/jquery-ui-1.10.3.custom/js/jquery-1.9.1.js"></script>
 <script src="js/jquery-ui-1.10.3.custom/js/jquery-ui-1.10.3.custom.js"></script>
+<link rel="stylesheet" type="text/css" href="css/jquery.svg.css"> 
+<script type="text/javascript" src="js/svg/jquery.svg.js"></script>
+<!-- <script type="text/javascript" src="js/date.format.js"></script> -->
 
 
 
@@ -28,12 +31,155 @@
 				});
 			}
 		});
+		$('#svg_container').svg({onLoad: drawMapLayer});
 
 		$( ".btn_" ).button();
 		$("#system_view_1").hide();
-		get_status_block();
+//		get_status_block();
 		cadi_list_rfcomms();
 	});
+
+	function drawMapLayer(svg){
+
+		// valves
+		svg.circle(645, 43, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv0'});
+		svg.circle(783, 210, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv1'});
+		svg.circle(540, 305, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv2'});
+		svg.circle(540, 333, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv3'});
+
+		// draw plug rectangles
+		var plg_x = 730;
+		var plg_y = 360;
+		var plg_s = 30;
+		svg.rect((plg_x+0*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cp0"});
+		svg.rect((plg_x+1*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cp1"});
+		svg.rect((plg_x+2*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cp2"});
+		svg.rect((plg_x+3*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cp3"});
+		svg.text((plg_x+20),(plg_y-10), 'Plugs',{fill: 'red', strokeWidth: 0});
+
+		// draw dosing pump rectangles
+		var plg_x = 618;
+		var plg_y = 167;
+		var plg_s = 13;
+		svg.rect((plg_x+0*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp1"});
+		svg.rect((plg_x+1*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp2"});
+		svg.rect((plg_x+2*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp3"});
+
+		// draw water levels
+		// tank max level in pixels
+		tmlp = 135;
+
+		// tank 3 pecific settings
+		t3wx = 729;
+		t3wy = 193;
+		ctl = 135;
+		svg.polygon([
+				[t3wx,t3wy],
+				[t3wx,(t3wy-ctl)],
+				[(t3wx+30),(t3wy-ctl-50)],
+				[(t3wx+120),(t3wy-ctl-50)],
+				[(t3wx+123),(t3wy-50+5)],
+				[(t3wx+95),t3wy]], 
+			{fill: 'blue', strokeWidth: 0, opacity: 0.5,  id:"tank3water"});
+
+
+		// tank 4 specific settings
+		t4top = 9;
+		t4btm = 50;
+		t4wx = 586;
+		t4wy = 393;
+		ctl = 50;
+		svg.polygon([
+				[t4wx,t4wy],
+				[t4wx,(t4wy-ctl)],
+				[(t4wx+30),(t4wy-ctl-50)],
+				[(t4wx+120),(t4wy-ctl-50)],
+				[(t4wx+123),(t4wy-50+5)],
+				[(t4wx+93),t4wy]], 
+			{fill: 'blue', strokeWidth: 0, opacity: 0.5, id:"tank4water"}); 
+
+
+
+ //   		var g = svg.group({stroke: 'black', strokeWidth: 2});
+
+		// draw cadi time 
+		svg.text(200, 35, 'Cadi time',{fill: 'red', strokeWidth: 0, id:'cadi_time2'});
+
+		// draw tank levels in text
+		svg.text(730, 135, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t3l_txt'});
+		svg.text(590, 335, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t4l_txt'});
+
+		// display pressure
+		svg.text(450, 405, 'Pressure@7.2',{fill: 'red', strokeWidth: 0, id:'psi_val'});
+
+	}
+
+	function redraw_svg_layer(){
+
+		$.post('cm/cadi_bt_processor.php', {action: 'get_status_csv'}, function(data){
+		//	alert(data);
+			var statusArray = data.split(',');
+			var date = new Date(statusArray[0]*1000);
+			$('#cadi_time2').html(date);
+
+			// tank 3 water level redraw
+			t3top = 12;
+			t3btm = 100;
+			t3wx = 728;
+			t3wy = 193;
+			ctl = Math.floor((120*(t3btm-statusArray[8]+t3top))/(t3btm-t3top));
+			$('#tank3water').attr('points', t3wx+','+t3wy+' '+t3wx+','+(t3wy-ctl)+' '+(t3wx+30)+','+(t3wy-ctl-50)+' '+(t3wx+120)+','+(t3wy-ctl-50)+' '+(t3wx+123)+','+(t3wy-50+5)+' '+(t3wx+98)+','+t3wy);
+
+			// tank 4 water lvl redraw
+			t4top = 9;
+			t4btm = 50;
+			t4wx = 586;
+			t4wy = 393;
+			var ctl = Math.floor((120*(t4btm-statusArray[9]+t4top))/(t4btm-t4top));
+			//ctl=120;
+			//alert(ctl);
+			$('#tank4water').attr('points', t4wx+','+t4wy+' '+t4wx+','+(t4wy-ctl)+' '+(t4wx+30)+','+(t4wy-ctl-50)+' '+(t4wx+120)+','+(t4wy-ctl-50)+' '+(t4wx+123)+','+(t4wy-50+5)+' '+(t4wx+93)+','+t4wy);
+
+			// draw labels for tanks, displaying current level
+			$('#t3l_txt').html('2Top: '+statusArray[8]+'cm');
+			$('#t4l_txt').html('2Top: '+statusArray[9]+'cm');
+			$('#psi_val').html('Pressure@7.2 = '+statusArray[14]+'bar');
+
+			// get valve state circles' colors
+			var valves = statusArray[5];
+			for (var i=0;i<4;i++) {
+				if (valves.charAt(3-i)=="1") {
+					$('#cv'+i).attr('fill', 'green');
+				}
+				else {
+					$('#cv'+i).attr('fill', 'red');
+				}
+			}
+
+			// set colors for plugs (Loads) state rectangles
+			for (var i=0;i<4;i++) {
+				if (statusArray[6].charAt(3-i)=="1") {
+					$('#cp'+i).attr('fill', 'green');
+				}
+				else {
+					$('#cp'+i).attr('fill', 'red');
+				}
+			}
+
+			// dosing pumps status squares colors
+			for (var i=1;i<4;i++) {
+				if (statusArray[16].charAt(3-i)=="1") {
+					$('#cdp'+i).attr('fill', 'green');
+				}
+				else {
+					$('#cdp'+i).attr('fill', 'red');
+				}
+			}
+
+		
+
+		});
+	}
 
 	function get_ip(){
 		$.post('cm/cadi_bt_processor.php', {action: 'get_ip'}, function(data){
@@ -99,6 +245,8 @@
 			});
 		}
 	}
+
+
 
 	function check_plug(){
 		alert("checking!");
@@ -185,7 +333,8 @@
 	function cadi_status_stream(){
 		var state = $('#flag_status_stream').is(':checked');
 		if (state==1) {
-			var interval = setInterval(function(){get_status_block()},1200);
+//			var interval = setInterval(function(){get_status_block()},1000);	// enables drawing SVG with PHP
+			var interval = setInterval(function(){redraw_svg_layer()},1000);	// enables SVG draw with JS
 			$('#status_stream_interval').val(interval);
 		}
 		if (state==0) {
@@ -280,8 +429,12 @@ function eeWrite(dataType) {
 				<img id="cadi_img" style="float:right;" src="img/curimage.jpeg?" />
 			</div>
 			<div id="system_view_2" style="border: 1px solid blue;">
-				<?php include_once('cm/cadi_status.svg'); ?>
-			</div>
+				<div style="float:left;">
+					<div style="float:left;"><img src="img/cadi_watering_hptl(high_pressure_two_lines).jpg" /></div>
+					<div id="svg_container" style="display:block; min-width:868px; min-height:415px; float:left; position: absolute; border:1px solid red;">
+
+					</div>
+				</div>
 		</td>
 		<td>
 			<div style="float:right; border: 1px solid blue;">
@@ -294,7 +447,9 @@ function eeWrite(dataType) {
 	=================================================	
 	<br>
 <!--	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div>  -->
-	<br> 
+
+<button onClick="redraw_svg_layer()">ReDraw</button>	
+<br> 
 	<button onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</button><br>
 	<button onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</button>
 	<select id="bind_mac" name="bind_mac">

@@ -307,7 +307,11 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
  *   =====  END OF DRIVER SECTION =====
  */
 
-
+// CRITCAL VALUES defines
+#define PSI_OVERPRESSURE	2700	// maximal pressure to shut down PSI pump
+#define TANK3_OVERLEVEL		15		// minimum distance to top for Fresh Water Tank
+#define TANK4_OVERLEVEL		9		// same for Fertilizer Mixing Tank
+#define TANK4_UNDERLEVEL	40		// maximum distance to top. if more, the mixing pump could fail
 
 
 // define eeprom cells for keeping user settings. memory map
@@ -335,11 +339,23 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define CIRCULATION_PUMP_ID_ADDR	0x0899		// seems not to be used due to overriding with timerId=70
 
 
+//these defines configure abstract layer for accessing Cadi devices
+// based on schematic picture used in Cadiweb panel
+#define TANK3_SONAR					0
+#define TANK4_SONAR					1
+#define	WI_VALVE					0
+#define FWI_VALVE					1
+#define WLINE_61_VALVE				2
+#define WLINE_62_VALVE				3
+#define MIXING_PUMP					2
+
+
 // WATERING PROGRAMS SETTINGS ADRESSES
 #define WP_AMOUNT					3		// 3x16=48(hex=30) values (range: 613-643)
 #define WP_SIZE						16		// size of block of settings data of watering program
 #define WP_OFFSET					0x0613	// watering program settings offset
 #define TOP_WATER_SENSOR_SHIFT		1		// water sensor address offset inside watering program
+#define WP_SOLUTION_VOLUME_SHOFT	1		// alternative programs use sonar value to reach to get solutionVolume within watering program function
 #define BOTTOM_WATER_SENSOR_SHIFT	2		// water sensor address offset inside watering program
 #define WATER_FILL_TIMEOUT_SHIFT	3		// if no sensor reached timout for water tank fill valve
 #define WP_DURATION_SHIFT			4		// ready solution watering duration
@@ -618,8 +634,37 @@ void get_status_block(uint8_t blockId);
 void run_circulation_pump(uint16_t time);
 void send_ee_addr(uint16_t addr, uint8_t type);
 void rx_ee(uint16_t addr, uint8_t type);
+void autoSafe(void);
+
+// auto_flags
+/*
+ * 0 - PSI pump stab		(1)
+ * 1 - tank level stab		(2)
+ * 2 - autoSafe				(4)
+ *
+ */
 
 
+void autoSafe(void){
+	if (((auto_flags&4)>>2)==1){
+		if (adcAverage[AVG_ADC_PSI]>PSI_OVERPRESSURE) {
+			plugStateSet(psi_pump_load_id,0);
+		}
+		vTaskDelay(1);
+		if (sonar_read[0]<TANK3_OVERLEVEL){
+			close_valve(0);
+		}
+		vTaskDelay(1);
+		if (sonar_read[1]<TANK4_OVERLEVEL){
+			close_valve(1);
+		}
+		vTaskDelay(1);
+		if (sonar_read[1]>TANK4_UNDERLEVEL){
+			plugStateSet(MIXING_PUMP,0);	// mixer pump off
+		}
+	}
+	vTaskDelay(1);
+}
 
 void device_open_valve(uint8_t device_id){
 	open_valve(device_id-20);
@@ -2243,6 +2288,105 @@ void run_watering_program(uint8_t progId){
 	vTaskDelay(200);
 }
 
+/* void run_watering_program_hptl(uint8_t progId){
+	wpStateFlags|=(1<<progId);	// set active flag for this program
+
+	plugStateSet(3,0);	// close drain valve
+	uint16_t addr, solutionVolume=0, fmpLink, wateringPlugId=0;
+	uint8_t i, tank4lvl=0;
+	uint32_t now=0, end=0, wateringDuration=0, lastTime=0;
+	vTaskDelay(1);
+
+	addr = WP_OFFSET+progId*WP_SIZE+WP_SOLUTION_VOLUME_SHOFT;
+	EE_ReadVariable(addr, &solutionVolume);
+
+	// water fill timeout
+	addr = WP_OFFSET+progId*WP_SIZE+WATER_FILL_TIMEOUT_SHIFT;
+	EE_ReadVariable(addr, &wateringDuration);
+
+	now = RTC_GetCounter();
+	end = now + wateringDuration;
+
+	vTaskDelay(5);
+
+
+	// fill the tank
+	open_valve(FWI_VALVE);	// open Fresh Water Intake (FWI) valve
+	// and keep it open until the water reaches the volume set or timeout exceeds
+	while (sonar_read[TANK4_SONAR]<solutionVolume || now<end) {
+		now = RTC_GetCounter();
+		vTaskDelay(25);
+	}
+	close_valve(FWI_VALVE);
+	vTaskDelay(1000);
+
+
+	// mix fertilizers
+	for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
+		// count current N value
+		uint16_t n=0;
+		uint32_t curN=0, interval=0, startime=0;
+		addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL_SHIFT;
+		interval = EE_ReadWord(addr);
+		addr = WP_OFFSET+progId*WP_SIZE+WP_START_TIME_SHIFT;
+		startime = EE_ReadWord(addr);
+		addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
+		EE_ReadVariable(addr, &n);
+		curN = (RTC_GetCounter()-startime)/interval;
+		uint8_t rest = curN/n;
+
+		uint16_t enabled=0;
+		addr = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;
+		EE_ReadVariable(addr, &fmpLink);
+		addr = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
+		EE_ReadVariable(addr, &enabled);
+		if (fmpLink==progId && enabled==1 && rest==0) {
+			run_fertilizer_mixer(i);
+		}
+		vTaskDelay(10);
+	}
+
+	// run watering
+	addr = WP_OFFSET+progId*WP_SIZE+WP_DURATION_SHIFT;
+	EE_ReadVariable(addr, &wateringDuration);
+
+	addr = WP_OFFSET+progId*WP_SIZE+WP_WATERING_PUMP_PLUG_ID;
+	EE_ReadVariable(addr, &wateringPlugId);
+
+	vTaskDelay(10);
+//	now=0;
+	now = RTC_GetCounter();
+	end = RTC_GetCounter() + wateringDuration;
+	vTaskDelay(10);
+
+	open_valve(WLINE_61_VALVE);
+#define WLINE_62_VALVE				3
+	i=0;
+	auto_flags |= 1;	// enable PSI level keeper
+	while (now<end && ((wpStateFlags>>progId)&1)) {
+		vTaskDelay(10);
+		i=cTimerStateFlags&1;	// HARDCODE!!! (used CTimer0) apply CTimer to split watering into periods
+		if ((lastTime<RTC_GetCounter()) && i==1 && waterSensorFlag==1) {
+			now++;
+			lastTime=RTC_GetCounter();
+		}
+		vTaskDelay(5);
+	}
+	auto_flags &= ~1;	// disable PSI level keeper
+	plugStateSet(wateringPlugId, 0);
+	// drain the rest of the tank
+
+	vTaskDelay(10);
+	close_valve(DRAIN_VALVE_ID);
+	open_valve(DRAIN_VALVE_ID);
+
+	addr = WP_OFFSET+progId*WP_SIZE+WP_LAST_RUN_SHIFT;
+	EE_WriteWord(addr, RTC_GetCounter());	// write last run time
+
+	wpStateFlags &= ~(1<<progId); // sbrosit' flag
+	vTaskDelay(200);
+} */
+
 void run_fertilizer_mixer(uint8_t progId){
 	uint16_t dosingTime, dosingPumpId, circulationMixingTime, addr;
 	uint32_t dosingEndTime=0;
@@ -2268,7 +2412,7 @@ void run_fertilizer_mixer(uint8_t progId){
 void run_circulation_pump(uint16_t time){
 	uint32_t endTime=0;
 	endTime = RTC_GetCounter()+time;
-	plugStateSet(circulationPumpId, 1);
+	plugStateSet(MIXING_PUMP, 1);
 	while (RTC_GetCounter()<endTime) {
 		vTaskDelay(10);
 	}
@@ -3561,7 +3705,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 		vTaskDelay(2);
 		dht_get_data();
 		tankLevelStab();
-		psiStab();
+		autoSafe();
 		sonar_ping();
 	}
 }
