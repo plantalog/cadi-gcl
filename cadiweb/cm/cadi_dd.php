@@ -15,11 +15,12 @@ function bt_setdd(state) {
 				cadi_list_rfcomms();
 		});
 	}
-} 
+}
 
 function auto_flags(flags){	// set new auto_flags byte
 	if (flags == 256) {
-		flags = $('#auto_flags').val();
+		flags = $('#auto_flags_input').val();
+		alert('Custom flags='+flags+' ('+flags.toString(2)+')');
 	}
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 8, flags:flags}, function(data){
 		$('#main_output').html(data);
@@ -182,7 +183,7 @@ function enable_dosing_pump(pumpId, state){
 		<button class="btn_" onClick="cadi_txcmd(12)">Set time</button>
 		<br>
 
-		<input type="text" value="254" id="auto_flags" />
+		<input type="text" value="254" id="auto_flags_input" />
 		<button onClick=auto_flags(256)>Set auto flags</button>
 
 	</td></tr>

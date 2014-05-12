@@ -256,6 +256,7 @@ function parse_response($srtrs){
 				$statarr['adc_avg'][3] = $adc_avg[3];	// ADC average value
 				$statarr['psi'] = round((($adc_avg[2]-600)/470), 2); 
 				$statarr['comm_state'] = ord($last_packet[2]);
+				$statarr['auto_flags'] = ord($last_packet[33]);
 
 				$tofile[0] = $cadi_time;
 				$tofile[1] = $statarr['dht']['temp'];
@@ -274,6 +275,8 @@ function parse_response($srtrs){
 				$tofile[14] = $statarr['psi'];
 				$tofile[15] = $statarr['comm_state'];
 				$tofile[16] = $statarr['dosingPumpsFlags'];
+				$tofile[17] = $statarr['auto_flags'];
+				
 				
 				$csv_string = implode(",", $tofile);
 				file_put_contents('cadi_status.csv', '');

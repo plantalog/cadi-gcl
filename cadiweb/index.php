@@ -103,7 +103,7 @@
  //   		var g = svg.group({stroke: 'black', strokeWidth: 2});
 
 		// draw cadi time 
-		svg.text(200, 35, 'Cadi time',{fill: 'red', strokeWidth: 0, id:'cadi_time2'});
+		svg.text(200, 25, 'Cadi time',{fill: 'red', strokeWidth: 0, id:'cadi_time2'});
 
 		// draw tank levels in text
 		svg.text(730, 135, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t3l_txt'});
@@ -111,6 +111,12 @@
 
 		// display pressure
 		svg.text(450, 405, 'Pressure@7.2',{fill: 'red', strokeWidth: 0, id:'psi_val'});
+
+		// display CDD status text
+		svg.text(200, 45, 'CDD status',{fill: 'red', strokeWidth: 0, id:'cdds'});
+
+		// display auto_flags
+		svg.text(350, 45, 'auto_flags:',{fill: 'red', strokeWidth: 0, id:'auto_flags'});
 
 	}
 
@@ -176,7 +182,22 @@
 				}
 			}
 
-		
+			if (statusArray[15]==51){	
+				$('#cdds').html('CDD Enabled');
+				$('#cdds').attr('fill', 'green');
+			}
+			else {
+				$('#cdds').html('CDD Disabled');
+				$('#cdds').attr('fill', 'red');
+			}
+			var af_bin = statusArray[17].toString(2);
+			$('#auto_flags').html(statusArray[17]+' ('+af_bin+')');
+
+			var vs_flag = $('#vs_flag').is(':checked');
+			if (vs_flag==1) {
+			//	alert('vs checked');
+				$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+			}
 
 		});
 	}
@@ -241,7 +262,11 @@
 				$('#status_block').html(blocks[0]);
 				$('#system_view_2').html(blocks[1]);
 				d = new Date();
-				$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+				var vs_flag = $('#vs_flag').is(':checked');
+				if (vs_flag==1) {
+					alert('vs checked');
+					$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
+				}
 			});
 		}
 	}
@@ -334,7 +359,8 @@
 		var state = $('#flag_status_stream').is(':checked');
 		if (state==1) {
 //			var interval = setInterval(function(){get_status_block()},1000);	// enables drawing SVG with PHP
-			var interval = setInterval(function(){redraw_svg_layer()},1000);	// enables SVG draw with JS
+			var delay=$("#status_stream_delay").val();
+			var interval = setInterval(function(){redraw_svg_layer()},delay);	// enables SVG draw with JS
 			$('#status_stream_interval').val(interval);
 		}
 		if (state==0) {
@@ -416,6 +442,7 @@ function eeWrite(dataType) {
 </div>
 <div id="tabs-1">
 <input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS (from server cache)
+<input type="checkbox" id="vs_flag" /> also Video
 <button class="btn_" id="cadi_view_cam" onClick="cadi_view(1)">Cam</button>
 <button class="btn_" id="cadi_view_map" onClick="cadi_view(2)">Map</button>
 <br>
@@ -446,9 +473,7 @@ function eeWrite(dataType) {
 
 	=================================================	
 	<br>
-<!--	<div onclick="bt_restart();" style="display:inline; border: 1px solid red;">BTRestart</div>  -->
 
-<button onClick="redraw_svg_layer()">ReDraw</button>	
 <br> 
 	<button onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</button><br>
 	<button onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</button>
@@ -473,8 +498,7 @@ function eeWrite(dataType) {
 	RFCOMM NUMBER:
 	<input type="text" value="0" id="rfcomm_nr" /><br>
 
-	<input type="text" value="254" id="auto_flags" />
-	<button onClick=auto_flags(256)>Set new flags</button>
+
 	<br>
 
 <!--  <div onClick="bt_setdd()">Set DD</div>	
@@ -504,6 +528,9 @@ Address: <input type="text" id="ee_addr" /><br>
 <button onClick="eeRead()">Read</button>
 <button onClick="eeWrite(2)">Write</button>
 <br>
+Status stream delay<input type="text" id="status_stream_delay" value="1000"/>
+<br>
+
 
 <input type="text" value="0" id="video_stream" title="this value is N in '/dev/videoN'" /><button onClick="change_video()">Change video</button>
 </div>
