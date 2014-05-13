@@ -195,6 +195,7 @@
 
 			var vs_flag = $('#vs_flag').is(':checked');
 			if (vs_flag==1) {
+				d = new Date();
 			//	alert('vs checked');
 				$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
 			}
