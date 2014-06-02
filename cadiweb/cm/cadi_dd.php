@@ -20,7 +20,7 @@ function bt_setdd(state) {
 function auto_flags(flags){	// set new auto_flags byte
 	if (flags == 256) {
 		flags = $('#auto_flags_input').val();
-		alert('Custom flags='+flags+' ('+flags.toString(2)+')');
+		// alert('Custom flags='+flags+' ('+flags.toString(2)+')');
 	}
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: 8, flags:flags}, function(data){
 		$('#main_output').html(data);
