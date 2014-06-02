@@ -311,7 +311,7 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 #define PSI_OVERPRESSURE	2700	// maximal pressure to shut down PSI pump
 #define TANK3_OVERLEVEL		15		// minimum distance to top for Fresh Water Tank
 #define TANK4_OVERLEVEL		9		// same for Fertilizer Mixing Tank
-#define TANK4_UNDERLEVEL	40		// maximum distance to top. if more, the mixing pump could fail
+#define TANK4_UNDERLEVEL	43		// maximum distance to top. if more, the mixing pump could fail
 
 
 // define eeprom cells for keeping user settings. memory map
@@ -635,6 +635,7 @@ void run_circulation_pump(uint16_t time);
 void send_ee_addr(uint16_t addr, uint8_t type);
 void rx_ee(uint16_t addr, uint8_t type);
 void autoSafe(void);
+void run_doser_for(uint8_t pump_id, uint8_t amount);
 
 // auto_flags
 /*
@@ -997,7 +998,8 @@ void run_uart_cmd(void){
 			}
 			break;
 		case 9:
-			enable_dosing_pump(cmdbuf[2], cmdbuf[3]);
+//			enable_dosing_pump(cmdbuf[2], cmdbuf[3]);
+			run_doser_for(cmdbuf[2], cmdbuf[3]);
 			break;
 		case 10:
 			valve_failed = cmdbuf[2];
@@ -1044,6 +1046,17 @@ void run_uart_cmd(void){
 			break;
 	}
 	rx_flush();
+}
+
+// adds 'amount' seconds of fertilizer using pump with ID	 = pump_id
+void run_doser_for(uint8_t pump_id, uint8_t amount){
+	uint32_t finish = 0, now = 0;
+	enable_dosing_pump(pump_id, 1);
+	while (now<finish) {
+		now = RTC_GetCounter();
+		vTaskDelay(50);
+	}
+	enable_dosing_pump(pump_id, 0);
 }
 
 void rx_ee(uint16_t addr, uint8_t type){
@@ -2704,14 +2717,16 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 
 }
 
-
+#define MAX_SONAR_READ	200				// drop wrong reads
 void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 {
   /* Clear TIM16 Capture compare interrupt pending bit */
   TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
   /* Get the Input Capture value */
-  sonar_read[1] = TIM16->CNT;
+  if (TIM16->CNT < MAX_SONAR_READ) {
+	  sonar_read[1] = TIM16->CNT;
+  }
   TIM16->CNT = 0;
 }
 
@@ -2721,7 +2736,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
   TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
 //  TIM17->SR &= ~TIM_SR_CC1IF;
   /* Get the Input Capture value */
-  if (!(GPIOB->IDR & (1<<9))) {
+  if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ)) {
 	  sonar_read[0]=SONAR1_TIM->CNT;
   }
   SONAR1_TIM->CNT = 0;

@@ -104,7 +104,7 @@ while(1){
 				$execmd = "/bin/echo -e '".$cmd_arr[2]."' >> /dev/".$cmd_arr[1];
 			break;
 			case 'reboot':
-				$execmd = "reboot now";
+				$execmd = "reboot";
 			//	echo $execmd;
 				break;
 			case 'stream_status':
