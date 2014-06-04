@@ -101,8 +101,6 @@ sudo git pull origin master
 cd /tmp/cadi-gcl/cadiweb/
 sudo cp -rf * /var/www/
 
-echo 'changing permissions for Cadi BTDaemon startup script (/var/www/cm/btds/btd_start.sh)'
-sudo chmod 777 /var/www/cm/btds/btd_start.sh
 # sudo chown www-data:www-data /var/www/cm/btds/btd_start.sh
 # sudo l2ping 20:13:06:14:34:06
 # http://wiki.openmoko.org/wiki/Manually_using_Bluetooth
@@ -121,6 +119,14 @@ cd $HCIMAC
 echo -e 'adding PIN codes to /var/lib/bluetooth/'$HCIMAC
 $CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
 sudo echo -e $CADIMAC' 1234' | sudo tee pincodes
+echo 'pincode 1234 added for device'$CADIMAC
+
+echo 'generating Cadi BTDaemon startup script'
+sudo echo - e '#!/bin/sh\nsleep 10\ncd /var/www/cm/\nphp /var/www/cm/bt_daemon.php >> btds/btd_output &' > /var/www/cm/btds/btd_start.sh
+
+echo 'changing permissions for Cadi BTDaemon startup script (/var/www/html/cm/btds/btd_start.sh)'
+sudo chmod 777 /var/www/cm/btds/btd_start.sh
+
 
 echo 'creating default BTDaemon config file'
 sudo echo '80,25000,37,5,0,150,3' >> /var/www/cm/btds/btd.conf
