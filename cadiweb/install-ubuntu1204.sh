@@ -119,7 +119,8 @@ hciconfig -a
 HCIMAC=$(hciconfig | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
 cd $HCIMAC
 echo -e 'adding PIN codes to /var/lib/bluetooth/'$HCIMAC
-sudo echo -e '20:13:06:19:15:11 1234\n20:13:06:14:34:06 1234\n' | sudo tee pincodes
+$CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
+sudo echo -e $CADIMAC' 1234' | sudo tee pincodes
 
 echo 'creating default BTDaemon config file'
 sudo echo '80,25000,37,5,0,150,3' >> /var/www/cm/btds/btd.conf
