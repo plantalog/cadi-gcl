@@ -37,6 +37,7 @@
 		$("#system_view_1").hide();
 //		get_status_block();
 		cadi_list_rfcomms();
+		cadi_status_stream();
 	});
 
 	function drawMapLayer(svg){
@@ -104,6 +105,8 @@
 
 		// draw cadi time 
 		svg.text(200, 25, 'Cadi time',{fill: 'red', strokeWidth: 0, id:'cadi_time2'});
+		svg.text(150, 75, 'Temp',{fill: 'green', strokeWidth: 0, id:'cadi_temp'});
+		svg.text(150, 95, 'rH',{fill: 'blue', strokeWidth: 0, id:'cadi_rh'});
 
 		// draw tank levels in text
 		svg.text(730, 135, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t3l_txt'});
@@ -127,6 +130,9 @@
 			var statusArray = data.split(',');
 			var date = new Date(statusArray[0]*1000);
 			$('#cadi_time2').html(date);
+
+			$('#cadi_temp').html(statusArray[1]);
+			$('#cadi_rh').html(statusArray[2]);
 
 			// tank 3 water level redraw
 			t3top = 12;
@@ -224,7 +230,10 @@
 			alert('connected'+data);
 			cadi_list_rfcomms();
 			$('#main_output').html(data);
+			setTimeout(function(){btd_stream_status(1)}, 5000);
+		//	btd_stream_status(1);
 		});
+		
 	}
 
 	function bt_restart(){
@@ -476,13 +485,17 @@ function eeWrite(dataType) {
 	<br>
 
 <br> 
-	<button onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">Refresh rfcomm list</button><br>
 	<button onClick="cadi_bt_scan();" style="display:inline; border: 1px solid red;">Scan</button>
 	<select id="bind_mac" name="bind_mac">
 	<option>Scan to get the list</option>
 	</select>
 	<button onClick=bt_connect() style="display:inline; border: 1px solid red;">Connect</button>
-	<div id="binded_rfcomms"></div>
+	RFCOMM NUMBER:
+	<input type="text" style="width: 40px;" value="0" id="rfcomm_nr" /><br>
+	Binded RFCOMM list (<button onclick="cadi_list_rfcomms();" style="display:inline; border: 1px solid red;">refresh</button>):
+	<div id="binded_rfcomms">
+		
+	</div>
 	<button class="btn_" onClick="btd_stream_status(1);">BTD status stream ON</button>
 	<button class="btn_" onClick="btd_stream_status(0);">BTD status stream OFF</button>
 <!--	<div title="use this field to send the data to Cadi while connected" id="tx_form">
@@ -496,8 +509,7 @@ function eeWrite(dataType) {
 		<div onClick="bt_tx()">Send packet</div>	
 	</div> -->
 
-	RFCOMM NUMBER:
-	<input type="text" value="0" id="rfcomm_nr" /><br>
+<br>
 
 
 	<br>

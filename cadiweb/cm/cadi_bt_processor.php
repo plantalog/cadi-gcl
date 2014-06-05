@@ -213,10 +213,7 @@ function rfcomm_scan(){
 
 
 function rfcomm_list_binded(){
-	echo 'Binded RFCOMMs list:';
 	$out = array();
-	// get "ls -la" to list existing bindings
-//	exec('ls /dev/ |grep rfcomm', $out);
 	exec('rfcomm -a', $out);
 	echo '<ul>';
 	for ($i=0; $i<sizeof($out); $i++) {
@@ -225,11 +222,7 @@ function rfcomm_list_binded(){
 		echo '<li>'.$out[$i].'&nbsp;&nbsp;&nbsp;<div style="display:inline; border:1px solid red;" onClick=bt_disconnect("'.$rfcomm_name.'");>Disconnect</div></li>';
 	}
 	echo '</ul>';
-
 	unset($out);
-	$cmd = "ps -ef |grep rfcomm";
-	exec($cmd, $out);
-	echo $cmd;
 	echo '<ul>';
 
 	for ($i=0; $i<sizeof($out); $i++) {
