@@ -48,6 +48,11 @@ $tank = '';
 		$GLOBALS['tank'][4]['bottom'] = 47;
 		$GLOBALS['tank'][4]['svg']['height'] = 430;
 		$GLOBALS['tank'][4]['svg']['tank_top'] = 300;
+		$photo_divider = 80;
+		$fsd_value = 37;
+		$csd_value = 25000;
+		$sppd_value = 80;
+		$srtrs_value = 150;
 		print_r($tank);
 	}
 
@@ -64,9 +69,6 @@ while(1){
 		file_put_contents($btd_cmd_file,'');
 		switch ($cmd_arr[0]) {
 			case 'bind':
-				
-			//	proc_close(proc_open('rfcomm -r connect /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' > /dev/null &', array(), $pipe));
-			//	$execmd = 'rfcomm -r connect /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' > /dev/null &';
 				$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
 				exec($execmd);
 				$execmd = 'ln -s /dev/'.$cmd_arr[1].' /dev/cadi';
@@ -75,7 +77,7 @@ while(1){
 				$execmd = "'kill -9 $(pidof rfcomm)'";
 				break;
 			case 'stream':
-				$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
+	//			$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
 	//			exec($execmd);
 				$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
 				$respfs = 0;
@@ -104,7 +106,7 @@ while(1){
 				$execmd = "/bin/echo -e '".$cmd_arr[2]."' >> /dev/".$cmd_arr[1];
 			break;
 			case 'reboot':
-				$execmd = "reboot";
+				$execmd = "reboot now";
 			//	echo $execmd;
 				break;
 			case 'stream_status':
@@ -120,7 +122,7 @@ while(1){
 				    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
 				    	$srtrs_value  = $data[5];	// Serial response tail read size
 					$sppd_value = $data[6];	// Status packet ping divider
-					if (!($srtrs_value>40 && $srtrs_value<1000)) {
+					if (!($srtrs_value<40 && $srtrs_value>1000)) {
 						$srtrs_value = 100;	// force default size if not in range [40..1000] bytes
 					}
 					echo PHP_EOL.' new CSD value ='.$csd_value;
@@ -136,6 +138,7 @@ while(1){
 					$photo_divider = 80;
 					$csd_value = 25000;
 					$sppd_value = 80;
+					$srtrs = 10;
 				}
 				$execmd = "echo";
 				break;
@@ -191,21 +194,31 @@ function parse_response($srtrs){
 
 	$packets_arr = explode('ZX', $data);
 	$last_packet_id = count($packets_arr)-1;
-	// echo 'Count='.$last_packet_id;
+	echo 'Count='.$last_packet_id.PHP_EOL;
 	$last_packet = $packets_arr[$last_packet_id];
 
-/*	for ($i=0; $i<=strlen($last_packet);$i++) {
+
+	// test output
+	$hexpacket = '';
+	echo 'HexPacket:';
+	for ($i=0; $i<=strlen($last_packet);$i++) {
 		$hexpacket .= sprintf("\\x%02x",ord($last_packet[$i]));
 	}
 
-	echo $hexpacket.PHP_EOL; */
+	echo $hexpacket.PHP_EOL.'EOF HexPacket'.PHP_EOL;
 
 
 	$packet_type = $last_packet[0];
 
 	$packet_size = ord($last_packet[1]);
 
+	for ($i=0; $i<strlen($last_packet); $i++) {
+		echo $last_packet[$i];
+	}
+
 	if ($packet_type==3 && strlen($last_packet)>37) {
+		echo "PacketT=3">PHP_EOL;
+		echo "LastPacket length>37">PHP_EOL;
 		// STATUS data provider
 		print_r($last_packet);
 		$block_id = ord($last_packet[36]);

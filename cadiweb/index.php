@@ -230,7 +230,7 @@
 			alert('connected'+data);
 			cadi_list_rfcomms();
 			$('#main_output').html(data);
-			setTimeout(function(){btd_stream_status(1)}, 5000);
+//			setTimeout(function(){btd_stream_status(1)}, 5000);
 		//	btd_stream_status(1);
 		});
 		
@@ -252,6 +252,8 @@
 	}
 
 	function bt_disconnect(){
+		btd_stream_status(0);	// Stop pinging Cadi before disconnect
+//		setTimeout(function(){}, 100);
 		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
 		$.post('cm/cadi_bt_processor.php', {action: 'bt_disconnect', rfcomm:rfcomm}, function(data){
 			alert('disconnected');
@@ -511,7 +513,8 @@ function eeWrite(dataType) {
 
 <br>
 
-
+	=================================================	
+	<br>
 	<br>
 
 <!--  <div onClick="bt_setdd()">Set DD</div>	

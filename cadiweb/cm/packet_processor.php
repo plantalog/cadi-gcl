@@ -69,11 +69,17 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(8);	// command
 			$packet .= chr($_POST['flags']);	// new auto_flags byte
 			break;
-		case 9:		// dosing pump enable/disable
+/*		case 9:		// dosing pump enable/disable
 			$packet .= chr(4);	// packet payload size (including this size byte)
 			$packet .= chr(9);	// command
 			$packet .= chr($_POST['pump_id']);	// pumpId for doser
 			$packet .= chr($_POST['state']);	// new state for doser
+			break;	*/
+		case 9:		// dosing pump fertilizer intake in seconds
+			$packet .= chr(4);	// packet payload size (including this size byte)
+			$packet .= chr(9);	// command
+			$packet .= chr($_POST['pump_id']);	// pumpId for doser
+			$packet .= chr($_POST['amount']);	// new state for doser
 			break;
 		case 10:		// set new valve_failed 8bit value
 			$packet .= chr(2);	// packet payload size (including this size byte)

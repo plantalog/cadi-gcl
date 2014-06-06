@@ -102,28 +102,6 @@
       <source file="..\..\..\..\stm_lib\inc\misc.h" lastModified="12e9ef2ce20">
          <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
-      <source file="..\..\..\..\main.c" lastModified="1465973e286">
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_it.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_gpio.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_rcc.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_tim.h"/>
-         <include file="..\..\..\..\stm_lib\inc\misc.h"/>
-         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_gpio.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_rcc.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_dma.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_exti.h"/>
-         <include file="..\..\..\..\cmsis_boot\stm32f10x_conf.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_usart.h"/>
-         <include file="..\..\..\..\freertos\Source\include\FreeRTOS.h"/>
-         <include file="..\..\..\..\freertos\Source\include\task.h"/>
-         <include file="..\..\..\..\freertos\Source\include\queue.h"/>
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_flash.h"/>
-         <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
-         <include file="..\..\..\..\ff9a\src\diskio.h"/>
-         <include file="..\..\..\..\ff9a\src\ff.h"/>
-         <include file="..\..\..\..\cadi_libs\inc\driver_sonar.h"/>
-      </source>
       <source file="..\..\..\..\stm_lib\inc\stm32f10x_dma.h" lastModified="13ba1ad1b26">
          <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>

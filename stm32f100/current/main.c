@@ -1051,6 +1051,8 @@ void run_uart_cmd(void){
 // adds 'amount' seconds of fertilizer using pump with ID	 = pump_id
 void run_doser_for(uint8_t pump_id, uint8_t amount){
 	uint32_t finish = 0, now = 0;
+	now = RTC_GetCounter();
+	finish = now+amount;
 	enable_dosing_pump(pump_id, 1);
 	while (now<finish) {
 		now = RTC_GetCounter();
@@ -3133,7 +3135,7 @@ const char menuItemArray[MENURECS][18]=
 		{"EC-stabilizer"},	// 19
 
 		{"DAYLIGHT SENSOR"},// 20
-		{"Tank lvl. keeper"},	// 21
+		{"   "},	// 21
 		{"Keeping window"},	// 22
 		{"Get water"},	// 23
 		{"Add Light"},	// 24
@@ -4847,7 +4849,7 @@ void setTimer(uint8_t timerId){
 	Lcd_clear();
 	Lcd_goto(0,2);
 	Lcd_write_str("Set ON time");
-	vTaskDelay(3000);
+	vTaskDelay(1500);
 	Lcd_clear();
 	vTaskDelay(50);
 	Data = EE_ReadWord(Address);
@@ -4861,7 +4863,7 @@ void setTimer(uint8_t timerId){
 	Address = EE_TIMER1_ON+timerId*EE_TIMER_SIZE+2;	// set OFF for plain timer
 	Data = EE_ReadWord(Address);
 	xTaskResumeAll();
-	vTaskDelay(3000);
+	vTaskDelay(1500);
 	Lcd_clear();
 	adjusteDate = timeAdjust(Data, 1);
 	EE_WriteWord(Address, adjusteDate);
