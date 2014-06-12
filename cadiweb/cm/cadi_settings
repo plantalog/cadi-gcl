@@ -1,7 +1,7 @@
 ac_loads,Light,PSI pump,Mixer pump,Drain valve
-ac_loads_hints,Enables light next to camera,High pressure diaphragm pump,,
-valves,8 WI valve,10 FWI valve,6.1 Cherry,6.2 Super Skunk
-valves_hints,Water Intake valve,Fresh (or Filtered) Water Intake valve,Tomatoes Cherry watering line,Drain valve
+ac_loads_hints,Enables light next to camera,High pressure diaphragm pump,Drain line valve,
+valves,8 WI valve,10 FWI valve,6.1 Cherry,6.2 Oak
+valves_hints,Water Intake valve,Fresh (or Filtered) Water Intake valve,Tomatoes Cherry watering line,Oak watering line
 dosing_pumps, ,RootJuice, GHE Bloom, GHE Grow
 dosers_hints, ,BioBizz RootJuice root stimulator,GHE FloraDuo Bloom fertilizer (2ml/sec), GHE FloraDuo Grow fertilizer (1ml/sec)
 dosers_pwm_duty_cycles, 90,100,80,100

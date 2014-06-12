@@ -1,0 +1,2 @@
+comparing to previous version it is better to have:
+- thicker layer transitions

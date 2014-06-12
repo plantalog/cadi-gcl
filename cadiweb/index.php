@@ -17,7 +17,42 @@
 <script type="text/javascript" src="js/svg/jquery.svg.js"></script>
 <!-- <script type="text/javascript" src="js/date.format.js"></script> -->
 
+<?php
+// load SVG settings
+		if (($handle = fopen("cm/svg.conf", "r")) !== FALSE) {
+		    	$data = fgetcsv($handle, 1000, ",");
+		    	$svg_t3top = $data[0];
+		    	$svg_t3btm  = $data[1];
+		    	$svg_t3wx = $data[2];
+		    	$svg_t3wy  = $data[3];
 
+		    	$svg_t4top = $data[4];
+		    	$svg_t4btm  = $data[5];
+		    	$svg_t4wx = $data[6];
+		    	$svg_t4wy  = $data[7];
+		    fclose($handle);
+		}
+		else {
+		    	$svg_t3top = 0;
+		    	$svg_t3btm  = 0;
+		    	$svg_t3wx = 0;
+		    	$svg_t3wy  = 0;
+
+		    	$svg_t4top = 0;
+		    	$svg_t4btm  = 0;
+		    	$svg_t4wx = 0;
+		    	$svg_t4wy  = 0; 
+/*		    	$svg_t3top = 0;
+		    	$svg_t3btm  = 100;
+		    	$svg_t3wx = 728;
+		    	$svg_t3wy  = 193;
+
+		    	$svg_t4top = 0;
+		    	$svg_t4btm  = 100;
+		    	$svg_t4wx = 586;
+		    	$svg_t4wy  = 393; */
+		}
+?>
 
 <script>
 
@@ -68,11 +103,13 @@
 
 		// draw water levels
 		// tank max level in pixels
-		tmlp = 135;
+		tmlp = 135;		// deprecated?
 
 		// tank 3 pecific settings
-		t3wx = 729;
-		t3wy = 193;
+		<?php echo 't3top = '.$svg_t3top.';'.PHP_EOL; ?>
+		<?php echo 't3btm = '.$svg_t3btm.';'.PHP_EOL; ?>
+		<?php echo 't3wx = '.$svg_t3wx.';'.PHP_EOL; ?>
+		<?php echo 't3wy = '.$svg_t3wy.';'.PHP_EOL; ?>
 		ctl = 135;
 		svg.polygon([
 				[t3wx,t3wy],
@@ -85,10 +122,10 @@
 
 
 		// tank 4 specific settings
-		t4top = 9;
-		t4btm = 50;
-		t4wx = 586;
-		t4wy = 393;
+		<?php echo 't4top = '.$svg_t4top.';'.PHP_EOL; ?>
+		<?php echo 't4btm = '.$svg_t4btm.';'.PHP_EOL; ?>
+		<?php echo 't4wx = '.$svg_t4wx.';'.PHP_EOL; ?>
+		<?php echo 't4wy = '.$svg_t4wy.';'.PHP_EOL; ?>
 		ctl = 50;
 		svg.polygon([
 				[t4wx,t4wy],
@@ -135,18 +172,19 @@
 			$('#cadi_rh').html(statusArray[2]);
 
 			// tank 3 water level redraw
-			t3top = 12;
-			t3btm = 100;
-			t3wx = 728;
-			t3wy = 193;
+			
+		<?php echo 't3top = '.$svg_t3top.';'.PHP_EOL; ?>
+		<?php echo 't3btm = '.$svg_t3btm.';'.PHP_EOL; ?>
+		<?php echo 't3wx = '.$svg_t3wx.';'.PHP_EOL; ?>
+		<?php echo 't3wy = '.$svg_t3wy.';'.PHP_EOL; ?>
 			ctl = Math.floor((120*(t3btm-statusArray[8]+t3top))/(t3btm-t3top));
 			$('#tank3water').attr('points', t3wx+','+t3wy+' '+t3wx+','+(t3wy-ctl)+' '+(t3wx+30)+','+(t3wy-ctl-50)+' '+(t3wx+120)+','+(t3wy-ctl-50)+' '+(t3wx+123)+','+(t3wy-50+5)+' '+(t3wx+98)+','+t3wy);
 
 			// tank 4 water lvl redraw
-			t4top = 9;
-			t4btm = 50;
-			t4wx = 586;
-			t4wy = 393;
+		<?php echo 't4top = '.$svg_t4top.';'.PHP_EOL; ?>
+		<?php echo 't4btm = '.$svg_t4btm.';'.PHP_EOL; ?>
+		<?php echo 't4wx = '.$svg_t4wx.';'.PHP_EOL; ?>
+		<?php echo 't4wy = '.$svg_t4wy.';'.PHP_EOL; ?>
 			var ctl = Math.floor((120*(t4btm-statusArray[9]+t4top))/(t4btm-t4top));
 			//ctl=120;
 			//alert(ctl);

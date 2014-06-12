@@ -97,11 +97,20 @@ switch ($action) {
 	case 'btd_apply_settings':		// save settings to file
 		btd_apply_settings($_POST['settings']);
 		break;
+	case 'svg_apply_settings':		// save settings to file
+		svg_apply_settings($_POST['settings']);
+		break;
 }
 
 function btd_apply_settings($settings){
 	file_put_contents('btds/btd.conf',$settings);
 	file_put_contents('daemon_cmd','reload_settings,');	// force Cadi BTDaemon to reload settings file
+	echo $settings;
+}
+
+function svg_apply_settings($settings){
+	file_put_contents('svg.conf',$settings);
+	echo $settings;
 }
 
 function command_send($command, $mac){
