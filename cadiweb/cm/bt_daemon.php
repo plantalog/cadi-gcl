@@ -113,6 +113,35 @@ while(1){
 				echo 'Going to stream status locally';
 				$status_stream_enabled = $cmd_arr[1];
 				break;
+			case 'cadiweb_update':
+				echo 'Going to upgrade to latest Cadiweb version';
+				$status_stream_enabled = 0;
+				$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
+				exec($execmd);
+				$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
+				exec($execmd);
+				$execmd = 'wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-ubuntu1204.sh -O /tmp/install.sh';
+				exec($execmd);
+				$execmd = 'chmod 777 /tmp/install.sh';
+				exec($execmd);
+		//		$execmd = '/tmp/install.sh >> /var/www/cadiweb_install_log &';
+		//		exec($execmd);
+				$install_in_progress=1;
+				while ($install_in_progress==1) {
+					$out = array();
+					$execmd = "grep 'IT IS RECOMMENDED TO RESTART COMPUTER' /var/www/cadiweb_install_log";
+					exec($execmd, $out);
+					if (sizeof($out)>0) {
+						if( strpos($out[0],"IT IS RECOMMENDED TO RESTART COMPUTER") !== false) {
+							$install_in_progress=0;
+	    					}
+					}
+				}
+				$execmd = 'date';
+				exec($execmd);
+				echo 'CADIWEB UPDATE DONE'.PHP_EOL;
+
+				break;
 			case 'reload_settings':	// read settings file fetching the daemon settings
 				echo PHP_EOL.' reloading Cadi BTDaemon settings'.PHP_EOL;
 				if (($handle = fopen("btds/btd.conf", "r")) !== FALSE) {
@@ -164,7 +193,7 @@ while(1){
 	}
 
 	if ($cycle_counter%$sppd_value==0 && $ping_delay==0 && $status_stream_enabled==1) {
-		echo '#CadiBTD# Cadi, Ping!';
+		echo '#CadiBTD# Cadi, Ping!'.PHP_EOL;
 		$ping_packet = "\x5a\x58\x32\x04\x07\x01\x32\x00";
 		$command = "/bin/echo -e '";
 		for ($i=0; $i<strlen($ping_packet);$i++) {
@@ -172,7 +201,7 @@ while(1){
 		}
 		// $command .= sprintf("\\x%02x",ord($ping_packet));
 		$command .= "' >> /dev/cadi";
-//		echo $ping_packet.PHP_EOL.$command.PHP_EOL;
+		echo $ping_packet.PHP_EOL.$command.PHP_EOL;
 		exec($command);
 	}
 	

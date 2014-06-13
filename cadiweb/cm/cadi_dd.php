@@ -94,8 +94,9 @@ function enable_dosing_pump(pumpId, state){
 function run_doser_for(){
 	var doserId = $('#fert_selector').val();
 	var amount = $('#fert_amount').val();
-	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '9', pump_id:pumpId, amount:amount}, function(data){
-		alert('Add fertilizer '+pumpId+' within '+amount+' seconds');
+	alert('Add fertilizer '+doserId+' within '+amount+' seconds');
+	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '9', pump_id:doserId, amount:amount}, function(data){
+		alert(data);
 	}); 
 }
 
@@ -109,7 +110,7 @@ function run_doser_for(){
 	<?php
 
 	$row = 1;
-	if (($handle = fopen("cm/cadi_settings_201306191511", "r")) !== FALSE) {
+	if (($handle = fopen("cm/cadi_settings", "r")) !== FALSE) {
 	    while (($_SESSION['settings_data'][$row] = fgetcsv($handle, 1000, ",")) !== FALSE) {
 		$num = count($_SESSION['settings_data'][$row]);
 		$row++;
@@ -204,11 +205,11 @@ function run_doser_for(){
 	echo '<select id="fert_selector">';
 	for ($i=0; $i<$dosers_amount; $i++) {
 		echo '
-			<option value="'.$i.'" title="'.$_SESSION['settings_data'][6][$i+1].'">'.$_SESSION['settings_data'][5][$i+1].'</option>';
+			<option value="'.$i.'" title="'.$_SESSION['settings_data'][6][$i+1].'">'.$i.': '.$_SESSION['settings_data'][5][$i+1].'</option>';
 	}
 	echo '</select>';
 	echo '<input type="text" value="0" title="amount of seconds to run the dosing pump" id="fert_amount" />';
-	echo '<button onClick="run_doser_for()">Add</button>';
+	echo '<button onClick=run_doser_for()>Add</button>';
 	echo '</div>';
 	?>
 	</div>

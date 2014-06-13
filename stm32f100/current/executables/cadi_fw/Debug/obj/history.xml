@@ -58,23 +58,23 @@
       <target file="syscalls.o" lastModified="1451581f5df">
          <source file="..\..\..\..\syscalls\syscalls.c" lastModified="13843cf2fc0"/>
       </target>
-      <target file="stm32f10x_adc.o" lastModified="1451581eb03">
-         <source file="..\..\..\..\stm_lib\src\stm32f10x_adc.c" lastModified="13868673a80"/>
-      </target>
       <target file="stm32f10x_tim.o" lastModified="14515819116">
          <source file="..\..\..\..\stm_lib\src\stm32f10x_tim.c" lastModified="12e9ef2ce20"/>
       </target>
-      <target file="stm32f10x_dma.o" lastModified="14515821224">
-         <source file="..\..\..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76"/>
+      <target file="stm32f10x_adc.o" lastModified="1451581eb03">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_adc.c" lastModified="13868673a80"/>
       </target>
       <target file="ff.o" lastModified="14515820d59">
          <source file="..\..\..\..\ff9a\src\ff.c" lastModified="13b8c095cd0"/>
       </target>
+      <target file="stm32f10x_dma.o" lastModified="14515821224">
+         <source file="..\..\..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76"/>
+      </target>
       <target file="startup_stm32f10x_md_vl.o" lastModified="145158191ee">
          <source file="..\..\..\..\cmsis_boot\startup\startup_stm32f10x_md_vl.c" lastModified="13843cf2fc0"/>
       </target>
-      <target file="main.o" lastModified="1466e97462d">
-         <source file="..\..\..\..\main.c" lastModified="1466e96c7b4"/>
+      <target file="main.o" lastModified="14696f5c761">
+         <source file="..\..\..\..\main.c" lastModified="14696f58a1b"/>
       </target>
       <target file="stm32f10x_usart.o" lastModified="1451581ee65">
          <source file="..\..\..\..\stm_lib\src\stm32f10x_usart.c" lastModified="12e9ef2ce20"/>

@@ -80,6 +80,7 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr(9);	// command
 			$packet .= chr($_POST['pump_id']);	// pumpId for doser
 			$packet .= chr($_POST['amount']);	// new state for doser
+			echo 'cmd=10';
 			break;
 		case 10:		// set new valve_failed 8bit value
 			$packet .= chr(2);	// packet payload size (including this size byte)

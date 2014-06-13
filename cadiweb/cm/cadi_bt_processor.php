@@ -100,6 +100,13 @@ switch ($action) {
 	case 'svg_apply_settings':		// save settings to file
 		svg_apply_settings($_POST['settings']);
 		break;
+	case 'redraw_log':		// save settings to file
+		redraw_log();
+		break;
+}
+
+function redraw_log(){
+	
 }
 
 function btd_apply_settings($settings){

@@ -60,4 +60,6 @@ $(function() {
 </div>
 
 <?php include_once('btds/cadi_btd_tuning.php'); ?>
+<?php include_once('cadiweb_info.php'); ?>
+
 

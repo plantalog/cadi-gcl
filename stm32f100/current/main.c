@@ -1056,7 +1056,9 @@ void run_doser_for(uint8_t pump_id, uint8_t amount){
 	enable_dosing_pump(pump_id, 1);
 	while (now<finish) {
 		now = RTC_GetCounter();
-		vTaskDelay(50);
+		vTaskDelay(25);
+		get_status_block(1);	// send status blocks
+		vTaskDelay(25);
 	}
 	enable_dosing_pump(pump_id, 0);
 }
@@ -1114,122 +1116,124 @@ void send_ee_addr(uint16_t addr, uint8_t type){	// sends EEPROM cell contents vi
 
 void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 //	uint8_t block[8];
-	TxBuffer[0] = 90;	// Z
-	TxBuffer[1] = 88;	// X
-	TxBuffer[2] = 51;	// 3 (sending STATUS)
-	TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
-	if (blockId==1) {	// state block 1
-		TxBuffer[4] = comm_state;
-		TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
-		TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
-		TxBuffer[7] = valveFlags;
-		TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
-		TxBuffer[9] = wpStateFlags;	// watering program run flags
-		TxBuffer[10] = dht_data[0];
-		TxBuffer[11] = dht_data[1];
-		TxBuffer[12] = dht_data[2];
-		TxBuffer[13] = dht_data[3];
-		TxBuffer[14] = (uint8_t)(RTC->CNTH&(0xFF));	// RTC unixtime
-		TxBuffer[15] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
-		TxBuffer[16] = (uint8_t)(RTC->CNTL&(0xFF));
-		TxBuffer[17] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
-		TxBuffer[18] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
-		TxBuffer[19] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
-		TxBuffer[20] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
-		TxBuffer[21] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
-		TxBuffer[22] = (uint8_t)(adcAverage[0]&(0xFF));	// ADC1 average reading
-		TxBuffer[23] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
-		TxBuffer[24] = (uint8_t)(adcAverage[1]&(0xFF));	// ADC2 average reading
-		TxBuffer[25] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
-		TxBuffer[26] = (uint8_t)(adcAverage[2]&(0xFF));	// ADC3 average reading
-		TxBuffer[27] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
-		TxBuffer[28] = (uint8_t)(adcAverage[3]&(0xFF));	// ADC4 average reading
-		TxBuffer[29] = (uint8_t)(((adcAverage[3])>>8)&(0xFF));
-		TxBuffer[30] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
-		TxBuffer[31] = (uint8_t)((water_counter[0]>>8)&(0xFF));
-		TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
-		TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
-		TxBuffer[34] = dosingPumpStateFlags2;		// dosing pump flags (dosingPumpStateFlags overwritten by some part of FW)
-		TxBuffer[35] = auto_flags;	// first sonar higher byte
-		TxBuffer[36] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
-		TxBuffer[37] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
-//		adcAverage[AVG_ADC_PSI]>psi_pump_top_level
-		TxBuffer[38] = blockId;
-	}
-	if (blockId==2) {	// state block 2
-//		uint32_t now = RTC_GetCounter();
-		TxBuffer[4] = (uint8_t)(psi_pump_top_level&(0xFF));
-		TxBuffer[5] = (uint8_t)((psi_pump_top_level>>8)&(0xFF));
-		TxBuffer[6] = (uint8_t)(psi_pump_btm_level&(0xFF));
-		TxBuffer[7] = (uint8_t)(((psi_pump_btm_level)>>8)&(0xFF));
-		TxBuffer[8] = (uint8_t)0;
-		TxBuffer[9] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
-		TxBuffer[10] = (uint8_t)(((adcAverage[1])>>0)&(0xFF));
-		TxBuffer[11] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
-		TxBuffer[12] = (uint8_t)(((adcAverage[2])>>0)&(0xFF));
-		TxBuffer[13] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
-		TxBuffer[38] = blockId;
-	}
-	if (blockId==3) {	// state block 3
-		TxBuffer[4] = (uint8_t)(GPIOA->IDR&(0xFF));
-		TxBuffer[5] = (uint8_t)(((GPIOA->IDR)>>8)&(0xFF));
-		TxBuffer[6] = (uint8_t)(((GPIOA->IDR)>>16)&(0xFF));
-		TxBuffer[7] = (uint8_t)(((GPIOA->IDR)>>24)&(0xFF));
-		TxBuffer[8] = (uint8_t)(GPIOB->IDR&(0xFF));
-		TxBuffer[9] = (uint8_t)(((GPIOB->IDR)>>8)&(0xFF));
-		TxBuffer[10] = (uint8_t)(((GPIOB->IDR)>>16)&(0xFF));
-		TxBuffer[11] = (uint8_t)(((GPIOB->IDR)>>24)&(0xFF));
-		TxBuffer[12] = dht_data[2];
-		TxBuffer[13] = dht_data[3];
-		TxBuffer[38] = blockId;
-	}
+//	if (txbuff_ne==0 && TxCounter==NbrOfDataToTransfer) { // only if nothing is being transfered
+		TxBuffer[0] = 90;	// Z
+		TxBuffer[1] = 88;	// X
+		TxBuffer[2] = 51;	// 3 (sending STATUS)
+		TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
+		if (blockId==1) {	// state block 1
+			TxBuffer[4] = comm_state;
+			TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
+			TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
+			TxBuffer[7] = valveFlags;
+			TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
+			TxBuffer[9] = wpStateFlags;	// watering program run flags
+			TxBuffer[10] = dht_data[0];
+			TxBuffer[11] = dht_data[1];
+			TxBuffer[12] = dht_data[2];
+			TxBuffer[13] = dht_data[3];
+			TxBuffer[14] = (uint8_t)(RTC->CNTH&(0xFF));	// RTC unixtime
+			TxBuffer[15] = (uint8_t)((RTC->CNTH>>8)&(0xFF));
+			TxBuffer[16] = (uint8_t)(RTC->CNTL&(0xFF));
+			TxBuffer[17] = (uint8_t)(((RTC->CNTL)>>8)&(0xFF));
+			TxBuffer[18] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+			TxBuffer[19] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+			TxBuffer[20] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+			TxBuffer[21] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+			TxBuffer[22] = (uint8_t)(adcAverage[0]&(0xFF));	// ADC1 average reading
+			TxBuffer[23] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
+			TxBuffer[24] = (uint8_t)(adcAverage[1]&(0xFF));	// ADC2 average reading
+			TxBuffer[25] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
+			TxBuffer[26] = (uint8_t)(adcAverage[2]&(0xFF));	// ADC3 average reading
+			TxBuffer[27] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
+			TxBuffer[28] = (uint8_t)(adcAverage[3]&(0xFF));	// ADC4 average reading
+			TxBuffer[29] = (uint8_t)(((adcAverage[3])>>8)&(0xFF));
+			TxBuffer[30] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
+			TxBuffer[31] = (uint8_t)((water_counter[0]>>8)&(0xFF));
+			TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
+			TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
+			TxBuffer[34] = dosingPumpStateFlags2;		// dosing pump flags (dosingPumpStateFlags overwritten by some part of FW)
+			TxBuffer[35] = auto_flags;	// first sonar higher byte
+			TxBuffer[36] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+			TxBuffer[37] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+	//		adcAverage[AVG_ADC_PSI]>psi_pump_top_level
+			TxBuffer[38] = blockId;
+		}
+		if (blockId==2) {	// state block 2
+	//		uint32_t now = RTC_GetCounter();
+			TxBuffer[4] = (uint8_t)(psi_pump_top_level&(0xFF));
+			TxBuffer[5] = (uint8_t)((psi_pump_top_level>>8)&(0xFF));
+			TxBuffer[6] = (uint8_t)(psi_pump_btm_level&(0xFF));
+			TxBuffer[7] = (uint8_t)(((psi_pump_btm_level)>>8)&(0xFF));
+			TxBuffer[8] = (uint8_t)0;
+			TxBuffer[9] = (uint8_t)(((adcAverage[0])>>8)&(0xFF));
+			TxBuffer[10] = (uint8_t)(((adcAverage[1])>>0)&(0xFF));
+			TxBuffer[11] = (uint8_t)(((adcAverage[1])>>8)&(0xFF));
+			TxBuffer[12] = (uint8_t)(((adcAverage[2])>>0)&(0xFF));
+			TxBuffer[13] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
+			TxBuffer[38] = blockId;
+		}
+		if (blockId==3) {	// state block 3
+			TxBuffer[4] = (uint8_t)(GPIOA->IDR&(0xFF));
+			TxBuffer[5] = (uint8_t)(((GPIOA->IDR)>>8)&(0xFF));
+			TxBuffer[6] = (uint8_t)(((GPIOA->IDR)>>16)&(0xFF));
+			TxBuffer[7] = (uint8_t)(((GPIOA->IDR)>>24)&(0xFF));
+			TxBuffer[8] = (uint8_t)(GPIOB->IDR&(0xFF));
+			TxBuffer[9] = (uint8_t)(((GPIOB->IDR)>>8)&(0xFF));
+			TxBuffer[10] = (uint8_t)(((GPIOB->IDR)>>16)&(0xFF));
+			TxBuffer[11] = (uint8_t)(((GPIOB->IDR)>>24)&(0xFF));
+			TxBuffer[12] = dht_data2[2];
+			TxBuffer[13] = dht_data2[3];
+			TxBuffer[38] = blockId;
+		}
 
-	if (blockId==4) {	// state block 4
-		TxBuffer[4] = currentEc;
-		TxBuffer[5] = currentPh;
-		TxBuffer[6] = phUnderOver+ecUnderOver*4;
-		TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
-		TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
-		TxBuffer[9] = 00;		// EMPTY
-		TxBuffer[10] = dosingPumpStateFlags2;
-		TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
-		TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
-		TxBuffer[13] = waterSensorStateFlags;
-		TxBuffer[38] = blockId;
-	}
+		if (blockId==4) {	// state block 4
+			TxBuffer[4] = currentEc;
+			TxBuffer[5] = currentPh;
+			TxBuffer[6] = phUnderOver+ecUnderOver*4;
+			TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
+			TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
+			TxBuffer[9] = 00;		// EMPTY
+			TxBuffer[10] = dosingPumpStateFlags2;
+			TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
+			TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
+			TxBuffer[13] = waterSensorStateFlags;
+			TxBuffer[38] = blockId;
+		}
 
-	if (blockId==5) {	// state block 5
-		TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
-		TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
-		TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
-		TxBuffer[7] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
-		TxBuffer[8] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
-		TxBuffer[9] = (uint8_t)((water_counter[0]>>8)&(0xFF));
-		TxBuffer[10] = (uint8_t)((water_counter[0]>>16)&(0xFF));
-		TxBuffer[11] = (uint8_t)((water_counter[0]>>24)&(0xFF));
-		TxBuffer[12] = valve_failed;		//
-		TxBuffer[13] = waterSensorStateFlags;
-		TxBuffer[38] = blockId;
-	}
+		if (blockId==5) {	// state block 5
+			TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+			TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+			TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+			TxBuffer[7] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+			TxBuffer[8] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
+			TxBuffer[9] = (uint8_t)((water_counter[0]>>8)&(0xFF));
+			TxBuffer[10] = (uint8_t)((water_counter[0]>>16)&(0xFF));
+			TxBuffer[11] = (uint8_t)((water_counter[0]>>24)&(0xFF));
+			TxBuffer[12] = valve_failed;		//
+			TxBuffer[13] = waterSensorStateFlags;
+			TxBuffer[38] = blockId;
+		}
 
-	if (blockId==6) {	// block 6
-		TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
-		TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
-		TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
-		TxBuffer[5] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
-		TxBuffer[8] = (uint8_t)(water_counter[1]&(0xFF));		// 2nd water flow meter counter
-		TxBuffer[9] = (uint8_t)((water_counter[1]>>8)&(0xFF));
-		TxBuffer[10] = (uint8_t)((water_counter[1]>>16)&(0xFF));
-		TxBuffer[11] = (uint8_t)((water_counter[1]>>24)&(0xFF));
-		TxBuffer[12] = (uint8_t)(wfCalArray[1]&(0xFF));
-		TxBuffer[13] = (uint8_t)((wfCalArray[1]>>8)&(0xFF));
-		TxBuffer[22] = blockId;
-	}
+		if (blockId==6) {	// block 6
+			TxBuffer[4] = (uint8_t)(sonar_read[0]&(0xFF));		// First sonar lower byte
+			TxBuffer[5] = (uint8_t)((sonar_read[0]>>8)&(0xFF));	// first sonar higher byte
+			TxBuffer[6] = (uint8_t)(sonar_read[1]&(0xFF));		// second sonar
+			TxBuffer[5] = (uint8_t)((sonar_read[1]>>8)&(0xFF));
+			TxBuffer[8] = (uint8_t)(water_counter[1]&(0xFF));		// 2nd water flow meter counter
+			TxBuffer[9] = (uint8_t)((water_counter[1]>>8)&(0xFF));
+			TxBuffer[10] = (uint8_t)((water_counter[1]>>16)&(0xFF));
+			TxBuffer[11] = (uint8_t)((water_counter[1]>>24)&(0xFF));
+			TxBuffer[12] = (uint8_t)(wfCalArray[1]&(0xFF));
+			TxBuffer[13] = (uint8_t)((wfCalArray[1]>>8)&(0xFF));
+			TxBuffer[22] = blockId;
+		}
 
-	TxBuffer[39] = crc_block(0, &TxBuffer[0],39);
-	NbrOfDataToTransfer = TxBuffer[3];
-	TxCounter=0;
-	txbuff_ne = 1;
+		TxBuffer[39] = crc_block(0, &TxBuffer[0],39);
+		NbrOfDataToTransfer = TxBuffer[3];
+		TxCounter=0;
+		txbuff_ne = 1;
+//	}
 }
 
 
@@ -2205,6 +2209,8 @@ void startWp(void){
 	Lcd_clear();
 	vTaskDelay(200);
 }
+
+
 
 void run_watering_program(uint8_t progId){
 	wpStateFlags|=(1<<progId);	// set active flag for this program

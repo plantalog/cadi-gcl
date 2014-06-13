@@ -1,3 +1,9 @@
+<?php
+session_start();
+$_SESSION['cadiweb_version'] = '1.0';
+
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -177,6 +183,7 @@
 		<?php echo 't3btm = '.$svg_t3btm.';'.PHP_EOL; ?>
 		<?php echo 't3wx = '.$svg_t3wx.';'.PHP_EOL; ?>
 		<?php echo 't3wy = '.$svg_t3wy.';'.PHP_EOL; ?>
+
 			ctl = Math.floor((120*(t3btm-statusArray[8]+t3top))/(t3btm-t3top));
 			$('#tank3water').attr('points', t3wx+','+t3wy+' '+t3wx+','+(t3wy-ctl)+' '+(t3wx+30)+','+(t3wy-ctl-50)+' '+(t3wx+120)+','+(t3wy-ctl-50)+' '+(t3wx+123)+','+(t3wy-50+5)+' '+(t3wx+98)+','+t3wy);
 
@@ -443,6 +450,19 @@ function btd_stream_status(newStatus){
 		});  
 }
 
+function redraw_update_log(){
+		$.post('cm/cadi_bt_processor.php', {action: 'redraw_log', status: newStatus}, function(data){
+			$('cadi_update_log').html(data);
+		});  
+}
+
+function cadiweb_update(){
+		btd_stream_status(0);
+		$.post('cm/cadi_bt_processor.php', {action: 'cadiweb_update'}, function(data){});
+		alert("Do not use Cadiweb control panel until server finishes software upgrade with reboot!");
+		setInterval(function(){redraw_update_log},1000);	// enables SVG draw with JS
+}
+
 function eeRead() {
 	var addr = $('#ee_addr').val();
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd:18, addr:addr}, function(data){
@@ -520,7 +540,7 @@ function eeWrite(dataType) {
 		</td>
 	</tr>	
 </table>
-
+<div id="cadi_update_log"></div>
 	=================================================	
 	<br>
 
@@ -566,6 +586,7 @@ function eeWrite(dataType) {
 <button onClick="get_ip()">Get IP</button>
 <button onClick="cw_reboot()">Reboot server</button><br>
 <button onClick="cadi_reset()">Cadi reset</button><br>
+<button onClick="cadiweb_update()">Cadiweb software update</button><br>
 
 <!-- 
 EEPROM read/write section
