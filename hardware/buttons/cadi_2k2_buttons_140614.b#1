@@ -1270,6 +1270,26 @@ chip</description>
 </package>
 </packages>
 </library>
+<library name="holes">
+<description>&lt;b&gt;Mounting Holes and Pads&lt;/b&gt;&lt;p&gt;
+&lt;author&gt;Created by librarian@cadsoft.de&lt;/author&gt;</description>
+<packages>
+<package name="3,2">
+<description>&lt;b&gt;MOUNTING HOLE&lt;/b&gt; 3.2 mm with drill center</description>
+<wire x1="-2.159" y1="0" x2="0" y2="-2.159" width="2.4892" layer="51" curve="90" cap="flat"/>
+<wire x1="0" y1="2.159" x2="2.159" y2="0" width="2.4892" layer="51" curve="-90" cap="flat"/>
+<circle x="0" y="0" radius="3.429" width="0.1524" layer="21"/>
+<circle x="0" y="0" radius="0.762" width="0.4572" layer="51"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="39"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="43"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="40"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="41"/>
+<circle x="0" y="0" radius="3.048" width="2.032" layer="42"/>
+<circle x="0" y="0" radius="1.7" width="0.2032" layer="21"/>
+<hole x="0" y="0" drill="3.2"/>
+</package>
+</packages>
+</library>
 </libraries>
 <attributes>
 </attributes>
@@ -1456,98 +1476,81 @@ design rules under a new name.</description>
 </pass>
 </autorouter>
 <elements>
-<element name="S1" library="switch-omron" package="B3F-40XX" value="" x="55.88" y="66.04" rot="R270">
-<attribute name="OC_NEWARK" value="36K3105" x="48.26" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="B3F-4000" x="48.26" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MF" value="OMRON COMPONENTS USA" x="48.26" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="OC_FARNELL" value="176434" x="48.26" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
+<element name="S1" library="switch-omron" package="B3F-40XX" value="" x="64.77" y="57.15" rot="R90">
+<attribute name="OC_NEWARK" value="36K3105" x="72.39" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="B3F-4000" x="72.39" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="OMRON COMPONENTS USA" x="72.39" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="OC_FARNELL" value="176434" x="72.39" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="S2" library="switch-omron" package="B3F-40XX" value="" x="43.18" y="66.04" rot="R270">
-<attribute name="OC_NEWARK" value="36K3105" x="35.56" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="B3F-4000" x="35.56" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MF" value="OMRON COMPONENTS USA" x="35.56" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="OC_FARNELL" value="176434" x="35.56" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
+<element name="S2" library="switch-omron" package="B3F-40XX" value="" x="77.47" y="57.15" rot="R90">
+<attribute name="OC_NEWARK" value="36K3105" x="85.09" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="B3F-4000" x="85.09" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="OMRON COMPONENTS USA" x="85.09" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="OC_FARNELL" value="176434" x="85.09" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="S3" library="switch-omron" package="B3F-40XX" value="" x="30.48" y="66.04" rot="R270">
-<attribute name="OC_NEWARK" value="36K3105" x="7.62" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="B3F-4000" x="7.62" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MF" value="OMRON COMPONENTS USA" x="7.62" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="OC_FARNELL" value="176434" x="7.62" y="44.45" size="1.778" layer="27" rot="R270" display="off"/>
+<element name="S3" library="switch-omron" package="B3F-40XX" value="" x="90.17" y="57.15" rot="R90">
+<attribute name="OC_NEWARK" value="36K3105" x="113.03" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="B3F-4000" x="113.03" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="OMRON COMPONENTS USA" x="113.03" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="OC_FARNELL" value="176434" x="113.03" y="78.74" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="S4" library="switch-omron" package="B3F-40XX" value="" x="17.78" y="66.04" rot="R270">
-<attribute name="OC_NEWARK" value="36K3105" x="-5.08" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MPN" value="B3F-4000" x="-5.08" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="MF" value="OMRON COMPONENTS USA" x="-5.08" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
-<attribute name="OC_FARNELL" value="176434" x="-5.08" y="26.67" size="1.778" layer="27" rot="R270" display="off"/>
+<element name="S4" library="switch-omron" package="B3F-40XX" value="" x="102.87" y="57.15" rot="R90">
+<attribute name="OC_NEWARK" value="36K3105" x="125.73" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MPN" value="B3F-4000" x="125.73" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="MF" value="OMRON COMPONENTS USA" x="125.73" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
+<attribute name="OC_FARNELL" value="176434" x="125.73" y="96.52" size="1.778" layer="27" rot="R90" display="off"/>
 </element>
-<element name="R1" library="resistor" package="R1206" value="2k2" x="48.26" y="63.5" rot="R90"/>
-<element name="R2" library="resistor" package="R1206" value="2k2" x="41.91" y="64.77"/>
-<element name="R3" library="resistor" package="R1206" value="2k2" x="34.29" y="64.77"/>
-<element name="R4" library="resistor" package="R1206" value="2k2" x="21.59" y="64.77"/>
-<element name="PAD1" library="wirepad" package="SMD2,54-5,08" value="VCC" x="52.07" y="64.77" rot="R90"/>
-<element name="PAD2" library="wirepad" package="SMD2,54-5,08" value="TO_ADC" x="59.69" y="67.31" rot="R90"/>
+<element name="R1" library="resistor" package="R1206" value="2k2" x="67.31" y="58.42" rot="R180"/>
+<element name="R2" library="resistor" package="R1206" value="2k2" x="73.66" y="58.42" rot="R180"/>
+<element name="R3" library="resistor" package="R1206" value="2k2" x="86.36" y="58.42" rot="R180"/>
+<element name="R4" library="resistor" package="R1206" value="2k2" x="97.79" y="58.42" rot="R180"/>
+<element name="PAD1" library="wirepad" package="SMD2,54-5,08" value="VCC" x="58.42" y="58.42" rot="R90"/>
+<element name="PAD2" library="wirepad" package="SMD2,54-5,08" value="TO_ADC" x="58.42" y="54.61" rot="R90"/>
+<element name="H1" library="holes" package="3,2" value="MOUNT-HOLE3.2" x="5.08" y="-5.08"/>
+<element name="H2" library="holes" package="3,2" value="MOUNT-HOLE3.2" x="5.08" y="-13.97"/>
 </elements>
 <signals>
 <signal name="N$1">
 <contactref element="S4" pad="2"/>
 <contactref element="R4" pad="1"/>
-<wire x1="20.168" y1="64.77" x2="20.2692" y2="59.7916" width="0" layer="19" extent="1-1"/>
+<wire x1="99.212" y1="58.42" x2="100.3808" y2="63.3984" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$2">
 <contactref element="S3" pad="2"/>
 <contactref element="R3" pad="1"/>
 <contactref element="R4" pad="2"/>
-<wire x1="23.012" y1="64.77" x2="32.868" y2="64.77" width="0" layer="19" extent="1-1"/>
-<wire x1="32.9692" y1="59.7916" x2="32.868" y2="64.77" width="0" layer="19" extent="1-1"/>
+<wire x1="96.368" y1="58.42" x2="87.782" y2="58.42" width="0" layer="19" extent="1-1"/>
+<wire x1="87.6808" y1="63.3984" x2="87.782" y2="58.42" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$3">
 <contactref element="S2" pad="2"/>
 <contactref element="R2" pad="1"/>
 <contactref element="R3" pad="2"/>
-<wire x1="35.712" y1="64.77" x2="45.6692" y2="59.7916" width="0" layer="19" extent="1-1"/>
-<wire x1="40.488" y1="64.77" x2="35.712" y2="64.77" width="0" layer="19" extent="1-1"/>
+<wire x1="84.938" y1="58.42" x2="74.9808" y2="63.3984" width="0" layer="19" extent="1-1"/>
+<wire x1="75.082" y1="58.42" x2="84.938" y2="58.42" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$4">
 <contactref element="S1" pad="2"/>
 <contactref element="R1" pad="1"/>
 <contactref element="R2" pad="2"/>
-<wire x1="43.332" y1="64.77" x2="48.26" y2="62.078" width="0" layer="19" extent="1-1"/>
-<wire x1="58.3692" y1="59.7916" x2="48.26" y2="62.078" width="0" layer="19" extent="1-1"/>
+<wire x1="72.238" y1="58.42" x2="68.732" y2="58.42" width="0" layer="19" extent="1-1"/>
+<wire x1="62.2808" y1="63.3984" x2="68.732" y2="58.42" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$5">
 <contactref element="R1" pad="2"/>
 <contactref element="PAD1" pad="1"/>
-<wire x1="52.07" y1="64.77" x2="48.26" y2="64.922" width="0" layer="19" extent="1-1"/>
+<wire x1="58.42" y1="58.42" x2="65.888" y2="58.42" width="0" layer="19" extent="1-1"/>
 </signal>
 <signal name="N$6">
-<contactref element="S1" pad="4"/>
-<contactref element="S2" pad="4"/>
-<contactref element="S3" pad="4"/>
-<contactref element="S4" pad="4"/>
 <contactref element="PAD2" pad="1"/>
-<wire x1="15.2908" y1="59.7916" x2="40.6908" y2="59.7916" width="0" layer="19" extent="1-1"/>
-<wire x1="59.69" y1="67.31" x2="15.2908" y2="59.7916" width="0" layer="19" extent="1-1"/>
-<wire x1="53.3908" y1="59.7916" x2="40.6908" y2="59.7916" width="0" layer="19" extent="1-1"/>
-<wire x1="27.9908" y1="59.7916" x2="53.3908" y2="59.7916" width="0" layer="19" extent="1-1"/>
-</signal>
-<signal name="N$7">
-<wire x1="15.24" y1="60.96" x2="15.24" y2="68.58" width="1.27" layer="1"/>
-<wire x1="15.24" y1="68.58" x2="57.15" y2="68.58" width="1.27" layer="1"/>
-</signal>
-<signal name="N$8">
-<wire x1="20.32" y1="60.96" x2="20.32" y2="63.5" width="1.27" layer="1"/>
-</signal>
-<signal name="N$9">
-<wire x1="24.13" y1="64.77" x2="31.75" y2="64.77" width="1.27" layer="1"/>
-</signal>
-<signal name="N$10">
-<wire x1="36.83" y1="64.77" x2="39.37" y2="64.77" width="1.27" layer="1"/>
-</signal>
-<signal name="N$11">
-<wire x1="44.45" y1="64.77" x2="46.99" y2="64.77" width="1.27" layer="1"/>
-</signal>
-<signal name="N$12">
-<wire x1="49.53" y1="64.77" x2="48.26" y2="64.77" width="1.27" layer="1"/>
+<contactref element="S1" pad="3"/>
+<contactref element="S2" pad="3"/>
+<contactref element="S3" pad="3"/>
+<contactref element="S4" pad="3"/>
+<wire x1="105.3592" y1="50.9016" x2="58.42" y2="54.61" width="0" layer="19" extent="1-1"/>
+<wire x1="92.6592" y1="50.9016" x2="105.3592" y2="50.9016" width="0" layer="19" extent="1-1"/>
+<wire x1="79.9592" y1="50.9016" x2="92.6592" y2="50.9016" width="0" layer="19" extent="1-1"/>
+<wire x1="67.2592" y1="50.9016" x2="79.9592" y2="50.9016" width="0" layer="19" extent="1-1"/>
 </signal>
 </signals>
 </board>

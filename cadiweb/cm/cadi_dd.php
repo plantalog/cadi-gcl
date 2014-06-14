@@ -94,9 +94,9 @@ function enable_dosing_pump(pumpId, state){
 function run_doser_for(){
 	var doserId = $('#fert_selector').val();
 	var amount = $('#fert_amount').val();
-	alert('Add fertilizer '+doserId+' within '+amount+' seconds');
+	alert('Going to add fertilizer '+doserId+' within '+amount+' seconds');
 	$.post('cm/cadi_bt_processor.php', {action: 'tx_packet', cmd: '9', pump_id:doserId, amount:amount}, function(data){
-		alert(data);
+//		alert(data);
 	}); 
 }
 
@@ -120,6 +120,8 @@ function run_doser_for(){
 
 
 	$plug_amount = 4;
+
+	echo '<tr><td><b>LOADS:</b></td></tr>';
 	for ($i=0; $i<$plug_amount; $i++) {
 		echo '
 		<tr title="'.$_SESSION['settings_data'][2][$i+1].'">
@@ -144,7 +146,7 @@ function run_doser_for(){
 	$valves_amount = 4;
 
 	
-
+	echo '<tr><b>VALVES:</b></tr>';
 	for ($i=0; $i<$valves_amount; $i++) {
 		echo '
 		<tr title="'.$_SESSION['settings_data'][4][$i+1].'">
@@ -161,8 +163,7 @@ function run_doser_for(){
 		</tr>';
 	}
 
-
-	$dosers_amount = 4;
+/*	$dosers_amount = 4;
 	for ($i=0; $i<$dosers_amount; $i++) {
 		echo '
 		<tr title="'.$_SESSION['settings_data'][6][$i+1].'">
@@ -177,13 +178,37 @@ function run_doser_for(){
 			</td>
 			<td></td>
 		</tr>';
-	}
+	} */
 
 
 	?>
 
 
 	<tr><td colspan="2">
+		<?php
+			echo '<div style="border: 1px solid red;">';
+			echo '<b style="color: red;">Fertilizer mixer</b><br>';
+			echo '<select id="fert_selector">';
+
+			$dosers_amount = 4;
+
+			for ($i=0; $i<$dosers_amount; $i++) {
+				echo '
+					<option value="'.$i.'" title="'.$_SESSION['settings_data'][6][$i+1].'">'.$i.': '.$_SESSION['settings_data'][5][$i+1].'</option>';
+			}
+			echo '</select>';
+			echo '<input
+					id="fert_amount"
+					style="width:40px;"
+					type="text"
+					value="0"
+					title="how much seconds to run the dosing pump"
+				/>';
+			echo '<button onClick=run_doser_for()>Add</button>';
+			echo '</div>';
+
+		?>		
+
 		<button class="btn_" onClick="reset_valve_fails()">Fails=0</button>
 		<button class="btn_" onClick="auto_flags(0)">Auto=0</button><br>
 		<button class="btn_" onClick="auto_flags(255)">Auto=255</button>
@@ -199,19 +224,7 @@ function run_doser_for(){
 	<tr><td></td></tr>
 
 	</table>
-	<?php
-	echo '<div style="border: 1px solid red;">';
-	echo '<b style="color: red;">Fertilizer mixer</b><br>';
-	echo '<select id="fert_selector">';
-	for ($i=0; $i<$dosers_amount; $i++) {
-		echo '
-			<option value="'.$i.'" title="'.$_SESSION['settings_data'][6][$i+1].'">'.$i.': '.$_SESSION['settings_data'][5][$i+1].'</option>';
-	}
-	echo '</select>';
-	echo '<input type="text" value="0" title="amount of seconds to run the dosing pump" id="fert_amount" />';
-	echo '<button onClick=run_doser_for()>Add</button>';
-	echo '</div>';
-	?>
+
 	</div>
 </div>
 <!--
