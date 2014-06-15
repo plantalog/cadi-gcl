@@ -1,13 +1,16 @@
 cadi-gcl
 ========
+Cadi GCL project is an open-source plant growth controller.
 
-Cadi - Grow Controller and Logger sources
 
 FOLDER STRUCTURE
 
 android:
     - Cadi Bluetooth Monitor for Android
     
+cadiweb:
+	contains Cadiweb server software for Cadi Remote Control.
+
 hardware:
     - Eagle schematics (принципиальные схемы)
     - Topor PCB layouts (дизайны плат)
