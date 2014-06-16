@@ -124,8 +124,8 @@ while(1){
 				exec($execmd);
 				$execmd = 'chmod 777 /tmp/install.sh';
 				exec($execmd);
-		//		$execmd = '/tmp/install.sh >> /var/www/cadiweb_install_log &';
-		//		exec($execmd);
+				$execmd = '/tmp/install.sh >> /var/www/cadiweb_update_log &';
+				exec($execmd);
 				$install_in_progress=1;
 				while ($install_in_progress==1) {
 					$out = array();

@@ -173,9 +173,10 @@ $_SESSION['cadiweb_version'] = '1.0';
 			var statusArray = data.split(',');
 			var date = new Date(statusArray[0]*1000);
 			$('#cadi_time2').html(date);
-
-			$('#cadi_temp').html(statusArray[1]);
-			$('#cadi_rh').html(statusArray[2]);
+			var temp = parseFloat(statusArray[1]).toFixed(1);
+			var rh = parseFloat(statusArray[2]).toFixed(1);
+			$('#cadi_temp').html('&nbsp;T: '+temp+'C');
+			$('#cadi_rh').html('rH: '+rh+'%');
 
 			// tank 3 water level redraw
 			
@@ -451,7 +452,7 @@ function btd_stream_status(newStatus){
 }
 
 function redraw_update_log(){
-		$.post('cm/cadi_bt_processor.php', {action: 'redraw_log', status: newStatus}, function(data){
+		$.post('cm/cadi_bt_processor.php', {action: 'redraw_update_log'}, function(data){
 			$('cadi_update_log').html(data);
 		});  
 }
@@ -460,7 +461,13 @@ function cadiweb_update(){
 		btd_stream_status(0);
 		$.post('cm/cadi_bt_processor.php', {action: 'cadiweb_update'}, function(data){});
 		alert("Do not use Cadiweb control panel until server finishes software upgrade with reboot!");
-		setInterval(function(){redraw_update_log},1000);	// enables SVG draw with JS
+		var log_upd_int_id = setInterval(function(){redraw_update_log},1000);	// enables SVG draw with JS
+		$('#log_interval_id').val(log_upd_int_id);
+}
+
+function stop_log_stream(){
+		var  interval = $('#log_interval_id').val();
+		clearInterval(interval);
 }
 
 function eeRead() {
@@ -540,7 +547,6 @@ function eeWrite(dataType) {
 		</td>
 	</tr>	
 </table>
-<div id="cadi_update_log"></div>
 	=================================================	
 	<br>
 
@@ -586,7 +592,18 @@ function eeWrite(dataType) {
 <button onClick="get_ip()">Get IP</button>
 <button onClick="cw_reboot()">Reboot server</button><br>
 <button onClick="cadi_reset()">Cadi reset</button><br>
+====================================
+<br>
 <button onClick="cadiweb_update()">Cadiweb software update</button><br>
+<input type="hidden" id="log_interval_id" value="0" />
+<div>
+	<textarea size="10" id="cadi_update_log"></textarea>
+</div>
+<button onClick=stop_log_stream();>Stop log stream</button>
+====================================
+<br>
+
+
 
 <!-- 
 EEPROM read/write section

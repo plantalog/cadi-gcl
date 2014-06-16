@@ -100,13 +100,23 @@ switch ($action) {
 	case 'svg_apply_settings':		// save settings to file
 		svg_apply_settings($_POST['settings']);
 		break;
-	case 'redraw_log':		// save settings to file
+	case 'cadiweb_update':		// save settings to file
+		$toput = "cadiweb_update, , ";
+		echo $toput;
+		file_put_contents('daemon_cmd', $toput);
+		sleep(1);
+		break;
+	case 'redraw_update_log':		// save settings to file
 		redraw_log();
 		break;
 }
 
 function redraw_log(){
-	
+	$logtail = array();
+	exec('tail 500 /var/www/cadiweb_update_log', $logtail);
+	for ($i=0; $i<sizeof($logtail);$i++){
+		echo $logtail[$i].PHP_EOL;
+	}
 }
 
 function btd_apply_settings($settings){
@@ -175,31 +185,6 @@ function tail_serial_log($amount){
 		
 		
 		$timer_States='';
-		/* echo '<table>
-			<tr>
-				<td>Time:</td>
-				<td>'.$cadi_str_arr[0].'<td>
-			</tr>
-			<tr>
-				<td>Temp:</td>
-				<td>'.$cadi_str_arr[4].'<td>
-			</tr>
-			<tr>
-				<td>rH:</td>
-				<td>'.$cadi_str_arr[5].'<td>
-			</tr>
-			<tr>
-				<td>Plug states:</td>
-				<td>'.$plugout.'<td>
-			</tr>
-			<tr>
-				<td>CTimer states:</td>
-				<td>'.$ctimerout.'<td>
-			</tr>
-
-
-
-		</table>'; */
 		echo $arrr[8];
 	}
 		
@@ -217,8 +202,8 @@ function rfcomm_scan(){
 	$out2 = array();
 	exec('hcitool scan', $out);
 
+	// parse 'hcitool scan' output and prepare options to put into <select> html tag
 	for ($i=1; $i<sizeof($out); $i++) {
-	
 		$out2[$i][0] = substr($out[$i], 1, 17);
 	    	$out2[$i][1] = substr($out[$i], 18, strlen($out[$i])-18);
 		echo '<option value="'.$out2[$i][0].'">';
@@ -235,22 +220,33 @@ function rfcomm_list_binded(){
 	for ($i=0; $i<sizeof($out); $i++) {
 		$rfend = strpos($out[$i], ':');
 		$rfcomm_name = substr($out[$i], 0, $rfend);
-		echo '<li>'.$out[$i].'&nbsp;&nbsp;&nbsp;<div style="display:inline; border:1px solid red;" onClick=bt_disconnect("'.$rfcomm_name.'");>Disconnect</div></li>';
+		echo '<li>
+			'.$out[$i].'&nbsp;&nbsp;&nbsp;
+				<div 
+					style="display:inline; border:1px solid red;"
+					onClick=bt_disconnect("'.$rfcomm_name.'");>
+					Disconnect
+				</div>
+			</li>';
 	}
 	echo '</ul>';
 	unset($out);
 	echo '<ul>';
 
-	for ($i=0; $i<sizeof($out); $i++) {
+/*	for ($i=0; $i<sizeof($out); $i++) {
 		$position = strpos($out[$i], 'rfcomm');
 		if (strpos($out[$i], 'oot')>0 && $position==0) {
 			$startpos = digit_offset($out[$i]);
 			$psid = substr($out[$i], $startpos,5);
-			echo '<li>'.$out[$i].' <div style="border:1px solid red; display:inline;" onClick=stopSerialRead('.$psid.')>Kill '.$psid.'</div></li>';
+			echo '<li>
+				'.$out[$i].'
+					<div 
+						style="border:1px solid red; display:inline;" 
+						onClick=stopSerialRead('.$psid.')>
+						Kill '.$psid.'</div></li>';
 		}
-	}
+	} */
 	echo '</ul>';
-//	echo '<div style="display:inline; border:1px solid red;" onClick="cadi_list_rfcomms();">Refresh binds</div>';
 }
 
 function digit_offset($text){
@@ -272,16 +268,10 @@ function rfcomm_release($name){
 
 function rfcomm_connect($rfcomm_name, $mac){
 	$out = array();
-//	$cmd = 'rfcomm -r connect /dev/'.$rfcomm_name.' '.$mac.' 1 > /dev/null &';
-//	$cmd = 'rfcomm -r bind /dev/'.$rfcomm_name.' '.$mac.' 1 > /dev/null &';
 	$cmd = './bt_expect.exp '.$rfcomm_name.' '.$mac.' > /dev/null &';
 	$cmd = 'id';
-//	pclose(popen("rfcomm -r connect /dev/rfcomm0 20:13:07:18:09:12 > /dev/null &","r"));
 	$out = exec($cmd);
-//	$cmd = "rfcomm connect /dev/".$rfcomm_name." ".$mac." > /dev/null & /dev/null 2> /dev/null &";
-//	proc_open($cmd, array(), $pipes);
 	echo $cmd.'<br>';
-//	$out .= exec("cat /dev/".$rfcomm_name." > serialresp.out");
 	print_r($out);
 }
 
