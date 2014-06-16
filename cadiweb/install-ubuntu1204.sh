@@ -1,9 +1,7 @@
 #!/bin/bash
-# this script "installs" cadiweb on Ubuntu 12.04 LTS system
+# this script installs Cadiweb on Ubuntu 12.04 LTS system
 # http://embeddedprogrammer.blogspot.com.es/2012/06/ubuntu-openingusing-serial-ports-as.html
 # http://embeddedprogrammer.blogspot.com.es/2012/06/ubuntu-hacking-hc-06-bluetooth-module.html
-
-
 
 export DEBIAN_FRONTEND=noninteractive
 
@@ -22,6 +20,9 @@ echo 'changing ownership to www-data for directory /var/www'
 chown www-data:www-data /var/www
 echo 'changing ownership to www-data for directory /var/www/cm'
 chown www-data:www-data /var/www/cm
+
+echo 'backing up cadi_settings file';
+sudo cp -rf /var/www/cm/cadi_settings /tmp
 
 echo 'changing permissions for directory /var/www/cm/btds'
 sudo chmod 777 /var/www/cm/btds
@@ -119,7 +120,8 @@ hciconfig -a
 HCIMAC=$(hciconfig | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
 cd $HCIMAC
 echo -e 'adding PIN codes to /var/lib/bluetooth/'$HCIMAC
-$CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
+CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
+echo 'adding '
 sudo echo -e $CADIMAC' 1234' | sudo tee pincodes
 echo 'pincode 1234 added for device'$CADIMAC
 
@@ -139,6 +141,9 @@ echo 'creating default SVG config file'
 sudo echo '12,100,728,193,9,50,586,393' >> /var/www/cm/svg.conf
 sudo chmod 777 /var/www/cm/svg.conf
 
+echo 'recovering backed up settings file'
+sudo cp -rf /tmp/cadi_settings /var/www/cm/
+sudo chown www-data:www-data /var/www/cm cadi_settings
 
 echo '### IT IS RECOMMENDED TO RESTART COMPUTER TO APPLY CHANGES ###'
 

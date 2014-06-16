@@ -1,5 +1,5 @@
 #!/bin/bash
-# this script "installs" cadiweb on Ubuntu 14.04 LTS system
+# this script installs Cadiweb on Ubuntu 14.04 LTS system
 
 # http://embeddedprogrammer.blogspot.com.es/2012/06/ubuntu-openingusing-serial-ports-as.html
 # http://embeddedprogrammer.blogspot.com.es/2012/06/ubuntu-hacking-hc-06-bluetooth-module.html
@@ -24,20 +24,23 @@ chown www-data:www-data /var/www/html
 echo 'changing ownership to www-data for directory /var/www/html/cm'
 chown www-data:www-data /var/www/html/cm
 
-echo 'changing permissions for directory /var/www/html/cm/btds'
-sudo chmod 777 /var/www/html/cm/btds
+echo 'backing up cadi_settings file';
+sudo cp -rf /var/www/cm/cadi_settings /tmp
 
 echo 'changing ownership for directory /var/www/html/cm/btds'
 sudo chown www-data:www-data /var/www/html/cm/btds
 
+echo 'changing permissions for directory /var/www/html/cm/btds'
+sudo chmod 777 /var/www/html/cm/btds
+
 echo 'creating/flushing /var/www/html/cm/daemon_cmd file (Cadi BT Daemon command log)'
 sudo echo > /var/www/html/cm/daemon_cmd
 
-echo 'changing permissions for file daemon_cmd'
-sudo chmod 777 /var/www/html/cm/daemon_cmd
-
 echo 'changing ownership to www-data for /var/www/html/cm/daemon_cmd'
 sudo chown www-data:www-data /var/www/html/cm/daemon_cmd
+
+echo 'changing permissions for file daemon_cmd'
+sudo chmod 777 /var/www/html/cm/daemon_cmd
 
 echo 'creating/flushing /var/www/html/cm/btds/btd_output file (Cadi BTD output log)'
 sudo echo > /var/www/html/cm/btds/btd_output
@@ -63,11 +66,11 @@ sudo chown www-data:www-data /var/www/html/cm/serialresp.out
 echo 'changing permissions for Cadi serial data dump log file'
 sudo chmod 755 /var/www/html/cm/serialresp.out
 
-echo 'changing permissions for Cadiweb parent directory (/var/www/html)'
-sudo chmod 777 /var/www/html
-
 echo 'changing ownership for Cadi parent directory'
 sudo chown www-data:www-data /var/www/html
+
+echo 'changing permissions for Cadiweb parent directory (/var/www/html)'
+sudo chmod 777 /var/www/html
 
 echo 'changing permissions for all files inside Cadiweb modules files (/var/www/html/cm)'
 cd /var/www/html/cm
@@ -119,12 +122,12 @@ hciconfig -a
 HCIMAC=$(hciconfig | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
 cd $HCIMAC
 echo -e 'adding PIN codes to /var/lib/bluetooth/'$HCIMAC
-$CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
+CADIMAC=$(hcitool scan | grep -o -E '([[:xdigit:]]{1,2}:){5}[[:xdigit:]]{1,2}')
 sudo echo -e $CADIMAC' 1234' | sudo tee pincodes
 echo 'pincode 1234 added for device'$CADIMAC
 
 echo 'generating Cadi BTDaemon startup script (apache 2.4.x specific /var/www/html/ directory used)'
-sudo echo - e '#!/bin/sh\nsleep 10\ncd /var/www/html/cm/\nphp /var/www/html/cm/bt_daemon.php >> btds/btd_output &' > /var/www/html/cm/btds/btd_start.sh
+sudo echo -e '#!/bin/sh\nsleep 10\ncd /var/www/html/cm/\nphp /var/www/html/cm/bt_daemon.php >> btds/btd_output &' > /var/www/html/cm/btds/btd_start.sh
 
 echo 'changing permissions for Cadi BTDaemon startup script (/var/www/html/cm/btds/btd_start.sh)'
 sudo chmod 777 /var/www/html/cm/btds/btd_start.sh
@@ -137,6 +140,10 @@ sudo chmod 777 /var/www/cm/btds/btd.conf
 echo 'creating default SVG config file'
 sudo echo '12,100,728,193,9,50,586,393' >> /var/www/html/cm/svg.conf
 sudo chmod 777 /var/www/html/cm/svg.conf
+
+echo 'recovering backed up settings file'
+sudo cp -rf /tmp/cadi_settings /var/www/cm/
+sudo chown www-data:www-data /var/www/cm cadi_settings
 
 echo '### IT IS RECOMMENDED TO RESTART COMPUTER TO APPLY CHANGES ###'
 
