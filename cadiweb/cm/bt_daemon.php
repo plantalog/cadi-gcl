@@ -118,18 +118,22 @@ while(1){
 				$status_stream_enabled = 0;
 				$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
 				exec($execmd);
+				sleep(1);
 				$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
 				exec($execmd);
+				sleep(1);
 				$execmd = 'wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-ubuntu1204.sh -O /tmp/install.sh';
 				exec($execmd);
 				$execmd = 'chmod 777 /tmp/install.sh';
 				exec($execmd);
-				$execmd = '/tmp/install.sh >> /var/www/cadiweb_update_log &';
+				$execmd = 'echo starting Cadiweb install >> /var/www/cadiweb_update_log';
 				exec($execmd);
+			//	$execmd = '/tmp/install.sh >> /var/www/cadiweb_update_log &';
+			//	exec($execmd);
 				$install_in_progress=1;
 				while ($install_in_progress==1) {
 					$out = array();
-					$execmd = "grep 'IT IS RECOMMENDED TO RESTART COMPUTER' /var/www/cadiweb_install_log";
+					$execmd = "grep 'IT IS RECOMMENDED TO RESTART COMPUTER' /var/www/cadiweb_update_log";
 					exec($execmd, $out);
 					if (sizeof($out)>0) {
 						if( strpos($out[0],"IT IS RECOMMENDED TO RESTART COMPUTER") !== false) {
