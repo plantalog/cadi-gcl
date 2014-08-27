@@ -33,7 +33,7 @@
 //#define USE_MINI_STM32
 #define USE_STM32VL_DISCOVERY
 
-#define STM32_SD_USE_DMA
+// #define STM32_SD_USE_DMA
 
 
 
@@ -117,7 +117,7 @@
  #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_4
 
 
-#elif defined(USE_STM32VL_DISCOVERY)
+#elif defined(USE_STM32VL_DISCOVERY_BAK)
  #define CARD_SUPPLY_SWITCHABLE   0
  #define SOCKET_WP_CONNECTED      0
  #define SOCKET_CP_CONNECTED      0
@@ -136,8 +136,42 @@
  #define RCC_APBPeriphClockCmd_SPI_SD  RCC_APB2PeriphClockCmd
  #define RCC_APBPeriph_SPI_SD     RCC_APB2Periph_SPI1
  /* - for SPI1 and full-speed APB2: 72MHz/4 */
-#define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_4
-// #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_256
+ #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_4
+ // #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_256
+
+#elif defined(USE_STM32VL_DISCOVERY)
+ // Olimex STM32-P103 not tested!
+ #define CARD_SUPPLY_SWITCHABLE   0
+ #define SOCKET_WP_CONNECTED      1 /* write-protect socket-switch */
+ #define SOCKET_CP_CONNECTED      1 /* card-present socket-switch */
+ #define GPIO_WP                  GPIOC
+ #define GPIO_CP                  GPIOC
+ #define RCC_APBxPeriph_GPIO_WP   RCC_APB2Periph_GPIOC
+ #define RCC_APBxPeriph_GPIO_CP   RCC_APB2Periph_GPIOC
+ #define GPIO_Pin_WP              GPIO_Pin_6
+ #define GPIO_Pin_CP              GPIO_Pin_7
+ #define GPIO_Mode_WP             GPIO_Mode_IN_FLOATING /* external resistor */
+ #define GPIO_Mode_CP             GPIO_Mode_IN_FLOATING /* external resistor */
+ #define SPI_SD                   SPI2
+ #define GPIO_CS                  GPIOB
+ #define RCC_APB2Periph_GPIO_CS   RCC_APB2Periph_GPIOB
+ #define GPIO_Pin_CS              GPIO_Pin_12
+ #define DMA_Channel_SPI_SD_RX    DMA1_Channel4
+ #define DMA_Channel_SPI_SD_TX    DMA1_Channel5
+ #define DMA_FLAG_SPI_SD_TC_RX    DMA1_FLAG_TC4
+ #define DMA_FLAG_SPI_SD_TC_TX    DMA1_FLAG_TC5
+ #define GPIO_SPI_SD              GPIOB
+ #define GPIO_Pin_SPI_SD_SCK      GPIO_Pin_13
+ #define GPIO_Pin_SPI_SD_MISO     GPIO_Pin_14
+ #define GPIO_Pin_SPI_SD_MOSI     GPIO_Pin_15
+ #define RCC_APBPeriphClockCmd_SPI_SD  RCC_APB1PeriphClockCmd
+ #define RCC_APBPeriph_SPI_SD     RCC_APB1Periph_SPI2
+ /* for SPI2 and full-speed APB1: 36MHz/2 */
+ /* !! PRESCALE 4 used here - 2 does not work, maybe because
+       of the poor wiring on the HELI_V1 prototype hardware */
+ #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_4
+
+
 #else
 #error "unsupported board"
 #endif
@@ -501,7 +535,7 @@ void stm32_dma_transfer(
 /*-----------------------------------------------------------------------*/
 // remapped SPI init for PB3-PB5 and PA15
 static
-void power_on(void)
+void power_on_bak(void)
 {
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;//Ã�Â²Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ Ã�Â°Ã�Â»Ã‘Å’Ã‘â€šÃ�ÂµÃ‘â‚¬Ã�Â½Ã�Â°Ã‘â€šÃ�Â¸Ã�Â²Ã�Â½Ã‘â€¹Ã‘â€¦ Ã‘â€žÃ‘Æ’Ã�Â½Ã�ÂºÃ‘â€ Ã�Â¸Ã�Â¹
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;//Ã�Â²Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ Ã�Â¿Ã�Â¾Ã‘â‚¬Ã‘â€šÃ�Â° Ã�ï¿½
@@ -548,7 +582,7 @@ void power_on(void)
 
 
 // Thomas SPI INIT
-/* static void power_on2(void)
+ static void power_on2(void)
 {
 	SPI_InitTypeDef  SPI_InitStructure;
 	GPIO_InitTypeDef GPIO_InitStructure;
@@ -623,7 +657,62 @@ void power_on(void)
 
 
 }
-*/
+
+
+/*-----------------------------------------------------------------------*/
+/* Power Control and interface-initialization (Platform dependent)       */
+/*-----------------------------------------------------------------------*/
+// remapped SPI init for PB3-PB5 and PA15
+
+static
+void power_on(void)
+{
+	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;//Ã�Â²Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ Ã�Â°Ã�Â»Ã‘Å’Ã‘â€šÃ�ÂµÃ‘â‚¬Ã�Â½Ã�Â°Ã‘â€šÃ�Â¸Ã�Â²Ã�Â½Ã‘â€¹Ã‘â€¦ Ã‘â€žÃ‘Æ’Ã�Â½Ã�ÂºÃ‘â€ Ã�Â¸Ã�Â¹
+	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN;
+	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;//Ã�Â²Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ Ã�Â¿Ã�Â¾Ã‘â‚¬Ã‘â€šÃ�Â° Ã�ï¿½
+//	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;//Ã�Â²Ã�ÂºÃ�Â»Ã‘Å½Ã‘â€¡Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ Ã�Â¿Ã�Â¾Ã‘â‚¬Ã‘â€šÃ�Â° b
+
+//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
+//	GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);
+
+	// MOSI
+	GPIOB->CRH |= GPIO_CRH_MODE15; //
+	GPIOB->CRH &= ~GPIO_CRH_CNF15; //
+	GPIOB->BSRR = GPIO_BSRR_BS15; //
+
+	// MISO
+	GPIOB->CRH |= GPIO_CRH_MODE14; //
+	GPIOB->CRH &= ~GPIO_CRH_CNF14; //
+	GPIOB->CRH |= GPIO_CRH_CNF14_1; //
+	GPIOB->BSRR = GPIO_BSRR_BS14;
+
+	// SCK
+	GPIOB->CRH &= ~GPIO_CRH_MODE13; //
+	GPIOB->CRH &= ~GPIO_CRH_CNF13; //
+	GPIOB->CRH |= GPIO_CRH_CNF13_1; //
+//	GPIOB->BSRR = GPIO_BSRR_BS4; //
+
+	// NSS
+	GPIOB->CRH |= GPIO_CRH_MODE12; //
+	GPIOB->CRH &= ~GPIO_CRH_CNF12; //
+	GPIOB->CRH |= GPIO_CRH_CNF12_1; //
+
+	//Ã�Â½Ã�Â°Ã‘ï¿½Ã‘â€šÃ‘â‚¬Ã�Â¾Ã�Â¸Ã‘â€šÃ‘Å’ Ã�Â¼Ã�Â¾Ã�Â´Ã‘Æ’Ã�Â»Ã‘Å’ SPI
+	RCC->APB1ENR |= RCC_APB1ENR_SPI2EN; //Ã�Â¿Ã�Â¾Ã�Â´Ã�Â°Ã‘â€šÃ‘Å’ Ã‘â€šÃ�Â°Ã�ÂºÃ‘â€šÃ�Â¸Ã‘â‚¬Ã�Â¾Ã�Â²Ã�Â°Ã�Â½Ã�Â¸Ã�Âµ
+	SPI2->CR2 = 0x0000; //
+	SPI2->CR1 = SPI_CR1_MSTR; //Ã�ÂºÃ�Â¾Ã�Â½Ã‘â€šÃ‘â‚¬Ã�Â¾Ã�Â»Ã�Â»Ã�ÂµÃ‘â‚¬ Ã�Â´Ã�Â¾Ã�Â»Ã�Â¶Ã�ÂµÃ�Â½ Ã�Â±Ã‘â€¹Ã‘â€šÃ‘Å’ Ã�Â¼Ã�Â°Ã‘ï¿½Ã‘â€šÃ�ÂµÃ‘â‚¬Ã�Â¾Ã�Â¼,Ã�ÂºÃ�Â¾Ã�Â½Ã�ÂµÃ‘â€¡Ã�Â½Ã�Â¾
+	SPI2->CR1 |= SPI_CR1_BR; //Ã�Â´Ã�Â»Ã‘ï¿½ Ã�Â½Ã�Â°Ã‘â€¡Ã�Â°Ã�Â»Ã�Â° Ã�Â·Ã�Â°Ã�Â´Ã�Â°Ã�Â´Ã�Â¸Ã�Â¼ Ã�Â¼Ã�Â°Ã�Â»Ã�ÂµÃ�Â½Ã‘Å’Ã�ÂºÃ‘Æ’Ã‘Å½ Ã‘ï¿½Ã�ÂºÃ�Â¾Ã‘â‚¬Ã�Â¾Ã‘ï¿½Ã‘â€šÃ‘Å’
+	SPI2->CR1 |= SPI_CR1_SSI;
+	SPI2->CR1 |= SPI_CR1_SSM;
+	SPI2->CR1 |= SPI_CR1_SPE; //Ã‘â‚¬Ã�Â°Ã�Â·Ã‘â‚¬Ã�ÂµÃ‘Ë†Ã�Â¸Ã‘â€šÃ‘Å’ Ã‘â‚¬Ã�Â°Ã�Â±Ã�Â¾Ã‘â€šÃ‘Æ’ Ã�Â¼Ã�Â¾Ã�Â´Ã‘Æ’Ã�Â»Ã‘ï¿½ SPI
+
+#ifdef STM32_SD_USE_DMA
+	// enable DMA clock
+	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
+#endif
+}
+
+
 
 
 /*

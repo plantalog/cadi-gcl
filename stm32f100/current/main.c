@@ -276,7 +276,7 @@ typedef struct
 } RTC_DateTime;
 
 RTC_Time toAdjust;
-uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
+uint8_t auto_flags=0;	// enable all except the 0 bit - psi stab
 uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS
 
@@ -298,7 +298,7 @@ uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plu
 // DRIVER: SD-card on SPI interface with FatFS
 #define USE_SD
 #ifdef USE_SD
-	int no_sd;
+	int no_sd=1;
 	FATFS   fs;       // file system variable to mount SD card
 	uint16_t logInterval=0;
 #endif
@@ -903,8 +903,29 @@ void USART1_IRQHandler(void)
 				pb_pntr=0;			// packet buffer pointer to 0
 
 			}
+		}
+		if (rxm_state==RXM_SET) {
+				if (pb_pntr==0) {	// if packet buffer pointer is 0, it points to payload size (payload, including this size byte)
+					packet_length=RxByte;	// get packet length
+				}
+				cmdbuf[pb_pntr++]=RxByte;	// receive byte into cmd buffer and increase command packet buffer pointer
+				if (pb_pntr==packet_length) {	// if packet buffer pointer reached packet length (rely on RXM_NONE set later)
+					// crc count
+					rx_packet_crc = crc_block(48, &cmdbuf[0],packet_length);	// 48 is XOR of "ZX2"
+					// crc check
+					if (rx_packet_crc==0) {
+						packet_ready=1;	// packet received correctly and is ready to process
+					}
+					else {
+						rx_flush();	// discard broken packet
+					}
+					rxm_state=RXM_NONE; // RX machine state set to NONE, completes RX cycle
+					pb_pntr=0;			// packet buffer pointer to 0
+
+				}
 
 		}
+
 
 
 		if (RxByte==90) {
@@ -933,11 +954,24 @@ void USART1_IRQHandler(void)
 	}
 }
 
+void save_settings(void){	// wrapper for rx_ee, simplifies settings packet receiving
+	if (cmdbuf[0]==5) {		// 16 bit (5: size(1b), addr(2b), data(2b))
+		rx_ee((cmdbuf[2]&(cmdbuf[3]<<8)), 1);
+	}
+	if (cmdbuf[0]==7) {		// 32 bit (7: size(1b), addr(2b), data(4b))
+		rx_ee((cmdbuf[2]&(cmdbuf[3]<<8)), 2);
+	}
+}
+
 static void uart_task(void *pvParameters){
 	while (1) {
 		if (packet_ready==1) {
-
-			run_uart_cmd();	// when
+			if (rxm_state == RXM_CMD) {
+				run_uart_cmd();	// when
+			}
+			if (rxm_state == RXM_SET) {
+				save_settings();
+			}
 			packet_ready=0;
 		}
 		vTaskDelay(10);
@@ -1108,7 +1142,8 @@ void send_ee_addr(uint16_t addr, uint8_t type){	// sends EEPROM cell contents vi
 		TxBuffer[8] = (uint8_t)((val32>>16)&0xFF);
 		TxBuffer[9] = (uint8_t)((val32>>24)&0xFF);
 	}
-	TxBuffer[39] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
+//	TxBuffer[39] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
+	TxBuffer[(TxBuffer[3]-1)] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
 	txbuff_ne = 1;
@@ -2725,7 +2760,7 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 
 }
 
-#define MAX_SONAR_READ	200				// drop wrong reads
+#define MAX_SONAR_READ	400				// drop wrong reads
 void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 {
   /* Clear TIM16 Capture compare interrupt pending bit */
@@ -3370,6 +3405,15 @@ void Delay_us(uint32_t delay){
 } */
 
 void buttonCalibration(void){	// buttons calibration function
+	Lcd_clear();
+	Lcd_goto(0,0);
+	Lcd_write_arr("no_sd=",5);
+	no_sd+=48;
+	Lcd_write_arr(no_sd,1);
+	run_valve_motor(0);
+	run_valve_motor(1);
+	Delay_us(100000);
+
 	uint16_t button_val[4], diff;
 	Lcd_clear();
 	Lcd_goto(0,0);
@@ -3726,7 +3770,7 @@ static void sdLog(void *pvParameters){	// store current device data into log
 			vTaskDelay(2);
 		}//
 		vTaskDelay(2);
-		dht_get_data();
+//		dht_get_data();
 		tankLevelStab();
 		autoSafe();
 		sonar_ping();
@@ -3740,7 +3784,7 @@ FRESULT string2log(char* str, int bytes){
 	if (no_sd==0) {
 		  static FIL logfile;
 		  UINT len;
-		  char FileName[]="0:CADIZLOG";
+		  char FileName[]="0:CADILOG";
 	//	  logfile = malloc(sizeof (FIL));
 	//      taskENTER_CRITICAL();
 		  vTaskSuspendAll();
@@ -5693,15 +5737,13 @@ int main(void)
 	/* EEPROM Init */
 	EE_Init();
 	AdcInit();
-	dht_init();
+//	dht_init();
 	RtcInit();		//init real time clock
 
 	DSTATUS resp=0;		// variable for status response from sd card init function
-	no_sd = disk_initialize(0);		// init card
-	if (no_sd==0){
-		no_sd = f_mount(0, &fs);
-		no_sd = string2log("System started\n", 15);
-	}
+//	no_sd = disk_initialize(0);		// init card
+//	no_sd=1;
+
 
 
 #ifndef PAPA_EDITION
@@ -5722,10 +5764,14 @@ int main(void)
 #ifdef USE_VALVES
 	valve_feedback_init();
 #endif
-
+//	no_sd = disk_initialize(0);
 	buttonCalibration();
 
 	Lcd_clear();
+//	if (no_sd==0){
+//		no_sd = f_mount(0, &fs);
+//		no_sd = string2log("System started\n", 15);
+//	}
 
 	// setup gpio for load triggering and led indication
 	// reinit valves HARDCODE
