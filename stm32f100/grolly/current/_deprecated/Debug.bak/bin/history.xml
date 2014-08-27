@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -O0 -nostartfiles -Map=hellow4.map -mcpu=cortex-m3 -mthumb -LD:\hw\coocox_projects\hellow4 --gc-sections -TD:\hw\coocox_projects\hellow4\link.ld -g">
+      <target file="hellow4.elf" lastModified="13bb584cc15">
+         <source file="..\obj\startup_stm32f10x_md_vl.o" lastModified="13b8b93ba93"/>
+         <source file="..\obj\core_cm3.o" lastModified="13b8b93bdae"/>
+         <source file="..\obj\system_stm32f10x.o" lastModified="13b8b93c070"/>
+         <source file="..\obj\diskio.o" lastModified="13ba1af108b"/>
+         <source file="..\obj\stm32f10x_gpio.o" lastModified="13b8b93c2bc"/>
+         <source file="..\obj\main.o" lastModified="13bb584c6d7"/>
+         <source file="..\obj\timers.o" lastModified="13ba26b484f"/>
+         <source file="..\obj\stm32f10x_rcc.o" lastModified="13b8b93e007"/>
+         <source file="..\obj\tasks.o" lastModified="13ba26b4f51"/>
+         <source file="..\obj\stm32f10x_adc.o" lastModified="13b8b93f06f"/>
+         <source file="..\obj\list.o" lastModified="13ba26b520f"/>
+         <source file="..\obj\syscalls.o" lastModified="13b8b93f5ab"/>
+         <source file="..\obj\stm32f10x_flash.o" lastModified="13b8b93f8ab"/>
+         <source file="..\obj\queue.o" lastModified="13ba26b5402"/>
+         <source file="..\obj\port.o" lastModified="13ba26b54dd"/>
+         <source file="..\obj\ff.o" lastModified="13ba1a5e7a3"/>
+         <source file="..\obj\stm32f10x_dma.o" lastModified="13ba1ad50e9"/>
+         <source file="..\obj\croutine.o" lastModified="13ba26b5605"/>
+         <source file="..\obj\stm32f10x_spi.o" lastModified="13b8be86b74"/>
+         <source file="..\obj\heap_2.o" lastModified="13ba26b56df"/>
+         <source file="..\obj\eeprom.o" lastModified="13b8b940c17"/>
+      </target>
+   </processor>
+</history>
