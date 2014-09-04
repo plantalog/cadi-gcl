@@ -1,8 +1,9 @@
 <?php
 
+include('btd_cadi_settings_processor.php');
+
 echo "Bluetooth daemon for Cadi started";
 $btd_cmd_file = 'daemon_cmd';
-
 // initial Cadi BTDaemon settings load
 file_put_contents($btd_cmd_file,'reload_settings,');
 $respfs = 0;
@@ -11,6 +12,19 @@ $cycle_counter = 0;
 $video = 0;
 $status_stream_enabled=0;		// shows if status stream enabled
 $tank = '';
+$packet_id = 1;
+$repeat_last_cmd = 0;
+
+// create cadi settings dump file if not exist
+	if (!file_exists('cadi_settings_dump')) {
+		define('SIZE',2000); // size of the file to be created.
+		$fp = fopen('cadi_settings_dump', 'w'); // open in write mode.
+		echo PHP_EOL."Creating dump file".PHP_EOL;
+		fseek($fp, 1999,0); //
+		fwrite($fp,'X'); // write data
+		fclose($fp); // close the file
+	}		
+
 
 // load SVG display settings
 	if (($handle = fopen("btds/svg_layer.conf", "r")) !== FALSE) {
@@ -60,125 +74,156 @@ print_r($tank);
 
 while(1){
 	$cycle_counter++;
-	$command = file_get_contents($btd_cmd_file);
-	unset($execmd);
-	if(!empty($command)){
-		$cmd_arr = explode(",", $command);
-		print_r($cmd_arr);
-		echo '('.date(DATE_RFC2822).') Got CMD ';
-		file_put_contents($btd_cmd_file,'');
-		switch ($cmd_arr[0]) {
-			case 'bind':
-				$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
-				exec($execmd);
-				$execmd = 'ln -s /dev/'.$cmd_arr[1].' /dev/cadi';
-				break;
-			case 'disconnect':
-				$execmd = "'kill -9 $(pidof rfcomm)'";
-				break;
-			case 'stream':
-	//			$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
-	//			exec($execmd);
-				$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
-				$respfs = 0;
-				break;
-			case 'release':
-				$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
-				exec($execmd);
-				$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
-				exec($execmd);
-				break;
-			case 'kill':
-				$execmd = "'kill -9 $(pidof rfcomm)'";
-				break;
-			case 'restart':
-				$execmd = "'./bt_restart.sh'";
-				break;
-			case 'change_video':
-				$execmd = "echo";
-				$video=$cmd_arr[1];
-				break;
-			case 'tx':		// send packet
-				if ($status_stream_enabled==1) {
-					$ping_delay = 10;
-					usleep($csd_value*$sppd_value);
-				}
-				$execmd = "/bin/echo -e '".$cmd_arr[2]."' >> /dev/".$cmd_arr[1];
-			break;
-			case 'reboot':
-				$execmd = "reboot now";
-			//	echo $execmd;
-				break;
-			case 'stream_status':
-				echo 'Going to stream status locally';
-				$status_stream_enabled = $cmd_arr[1];
-				break;
-			case 'cadiweb_update':
-				echo 'Going to upgrade to latest Cadiweb version';
-				$status_stream_enabled = 0;
-				$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
-				exec($execmd);
-				sleep(1);
-				$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
-				exec($execmd);
-				sleep(1);
-				$execmd = 'wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-ubuntu1204.sh -O /tmp/install.sh';
-				exec($execmd);
-				$execmd = 'chmod 777 /tmp/install.sh';
-				exec($execmd);
-				$execmd = 'echo starting Cadiweb install >> /var/www/cadiweb_update_log';
-				exec($execmd);
-			//	$execmd = '/tmp/install.sh >> /var/www/cadiweb_update_log &';
-			//	exec($execmd);
-				$install_in_progress=1;
-				while ($install_in_progress==1) {
-					$out = array();
-					$execmd = "grep 'IT IS RECOMMENDED TO RESTART COMPUTER' /var/www/cadiweb_update_log";
-					exec($execmd, $out);
-					if (sizeof($out)>0) {
-						if( strpos($out[0],"IT IS RECOMMENDED TO RESTART COMPUTER") !== false) {
-							$install_in_progress=0;
-	    					}
-					}
-				}
-				$execmd = 'date';
-				exec($execmd);
-				echo 'CADIWEB UPDATE DONE'.PHP_EOL;
-
-				break;
-			case 'reload_settings':	// read settings file fetching the daemon settings
-				echo PHP_EOL.' reloading Cadi BTDaemon settings'.PHP_EOL;
-				if (($handle = fopen("btds/btd.conf", "r")) !== FALSE) {
-				    	$data = fgetcsv($handle, 1000, ",");
-				    	$csd_value = $data[1];
-				    	$photo_divider  = $data[0];
-				    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
-				    	$srtrs_value  = $data[5];	// Serial response tail read size
-					$sppd_value = $data[6];	// Status packet ping divider
-					if (!($srtrs_value<40 && $srtrs_value>1000)) {
-						$srtrs_value = 100;	// force default size if not in range [40..1000] bytes
-					}
-					echo PHP_EOL.' new CSD value ='.$csd_value;
-					echo PHP_EOL.' new Photoshot divider value ='.$photo_divider.PHP_EOL;
-					echo PHP_EOL.' new FileSizeDifference value ='.$fsd_value.PHP_EOL;
-					echo PHP_EOL.' new Serial response tail read size value ='.$srtrs_value.PHP_EOL;
-					echo PHP_EOL.' new Status packet ping divider ='.$sppd_value.PHP_EOL;
-				    fclose($handle);
-				}
-				else {
-					echo PHP_EOL.'WARNING: btds/btd.conf not found!'.PHP_EOL;
-					// using default values
-					$photo_divider = 80;
-					$csd_value = 25000;
-					$sppd_value = 80;
-					$srtrs = 10;
-				}
-				$execmd = "echo";
-				break;
-		}
-
-		echo $execmd.PHP_EOL;
+	if ($repeat_last_cmd>0) {		// repeat last cmd if no confirmation got
 		exec($execmd);
+		echo PHP_EOL.'$$$$$$$   Repeating packet:'.$execmd.PHP_EOL;
+		$repeat_last_cmd--;
+	}
+	else {						// or continue main loop
+		$command = file_get_contents($btd_cmd_file);
+		unset($execmd);
+		if(!empty($command)){
+			$cmd_arr = explode(",", $command);
+			print_r($cmd_arr);
+			echo '('.date(DATE_RFC2822).') Got CMD ';
+			file_put_contents($btd_cmd_file,'');
+			switch ($cmd_arr[0]) {
+				case 'bind':
+					$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
+					exec($execmd);
+					$execmd = 'ln -s /dev/'.$cmd_arr[1].' /dev/cadi';
+					break;
+				case 'disconnect':
+					$execmd = "'kill -9 $(pidof rfcomm)'";
+					break;
+				case 'stream':
+		//			$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
+		//			exec($execmd);
+					$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
+					$respfs = 0;
+					break;
+				case 'release':
+					$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
+					exec($execmd);
+					$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
+					exec($execmd);
+					break;
+				case 'kill':
+					$execmd = "'kill -9 $(pidof rfcomm)'";
+					break;
+				case 'restart':
+					$execmd = "'./bt_restart.sh'";
+					break;
+				case 'change_video':
+					$execmd = "echo";
+					$video=$cmd_arr[1];
+					break;
+				case 'tx':		// send packet
+					if ($status_stream_enabled==1) {
+						$ping_delay = 10;
+						usleep($csd_value*$sppd_value);
+					}
+					$packet = $cmd_arr[2];
+					$part1 = substr($packet, 0, (sizeof($packet)-5));
+					$part2 = sprintf("\\x%02x",$packet_id);
+					$part3 = substr($packet, -4);
+					$packet = $part1.$part2.$part3.$part3;
+				//	$packet .=$packet;
+					//$packet .= sprintf("\\x%02x",ord($packet_id++));	// add Packet ID, that Cadi sends back as execution confirmation
+					$execmd = "/bin/echo -e '".$packet."' >> /dev/".$cmd_arr[1];
+					echo PHP_EOL.'### Pckt: '.$packet.' ###'.PHP_EOL;	// display packet contents into BTD log
+					if ($packet_id>255){
+						$packet_id=1;
+					}
+					$repeat_last_cmd = 10;	// enable repeater. Disabled within response parser
+				break;
+				case 'reboot':
+					$execmd = "reboot now";
+				//	echo $execmd;
+					break;
+				case 'dl_cadi_settings':
+					dl_cadi_settings();
+				//	$execmd = "reboot now";
+				//	echo $execmd;
+					break;
+				case 'ul_cadi_settings':
+					ul_cadi_settings();
+				//	$execmd = "reboot now";
+				//	echo $execmd;
+					break;
+				case 'stream_status':
+					echo 'Going to stream status locally';
+					$status_stream_enabled = $cmd_arr[1];
+					break;
+				case 'cadiweb_update':
+					echo 'Going to upgrade to latest Cadiweb version';
+					$status_stream_enabled = 0;
+					$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
+					exec($execmd);
+					sleep(1);
+					$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
+					exec($execmd);
+					sleep(1);
+					$execmd = 'wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-ubuntu1204.sh -O /tmp/install.sh';
+					exec($execmd);
+					$execmd = 'chmod 777 /tmp/install.sh';
+					exec($execmd);
+					$execmd = 'echo starting Cadiweb install >> /var/www/cadiweb_update_log';
+					exec($execmd);
+				//	$execmd = '/tmp/install.sh >> /var/www/cadiweb_update_log &';
+				//	exec($execmd);
+					$install_in_progress=1;
+					while ($install_in_progress==1) {
+						$out = array();
+						$execmd = "grep 'IT IS RECOMMENDED TO RESTART COMPUTER' /var/www/cadiweb_update_log";
+						exec($execmd, $out);
+						if (sizeof($out)>0) {
+							if( strpos($out[0],"IT IS RECOMMENDED TO RESTART COMPUTER") !== false) {
+								$install_in_progress=0;
+		    					}
+						}
+					}
+					$execmd = 'date';
+					exec($execmd);
+					echo 'CADIWEB UPDATE DONE'.PHP_EOL;
+
+					break;
+				case 'reload_settings':	// read settings file fetching the daemon settings
+					echo PHP_EOL.' reloading Cadi BTDaemon settings'.PHP_EOL;
+					if (($handle = fopen("btds/btd.conf", "r")) !== FALSE) {
+					    	$data = fgetcsv($handle, 1000, ",");
+					    	$csd_value = $data[1];
+					    	$photo_divider  = $data[0];
+					    	$fsd_value  = $data[2];	// File Size Difference in bytes to start parsing
+					    	$srtrs_value  = $data[5];	// Serial response tail read size
+						$sppd_value = $data[6];	// Status packet ping divider
+						$settings_filesize = $data[7];	// File settings dump file size
+						$settings_startaddr = $data[8];	// Settings start address
+						if (!($srtrs_value<40 && $srtrs_value>1000)) {
+							$srtrs_value = 100;	// force default size if not in range [40..1000] bytes
+						}
+						echo PHP_EOL.' new CSD value ='.$csd_value;
+						echo PHP_EOL.' new Photoshot divider value ='.$photo_divider.PHP_EOL;
+						echo PHP_EOL.' new FileSizeDifference value ='.$fsd_value.PHP_EOL;
+						echo PHP_EOL.' new Serial response tail read size value ='.$srtrs_value.PHP_EOL;
+						echo PHP_EOL.' new Status packet ping divider ='.$sppd_value.PHP_EOL;
+					    fclose($handle);
+					}
+					else {
+						echo PHP_EOL.'WARNING: btds/btd.conf not found!'.PHP_EOL;
+						// using default values
+						$photo_divider = 80;
+						$csd_value = 25000;
+						$sppd_value = 80;
+						$srtrs = 10;
+					}
+					$execmd = "echo";
+					break;
+			}
+
+			echo $execmd.PHP_EOL;
+			exec($execmd);
+		}
 	}
 
 	usleep($csd_value);
@@ -191,14 +236,14 @@ while(1){
 	$curespfs = filesize('serialresp.out');	// current response file size
 	clearstatcache();				// refresh file size
 
-	if ($curespfs>($respfs+$fsd_value)) {	// compare new and old values if they match. if not, file changed (35 for minimum file difference)
+	if ($curespfs>($respfs+$fsd_value)) {	// compare new and old values if they match. if not, file changed (35B for minimum file difference)
 		$respfs = $curespfs;		// update old file size value
 		parse_response($srtrs_value);		// parse response if change detected
 	}
 
 	if ($cycle_counter%$sppd_value==0 && $ping_delay==0 && $status_stream_enabled==1) {
 		echo '#CadiBTD# Cadi, Ping!'.PHP_EOL;
-		$ping_packet = "\x5a\x58\x32\x04\x07\x01\x32\x00";
+		$ping_packet = "\x5a\x58\x32\x04\x33\x01\x06\x00";
 		$command = "/bin/echo -e '";
 		for ($i=0; $i<strlen($ping_packet);$i++) {
 			$command .= sprintf("\\x%02x",ord($ping_packet[$i]));
@@ -216,11 +261,47 @@ while(1){
 //	exec('streamer -f jpeg -o ../img/curimage.jpeg');
 }
 
+function dump_settings_block($addr, $block_data){
+	global $settings_startaddr;
+	$curfsize = filesize('cadi_settings_dump');	// current response file size
+	clearstatcache();				// refresh file size
+	$fp = fopen('cadi_settings_dump', 'rb'); // open in binary read mode.
+	fseek($fp, 0,0); //point to file start
+	$settings_dump = array();
+	$settings_dump = fread($fp,$curfsize); // read settings dump data
+	fclose($fp); // close the file
+	$settings_hex = '';
+	for ($i=0; $i<strlen($block_data);$i++) {
+		$settings_hex .= sprintf("\\x%02x",ord($block_data[$i]));
+	}
+	echo PHP_EOL."Writing settings data into cadi_settings_dump2 dump file: ".$settings_hex.PHP_EOL;
+	$offset = ($addr - $settings_startaddr)*2;	// multiplied by 2 because each value should have 16 bit to store.
+	echo PHP_EOL."at offset: ".$offset.PHP_EOL;
+	for ($i=0; $i<strlen($block_data);$i++) {
+		$settings_dump[($offset+$i)] = $block_data[$i];
+	}
+
+	// print settings file dump hex representation into BTD log
+	for ($i=0; $i<strlen($settings_dump);$i++) {
+		if (($i%10)==0) {
+			$settings_file_hex .= PHP_EOL;
+			$settings_file_hex .= ' '.($i/10).' ';
+		}
+		$settings_file_hex .= sprintf("\\x%02x",ord($settings_dump[$i]));
+	}
+	echo PHP_EOL."settings file hex (first byte has STM32 EEPROM address ".$settings_startaddr."): ".PHP_EOL.$settings_file_hex.PHP_EOL;
+	// recreate dump file, now updated
+	$fp = fopen('cadi_settings_dump', 'w');
+	fwrite($fp, $settings_dump);
+	fclose($fp); // close the file
+}
+
 function parse_response($srtrs){
+	global $packet_id, $repeat_last_cmd, $execmd, $settings_filesize, $settings_startaddr;
 	echo PHP_EOL.'Trying parse response'.PHP_EOL;
 	// create file pointer
 	$fp = fopen('serialresp.out', 'rb');
-	fseek($fp, ($srtrs*(-1)), SEEK_END); // It needs to be negative to seek from the file end
+	fseek($fp, ($srtrs*(-1)), SEEK_END); // It needs to be negative (*(-1)) to seek from the file end
 	$data = fread($fp, $srtrs);
 	fclose($fp);
 
@@ -242,16 +323,38 @@ function parse_response($srtrs){
 
 
 	$packet_type = $last_packet[0];
-
 	$packet_size = ord($last_packet[1]);
+
+	echo "Packet type = ".$packet_types.PHP_EOL;
 
 	for ($i=0; $i<strlen($last_packet); $i++) {
 		echo $last_packet[$i];
 	}
 
-	if ($packet_type==3 && strlen($last_packet)>37) {
-		echo "PacketT=3">PHP_EOL;
-		echo "LastPacket length>37">PHP_EOL;
+	
+
+	if ($packet_type==1 ) {		// parsing Cadi settings
+		$block_addr = ord($last_packet[2])+ord($last_packet[3])*256;		// block address
+		$block_size = 32;
+		$crc = ord($last_packet[($packet_size-3)]);
+		$block_data = substr($last_packet,4,32);
+		dump_settings_block($block_addr, $block_data);		
+	}
+
+	if ($packet_type==7) {		// parsing Cadi command execution confirmation response
+		$cmd_uid = ord($last_packet[2]);				// relative block_id (incoming blocks are 16vars long, outgoing are 3vars)
+		echo '### EXTRACTED CMD UID '.$cmd_uid.'###'.PHP_EOL;
+		if ($packet_id == $cmd_uid) {
+			$packet_id++;
+			unset($execmd);
+			$repeat_last_cmd = 0;
+			echo PHP_EOL.'%%%%%%%  Command '.$cmd_uid.' executed successfully!!!'.PHP_EOL;
+		}
+	}
+
+	if ($packet_type==3 && strlen($last_packet)>37) {		// parsing Cadi status
+		echo "PacketT=3".PHP_EOL;
+		echo "LastPacket length>37".PHP_EOL;
 		// STATUS data provider
 		print_r($last_packet);
 		$block_id = ord($last_packet[36]);
@@ -304,6 +407,7 @@ function parse_response($srtrs){
 				$statarr['comm_state'] = ord($last_packet[2]);
 				$statarr['auto_flags'] = ord($last_packet[33]);
 
+				// prepare array for CSV
 				$tofile[0] = $cadi_time;
 				$tofile[1] = $statarr['dht']['temp'];
 				$tofile[2] = $statarr['dht']['rh'];
@@ -328,7 +432,7 @@ function parse_response($srtrs){
 				file_put_contents('cadi_status.csv', '');
 				file_put_contents('cadi_status.csv',$csv_string);
 
-				$statstr = 'PHP time: '.date("Y-m-d H:i:s", time()).'
+/*				$statstr = 'PHP time: '.date("Y-m-d H:i:s", time()).'
 					<table>
 					<tr>
 						<td>Cadi Time</td>
@@ -387,7 +491,7 @@ function parse_response($srtrs){
 			$statstr = build_svg($statarr);
 	//		echo "STARTSRT".$statstr.PHP_EOL;
 			file_put_contents('status_view_2.php', '');
-			file_put_contents('status_view_2.php',$statstr);
+			file_put_contents('status_view_2.php',$statstr); */
 
 			}
 			else {

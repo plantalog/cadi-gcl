@@ -18,13 +18,51 @@ switch ($packet_type) {
 		// screening
 	break;
 	case 1:
-		// settings
+		// settings extractor and dumper into local Cadi settings binary file
+		/*	"ZX1"(3)+[packet_size(1)]+[block_id(1)]+[data(packet_size-3)]+[CRC(1)]
+			
+		*/
+		$block_id = ord($last_packet[2]);
+		for ($i=0;$i<$_SESSION['csblksize'];$i++) {
+			$cs_block_data[$i] = $last_packet[($i+3)];		// !!!!!!!!!!weak place?!!!!!!!!!!
+		} 
+	
+		// Let's make sure the file exists and is writable first.
+		if (is_writable($_SESSION['csbin_filename'])) {
+
+		    // In our example we're opening $filename in append mode.
+		    // The file pointer is at the bottom of the file hence
+		    // that's where $somecontent will go when we fwrite() it.
+		    if (!$handle = fopen($_SESSION['csbin_filename'], 'a')) {
+			 echo "Cannot open file (".$_SESSION['csbin_filename'].")";
+			 exit;
+		    }
+
+			// seek to certain binary file position where block will be written
+		    fseek($fp, ($block_id*$_SESSION['csblksize']));
+
+		    // Write $somecontent to our opened file.
+		    if (fwrite($handle, $cs_block_data) === FALSE) {
+			echo "Cannot write to file (".$_SESSION['csbin_filename'].")";
+			exit;
+		    }
+
+		    echo "Success, wrote (".$cs_block_data[$i].") to file (".$_SESSION['csbin_filename'].")";
+
+		    fclose($handle);
+
+		} else {
+		    echo "The file ".$_SESSION['csbin_filename']." is not writable";
+		}
+		
+		$crc = ord($last_packet[($packet_size-3)]);
+		$counted_crc = crc_block(2, $last_packet, ($packet_size-3));	// 90 xor 88 = 2
 	break;
 	case 2:
 		// command
 	break;
 	case 3:
-		// STATUS data provider
+		// STATUS data provider. Cadi status data packets extractor
 		$block_id = ord($last_packet[36]);
 		echo 'something--separator--';
 		switch ($block_id) {

@@ -11,7 +11,9 @@ function apply_btd_settings(){
 			$("#cadi_set_rpd").val(),
 			$("#cadi_set_cn").val(),
 			$("#cadi_set_srtrs").val(),
-			$("#cadi_set_sppd").val()];
+			$("#cadi_set_sppd").val(),
+			$("#cadi_set_setfs").val(),
+			$("#cadi_set_setsa").val()];
 	settings = arr.join();
 //	alert(arr);
 	$.post('cm/cadi_bt_processor.php', {action: 'btd_apply_settings', settings:settings}, function(data){
@@ -95,6 +97,20 @@ function apply_btd_settings(){
 			title="Send status request packet to Cadi every N iteration of daemon main loop"
 			type="text"
 			value="<?php echo $temparr[6]; ?>" />
+	</li>
+	<li>Settings dump file size, bytes
+		<input
+			id="cadi_set_setfs"
+			title="Daemon prelocates settings dump file to this size"
+			type="text"
+			value="<?php echo $temparr[7]; ?>" />
+	</li>
+	<li>Settings dump start adress (within STM32 memory) offset, bytes
+		<input
+			id="cadi_set_setsa"
+			title="First byte in settings dump file corresponds to this address in Cadi EEPROM memory"
+			type="text"
+			value="<?php echo $temparr[8]; ?>" />
 	</li>
 </ul>
 

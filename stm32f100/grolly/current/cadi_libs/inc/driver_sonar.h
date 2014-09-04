@@ -15,8 +15,8 @@
 #define SONAR_ECHO_PORT			GPIOB
 #endif
 
-uint16_t	sonar_read[SONAR_AMOUNT];	// 2 sonars on pins PA6 and PA7 with trig on PC4
-uint16_t	sonar_mm[SONAR_AMOUNT];
+static uint16_t	sonar_read[SONAR_AMOUNT];	// 2 sonars on pins PA6 and PA7 with trig on PC4
+static uint16_t	sonar_mm[SONAR_AMOUNT];
 #endif
 
 

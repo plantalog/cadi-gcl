@@ -133,12 +133,12 @@ sudo chmod 777 /var/www/cm/btds/btd_start.sh
 
 
 echo 'creating default BTDaemon config file'
-sudo echo '80,25000,37,5,0,150,3' >> /var/www/cm/btds/btd.conf
+sudo echo '80,25000,37,5,0,150,3' > /var/www/cm/btds/btd.conf
 sudo chmod 777 /var/www/cm/btds/btd.conf
 # hcitool -i hci0 info <bdaddr>
 
 echo 'creating default SVG config file'
-sudo echo '12,100,728,193,9,50,586,393' >> /var/www/cm/svg.conf
+sudo echo '12,100,728,193,9,50,586,393' > /var/www/cm/svg.conf
 sudo chmod 777 /var/www/cm/svg.conf
 
 echo 'recovering backed up settings file'

@@ -109,6 +109,11 @@ switch ($action) {
 	case 'redraw_update_log':		// save settings to file
 		redraw_log();
 		break;
+	case 'tx_str':
+		$tx_str = 'tx,cadi,'.$_POST['str'].',';
+		file_put_contents('daemon_cmd', $tx_str);
+		break;
+
 }
 
 function redraw_log(){

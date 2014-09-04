@@ -86,8 +86,8 @@ $_SESSION['cadiweb_version'] = '1.0';
 		// valves
 		svg.circle(645, 43, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv0'});
 		svg.circle(783, 210, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv1'});
-		svg.circle(540, 305, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv2'});
-		svg.circle(540, 333, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv3'});
+		svg.circle(540, 305, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv3'});
+		svg.circle(540, 333, 15, {fill: 'red', stroke: 'blue', strokeWidth: 0, opacity: 0.5, id:'cv2'});
 
 		// draw plug rectangles
 		var plg_x = 730;
@@ -103,9 +103,12 @@ $_SESSION['cadiweb_version'] = '1.0';
 		var plg_x = 618;
 		var plg_y = 167;
 		var plg_s = 13;
-		svg.rect((plg_x+0*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp1"});
-		svg.rect((plg_x+1*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp2"});
-		svg.rect((plg_x+2*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp3"});
+		svg.rect((plg_x+0*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp4"});
+		svg.rect((plg_x+1*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp3"});
+		svg.rect((plg_x+2*plg_s), plg_y, plg_s, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp2"});
+
+
+		svg.rect((plg_x-0*plg_s), plg_y-25, plg_s*3, plg_s, 3, 3, {fill: 'red', opacity: 0.5, id:"cdp1"});
 
 		// draw water levels
 		// tank max level in pixels
@@ -225,8 +228,8 @@ $_SESSION['cadiweb_version'] = '1.0';
 			}
 
 			// dosing pumps status squares colors
-			for (var i=1;i<4;i++) {
-				if (statusArray[16].charAt(3-i)=="1") {
+			for (var i=1;i<5;i++) {
+				if (statusArray[16].charAt(4-i)=="1") {
 					$('#cdp'+i).attr('fill', 'green');
 				}
 				else {
