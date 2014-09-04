@@ -50,6 +50,11 @@ switch ($action) {
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
+	case 'rx_ee':
+		$toput = "rx_ee,cadi,".$_POST['addr'].", ".$_POST['number'].", ";
+		file_put_contents('daemon_cmd', $toput);
+		sleep(1);
+		break;
 	case 'tx':
 		bt_tx('rfcomm0', $cadi_packet);
 		print_r($cadi_packet);

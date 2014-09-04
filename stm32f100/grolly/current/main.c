@@ -267,7 +267,7 @@ typedef struct
 } RTC_DateTime;
 
 RTC_Time toAdjust;
-static uint8_t auto_flags=0;	// enable all except the 0 bit - psi stab
+static uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
 static uint8_t auto_failures=0;	// failure bits for corresponding auto programs' flags
 static uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS

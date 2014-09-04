@@ -44,6 +44,12 @@ function apply_settings(){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:19}, function(data){});
 }
 
+function rx_ee(){
+	var addr = $('#settings_block_id').val();
+	var number = $('#settings_number').val();
+	$.post('cm/cadi_bt_processor.php', {action: 'rx_ee', addr:addr, number:number}, function(data){});
+}
+
 </script>
 <div id="cadi_watering_accordion">
 
@@ -101,6 +107,12 @@ Value<input type="text" id="settings_value" />
 <button onClick="save_settings_block()" title="from dump file, starting at address set above in 'BlockId'">Send block</button>
 <br>
 <button onClick="apply_settings()">Apply settings</button>
+<br>
+<br>
+<b title="put start address in the field above">Daemon controlled settings dump file write to EEPROM</b><br>
+Number of 16 bit vals to transfer<input type="text" id="settings_number" />
+<button onClick="rx_ee()">BTD rx_ee</button>
+
 
 </div>
 

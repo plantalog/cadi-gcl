@@ -36,7 +36,7 @@ function dump2block($addr){
 		$temp = $settings_dump[$i*2];
 		$settings_dump[$i]=$settings_dump[($i*2+1)];
 		$settings_dump[($i*2+1)] = $temp;
-		// GDE-TO TUT :)))))
+		// GDE-TO TUT :)))))	
 	}
 	return $settings_dump;
 }
@@ -176,7 +176,7 @@ if (isset($_POST['cmd'])) {
 
 	// convert packet into "echo -e" Linux command usable format
 	unset($arguments);
-	for ($i=0; $i<=strlen($packet);$i++) {
+	for ($i=0; $i<strlen($packet);$i++) {
 		$arguments .= sprintf("\\x%02x",ord($packet[$i]));
 	}
 	unset($packet);
