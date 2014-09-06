@@ -1,6 +1,6 @@
 	<?php
-
-
+	include_once('cadi_settings.php');
+	sync_dump2conf();
 	unset($cs_arr);
 	$cs_arr = array();
 	if (($handle = fopen("cadi_settings_conf.csv", "r")) !== FALSE) {
@@ -36,7 +36,7 @@
 						<option value="3" '.$selected[3].'>32 bit</option>
 					</select></td>';				// type
 				echo '<td>'.$cs_arr[$i][1].'</td>';				// value
-				echo '<td><input type="text" name="'.$idpref.'value" value="'.$cs_arr[$i][2].'" /></td>';				// value
+				echo '<td><input type="text" onChange="rx_ee('.(intval(substr($idpref,4,5))).')" name="'.$idpref.'value" value="'.$cs_arr[$i][2].'" /></td>';				// value
 				echo '<td><input type="text" name="'.$idpref.'text" value="'.$cs_arr[$i][3].'" /></td>';				// text description
 			echo '</tr>';
 				

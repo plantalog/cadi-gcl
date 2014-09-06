@@ -20,6 +20,7 @@
 #include "stm32f10x_exti.h"
 #include "stm32f10x_conf.h"
 #include "stm32f10x_usart.h"
+#include "stm32f10x_iwdg.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
@@ -1554,7 +1555,7 @@ void open_valve(uint8_t valveId){
 		VALVE_CTRL_PORT->BRR |= (1<<8);			// valveId=0 is FWI valve
 	}
 	else {
-		VALVE_CTRL_PORT->BRR |= (1<<valveId+10);	// 10 - shift for PA11 for valve 1
+		VALVE_CTRL_PORT->BRR |= (1<<(valveId+10));	// 10 - shift for PA11 for valve 1
 	}
 	valveFlags |= (1<<valveId); // set flag
 }
@@ -4471,6 +4472,8 @@ void displayClock(void *pvParameters)
 		Lcd_clear();
     	while (1)
 	    {
+
+  		  IWDG_ReloadCounter();
 	    	vTaskDelay(10);
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
@@ -4808,6 +4811,41 @@ void test_grolly_hw(void){
 
 }
 
+void watchdog_init(void){
+	// WATCHDOG check ###################
+	__IO uint32_t LsiFreq = 40000;
+		 /* Check if the system has resumed from IWDG reset */
+		  if (RCC_GetFlagStatus(RCC_FLAG_IWDGRST) != RESET)
+		  {
+		    /* Clear reset flags */
+		    RCC_ClearFlag();
+		  }
+
+		  /* IWDG timeout equal to 250 ms (the timeout may varies due to LSI frequency
+		     dispersion) */
+		  /* Enable write access to IWDG_PR and IWDG_RLR registers */
+		  IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+
+		  /* IWDG counter clock: LSI/32 */
+		  IWDG_SetPrescaler(IWDG_Prescaler_32);
+
+		  /* Set counter reload value to obtain 250ms IWDG TimeOut.
+		     Counter Reload Value = 250ms/IWDG counter clock period
+		                          = 250ms / (LSI/32)
+		                          = 0.25s / (LsiFreq/32)
+		                          = LsiFreq/(32 * 4)
+		                          = LsiFreq/128
+		   */
+		  IWDG_SetReload(LsiFreq/16);
+
+		  /* Reload IWDG counter */
+		  IWDG_ReloadCounter();
+
+		  /* Enable IWDG (the LSI oscillator will be enabled by hardware) */
+		  IWDG_Enable();
+
+}
+
 uint8_t main(void)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
@@ -4822,6 +4860,7 @@ uint8_t main(void)
 	// EOF VALVE INIT
 
 	SystemInit();
+
 
 	uint32_t i;
 	dosing_motor_control_init();
@@ -4880,6 +4919,8 @@ uint8_t main(void)
             NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(vTaskLCDdraw,(signed char*)"LCDDRW",configMINIMAL_STACK_SIZE,
             NULL, tskIDLE_PRIORITY + 1, NULL);
+
+    watchdog_init();	// start watchdog timer
 
 /* Start the scheduler. */
 

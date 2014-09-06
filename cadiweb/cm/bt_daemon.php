@@ -125,20 +125,21 @@ while(1){
 					exec($execmd);
 					break;
 					// rx_ee, cadi, <start_addr>, <number_of_data>
-				case 'rx_ee':	// sends block of settings dump file to Cadi
+				case 'rx_ee':	// sends block of settings dump file to Cadi   UPLOAD
 					sync_conf2dump();
 					$ping_delay = 10;	// delay status stream requests
 					usleep($csd_value*$sppd_value);	// delay to finish previous transfers
-					$sbsa = $cmd_arr[2];	// start address
+					$sbsa_tx = $cmd_arr[2];	// start address
 					$NbrOfDataToSend = $cmd_arr[3];	// amount of 16bit variables of settings dump to send
 					$TxCounter = 0;		// reset counter
+					$execmd="";
 					break;
-				case 'ee2server':	//	get Cadi EEPROM dump to server's local binary file
+				case 'ee2server':	//	get Cadi EEPROM dump to server's local binary file	DOWNLOAD
 					$ping_delay = 10;
 					usleep($csd_value*$sppd_value);	// delay to finish previous transfers
 					//$sbsa2 = $cmd_arr[2];	// start address
 					// $NbrOfDataToRead = $cmd_arr[3];	// amount of 16bit variables of settings dump to send
-					$sbsa2 = 1500;			// settings start EEPROM address
+					$sbsa = 1500;			// settings start EEPROM address
 					$NbrOfDataToRead = 200;	// amount of settings to read (16bit values)
 					$RxCounter = 0;			// reset counter
 					$execmd='';
@@ -275,7 +276,7 @@ while(1){
 		
 			
 		file_put_contents('btds/btd_state', '2');	// BTD status - 2:Settings download
-		$ee_addr = $sbsa2+$RxCounter;
+		$ee_addr = $sbsa+$RxCounter;
 		// prepare get_status_block compatible packet
 		unset($packet);
 		$packet = '';
@@ -316,7 +317,8 @@ while(1){
 		//$repeat_last_cmd = 10;	// if no successful write confirmation received, try again up to 10 times
 		// read 2 bytes from dump
 		$fp = fopen('cadi_settings_dump', 'rb'); // open in binary read mode.
-		$sfp = ($sbsa-$settings_startaddr+$TxCounter)*2;	// settings file pointer
+		$sfp = ($sbsa_tx-$settings_startaddr+$TxCounter)*2;	// settings file pointer
+		echo PHP_EOL.' ^^^^^^^^^^ FIle pointer offset counted like this: '.$sfp.' = ('.$sbsa2.' - '.$settings_startaddr.' + '.$TxCounter.') * 2';
 		fseek($fp,$sfp,0); //point to file start
 		$settings_dump = array();
 		$settings_dump = fread($fp,2); // read settings dump data
@@ -327,7 +329,7 @@ while(1){
 			$arguments .= sprintf("\\x%02x",ord($settings_dump[$i]));
 		}
 		
-		$ee_addr = $sbsa+$TxCounter;
+		$ee_addr = $sbsa_tx+$TxCounter;
 		// prepare rx_ee compatible packet
 		unset($packet);
 		$packet = '';
@@ -412,9 +414,9 @@ function dump_settings_block($addr, $block_data){
 	}
 	echo PHP_EOL."settings file hex (first byte has STM32 EEPROM address ".$settings_startaddr."): ".PHP_EOL.$settings_file_hex.PHP_EOL;
 	// recreate dump file, now updated
-	define('SIZE',$settings_filesize); // size of the file to be created.
+//	define('SIZE',$settings_filesize); // size of the file to be created.
 	$fp = fopen('cadi_settings_dump', 'w');
-	fwrite($fp, implode('',$settings_dump));
+	fwrite($fp, $settings_dump);
 	fclose($fp); // close the file
 }
 

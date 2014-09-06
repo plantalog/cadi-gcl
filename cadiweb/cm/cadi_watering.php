@@ -27,7 +27,7 @@ function save_settings(){
 	var addr = $('#settings_block_id').val();
 	var value = $('#settings_value').val();
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:value}, function(data){
-		//	alert('settings saved');
+			alert('settings saved');
 	});
 }
 
@@ -44,11 +44,7 @@ function apply_settings(){
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:19}, function(data){});
 }
 
-function rx_ee(){
-	var addr = $('#settings_block_id').val();
-	var number = $('#settings_number').val();
-	$.post('cm/cadi_bt_processor.php', {action: 'rx_ee', addr:addr, number:number}, function(data){});
-}
+
 
 </script>
 <div id="cadi_watering_accordion">

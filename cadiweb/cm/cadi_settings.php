@@ -24,10 +24,6 @@ $_SESSION['csblksize'] = 32;	// 16 variables of 16bit each.
 	}
 
 
-	echo 'dumper running';
-
-//	sync_conf2dump();
-//	sync_dump2conf();
 
 
 // injects Cadi settings config file into dump file
@@ -137,7 +133,7 @@ function sync_dump2conf(){
 		}
 		$settings_file_hex .= sprintf("\\x%02x",ord($settings_dump[$i]));
 	}
-	echo PHP_EOL."settings file hex (first byte has STM32 EEPROM address ".$settings_startaddr."): ".PHP_EOL.$settings_file_hex.PHP_EOL;
+//	echo PHP_EOL."settings file hex (first byte has STM32 EEPROM address ".$settings_startaddr."): ".PHP_EOL.$settings_file_hex.PHP_EOL;
 	// EOF TEST BLOCK
 
 
@@ -151,7 +147,7 @@ function sync_dump2conf(){
 				$seekaddr = ($addr-$settings_startaddr)*2+$parity;
 				fseek($fp,$seekaddr,0); 
 			    	$data = fread($fp, 1);
-				$sca[$key][2] = $data;
+				$sca[$key][2] = ord($data);
 				fclose($fp);
 			}
 		}
@@ -159,7 +155,7 @@ function sync_dump2conf(){
 			// 16 bit value extraction
 
 			$addr = $row[0];
-			echo 'Extracting 16 bit val from addr '.$addr.PHP_EOL;
+			//echo 'Extracting 16 bit val from addr '.$addr.PHP_EOL;
 			if (($fp = fopen("cadi_settings_dump", "rb")) !== FALSE) {
 				$seekaddr = ($addr-$settings_startaddr)*2;
 				fseek($fp,$seekaddr,0); 

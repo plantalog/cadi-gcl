@@ -52,6 +52,8 @@ switch ($action) {
 		break;
 	case 'rx_ee':
 		$toput = "rx_ee,cadi,".$_POST['addr'].", ".$_POST['number'].", ";
+		include_once('cadi_settings.php');
+		
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
@@ -174,8 +176,8 @@ function upload_csx($csx){
 	file_put_contents('cadi_settings_conf.csv',$outfile);
 
 	// start settings transfer into Cadi EEPROM
-	unset($cmd);
-	$cmd = "rx_ee,cadi,1500,200, ";
+//	unset($cmd);
+//	$cmd = "rx_ee,cadi,1400,200, ";
 //	file_put_contents('daemon_cmd', $toput);
 	sleep(1);
 	
