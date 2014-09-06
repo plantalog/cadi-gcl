@@ -118,7 +118,67 @@ switch ($action) {
 		$tx_str = 'tx,cadi,'.$_POST['str'].',';
 		file_put_contents('daemon_cmd', $tx_str);
 		break;
+	case 'upload_csx':
+		// parse $params into array of values
+		$params = array();
+		parse_str($_POST['csx_data'], $params);
+		upload_csx($params);
+		break;
+	case 'download_csx':
+		file_put_contents('daemon_cmd', 'ee2server,1500,200,');
+		break;
+	case 'get_btd_state':
+		$btd_state = file_get_contents('btds/btd_state');
+		if ($btd_state==1) {
+			$btd_state_text='1<font color="green">BTD: Idle</font>';
+		}
+		if ($btd_state==2) {
+			$btd_state_text='2<font color="yellow">BTD: CSX DL</font>';
+		}
+		if ($btd_state==3) {
+			$btd_state_text='3<font color="yellow">BTD: CSX UL</font>';
+		}
+		echo $btd_state_text;
+		break;
+}
 
+// uploads Cadi Settings passed from Web Form in Cadiweb into Cadi EEPROM
+function upload_csx($csx){
+
+	// create array for values of cadi settings form
+	$curaddr = 0;
+	$ndx = 0;
+	unset($outarr);
+	$outarr = array();
+	foreach ($csx as $key=>$value) {
+		unset($tmparr);
+		$tmparr = explode("_", $key);
+		$rowaddr = $tmparr[1];
+		$subkey = $tmparr[2];
+		if ($curaddr != $rowaddr) {
+			$curaddr = $rowaddr;
+			$ndx++;
+		}
+		$outarr[$ndx][$subkey] = $value;
+		$outarr[$ndx]['addr'] = $rowaddr;	
+	}
+
+	// prepare cadi settings config file contents
+	unset($outfile);
+	foreach ($outarr as $key=>$value) {
+		unset($line);
+		$line = $value['addr'].','.$value['type'].','.$value['value'].','.$value['text'].','.PHP_EOL;
+		$outfile .= $line;
+	}
+	// put file contents into config file
+	file_put_contents('cadi_settings_conf.csv',$outfile);
+
+	// start settings transfer into Cadi EEPROM
+	unset($cmd);
+	$cmd = "rx_ee,cadi,1500,200, ";
+//	file_put_contents('daemon_cmd', $toput);
+	sleep(1);
+	
 }
 
 function redraw_log(){
@@ -127,6 +187,7 @@ function redraw_log(){
 	for ($i=0; $i<sizeof($logtail);$i++){
 		echo $logtail[$i].PHP_EOL;
 	}
+	
 }
 
 function btd_apply_settings($settings){

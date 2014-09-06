@@ -81,6 +81,11 @@ $_SESSION['cadiweb_version'] = '1.0';
 		cadi_status_stream();
 	});
 
+
+$(document).ready(function() {
+	cadi_status_stream();
+});
+
 	function drawMapLayer(svg){
 
 		// valves
@@ -170,6 +175,12 @@ $_SESSION['cadiweb_version'] = '1.0';
 	}
 
 	function redraw_svg_layer(){
+	
+		// display BTD state
+		$.post('cm/cadi_bt_processor.php', {action: 'get_btd_state'}, function(data){
+			$('#btd_state').html(data);
+		});
+
 
 		$.post('cm/cadi_bt_processor.php', {action: 'get_status_csv'}, function(data){
 		//	alert(data);
@@ -276,7 +287,7 @@ $_SESSION['cadiweb_version'] = '1.0';
 		var rfcomm = "rfcomm"+$("#rfcomm_nr").val();
 //		alert('going to connect '+mac);
 		$.post('cm/cadi_bt_processor.php', {action: 'bt_connect', mac:mac, rfcomm: rfcomm}, function(data){
-			alert('connected'+data);
+	//		alert('connected'+data);
 			cadi_list_rfcomms();
 			$('#main_output').html(data);
 //			setTimeout(function(){btd_stream_status(1)}, 5000);
@@ -450,7 +461,7 @@ function btd_stream_status(newStatus){
 	//	alert();
 		$.post('cm/cadi_bt_processor.php', {action: 'btd_stream_start', status: newStatus}, function(data){
 	//		cadi_list_rfcomms();
-			alert('Streaming to server cache');
+	//		alert('Streaming to server cache');
 		});  
 }
 
@@ -517,11 +528,12 @@ function eeWrite(dataType) {
 <!--<li><a href="cm/cadi_dd.php">Direct drive</a></li> -->
 </ul>
 <div class="ral">
+<b id="btd_state">BTD state</b>
 <button class="btn_ fr" onClick="check_plug()">Apply settings</button>
 <button class="btn_ fr">Reload settings</button>
 </div>
 <div id="tabs-1">
-<input type="checkbox" id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS (from server cache)
+<input type="checkbox" checked id="flag_status_stream" onClick="cadi_status_stream()" />Stream STATUS (from server cache)
 <input type="checkbox" id="vs_flag" /> also Video
 <button class="btn_" id="cadi_view_cam" onClick="cadi_view(1)">Cam</button>
 <button class="btn_" id="cadi_view_map" onClick="cadi_view(2)">Map</button>

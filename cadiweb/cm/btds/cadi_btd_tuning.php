@@ -105,10 +105,10 @@ function apply_btd_settings(){
 			type="text"
 			value="<?php echo $temparr[7]; ?>" />
 	</li>
-	<li>Settings dump start adress (within STM32 memory) offset, bytes
+	<li>Settings dump start address (within STM32 memory) offset, EEPROM cell addresses
 		<input
 			id="cadi_set_setsa"
-			title="First byte in settings dump file corresponds to this address in Cadi EEPROM memory"
+			title="First byte in settings dump file corresponds to this address in Cadi EEPROM memory (each address points to on 16bit variable)"
 			type="text"
 			value="<?php echo $temparr[8]; ?>" />
 	</li>

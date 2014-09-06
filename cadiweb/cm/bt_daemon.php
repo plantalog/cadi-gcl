@@ -1,6 +1,5 @@
 <?php
 
-include('btd_cadi_settings_processor.php');
 include_once('cadi_settings.php');
 
 echo "Bluetooth daemon for Cadi started";
@@ -19,13 +18,18 @@ $NbrOfDataToSend = 0;	// amount of 16bit variables of settings dump to send
 $TxCounter = 0;		// settings transmit pointer
 $sbsa = 0;			// Settings Block Start Address
 
+
+$NbrOfDataToRead = 0;	// amount of 16bit variables of settings dump to read from Cadi
+$RxCounter = 0;		// settings Rx pointer
+$sbsa2 = 0;			// starting address in EEPROM memory of cadi
+
 // create cadi settings dump file if not exist
 	if (!file_exists('cadi_settings_dump')) {
 		define('SIZE',2000); // size of the file to be created.
 		$fp = fopen('cadi_settings_dump', 'w'); // open in write mode.
 		echo PHP_EOL."Creating dump file".PHP_EOL;
-		fseek($fp, 1999,0); //
-		fwrite($fp,'X'); // write data
+		fseek($fp, SIZE-1,0); //
+		fwrite($fp,'0'); // write data
 		fclose($fp); // close the file
 	}		
 
@@ -83,9 +87,17 @@ while(1){
 		echo PHP_EOL.'$$$$$$$   Repeating packet:'.$execmd.PHP_EOL;
 		$repeat_last_cmd--;
 	}
-	else {						// or continue main loop
+	// should put elseif to avoid command run before long ones (like settings upload/download) finished?
+
+	else {						// or continue main loop if no tasks waits to execute
 		$command = file_get_contents($btd_cmd_file);
 		unset($execmd);
+		
+		if ($RxCounter>=$NbrOfDataToRead && $TxCounter>=$NbrOfDataToSend){
+			// setting transfer activities are finished
+			file_put_contents('btds/btd_state', '1');	// BTD status - 1:Idle
+		}
+
 		if(!empty($command)){
 			$cmd_arr = explode(",", $command);
 			print_r($cmd_arr);
@@ -121,6 +133,16 @@ while(1){
 					$NbrOfDataToSend = $cmd_arr[3];	// amount of 16bit variables of settings dump to send
 					$TxCounter = 0;		// reset counter
 					break;
+				case 'ee2server':	//	get Cadi EEPROM dump to server's local binary file
+					$ping_delay = 10;
+					usleep($csd_value*$sppd_value);	// delay to finish previous transfers
+					//$sbsa2 = $cmd_arr[2];	// start address
+					// $NbrOfDataToRead = $cmd_arr[3];	// amount of 16bit variables of settings dump to send
+					$sbsa2 = 1500;			// settings start EEPROM address
+					$NbrOfDataToRead = 200;	// amount of settings to read (16bit values)
+					$RxCounter = 0;			// reset counter
+					$execmd='';
+					break;
 				case 'kill':
 					$execmd = "'kill -9 $(pidof rfcomm)'";
 					break;
@@ -136,6 +158,7 @@ while(1){
 						$ping_delay = 10;
 						usleep($csd_value*$sppd_value);
 					}
+
 					$packet = $cmd_arr[2];
 					
 					$part2 = sprintf("\\x%02x",$packet_id);
@@ -146,20 +169,10 @@ while(1){
 					if ($packet_id>255){
 						$packet_id=1;
 					}
-					$repeat_last_cmd = 10;	// enable repeater. Disabled within response parser
+					$repeat_last_cmd = 200;	// enable repeater. Disabled within response parser
 				break;
 				case 'reboot':
 					$execmd = "reboot now";
-				//	echo $execmd;
-					break;
-				case 'dl_cadi_settings':
-					dl_cadi_settings();
-				//	$execmd = "reboot now";
-				//	echo $execmd;
-					break;
-				case 'ul_cadi_settings':
-					ul_cadi_settings();
-				//	$execmd = "reboot now";
 				//	echo $execmd;
 					break;
 				case 'stream_status':
@@ -252,8 +265,54 @@ while(1){
 		parse_response($srtrs_value);		// parse response if change detected
 	}
 
+
+
+	if ($RxCounter<$NbrOfDataToRead && $repeat_last_cmd == 0) {
+
+		$rxblock++;	// to see iterations of this if
+		echo '<<<<>>>>> THIS is RX block nr '.$rxblock.'. It has RxCounter='.$RxCounter.' and '.PHP_EOL;		
+		
+		
+			
+		file_put_contents('btds/btd_state', '2');	// BTD status - 2:Settings download
+		$ee_addr = $sbsa2+$RxCounter;
+		// prepare get_status_block compatible packet
+		unset($packet);
+		$packet = '';
+		$packet = chr(90).chr(88).chr(50);	// ZX2	
+		$packet .= chr(5);	// packet payload size
+		$packet .= chr(59);	// send_ee_block()
+		$packet .= chr($ee_addr%256);	// address
+		$packet .= chr(floor($ee_addr/256));
+		unset($crc);
+		$crc =  chr(crc_block(0, $packet, 7));
+		$packet .= $crc;
+
+		// convert packet into echo -e usable format
+		unset($arguments);
+		for ($i=0; $i<8;$i++) {
+			$arguments .= sprintf("\\x%02x",ord($packet[$i]));
+		}
+		unset($packet);
+		$cadi_packet = $arguments;
+
+		$RxCounter+=16;		// increment for next block
+
+				
+
+		echo PHP_EOL.'CADI SETTINGS DOWN LOAD: '.$cadi_packet.PHP_EOL;
+
+		// store it as "tx" command for daemon into daemon_cmd
+		unset($btdcmd);
+		$btdcmd = 'tx,cadi,'.$cadi_packet.',';
+		file_put_contents($btd_cmd_file,$btdcmd);
+		$ping_delay=10;
+	}
+
 	// sends block of settings dump file into Cadi EEPROM. This block triggered by 'rx_ee' case
 	if ($TxCounter<$NbrOfDataToSend && $repeat_last_cmd == 0) {
+
+		file_put_contents('btds/btd_state', '3');	// BTD status - 3:Settings upload from server to Cadi
 		//$repeat_last_cmd = 10;	// if no successful write confirmation received, try again up to 10 times
 		// read 2 bytes from dump
 		$fp = fopen('cadi_settings_dump', 'rb'); // open in binary read mode.
@@ -273,7 +332,7 @@ while(1){
 		unset($packet);
 		$packet = '';
 		$packet = chr(90).chr(88).chr(50);	// ZX2	
-		$packet .= chr(7);	// packet payload size (9 bytes)
+		$packet .= chr(7);	// packet payload size
 		$packet .= chr(15);	// command (rx_ee for 16bit variable (type=2))
 		$packet .= chr($ee_addr%256);	// address
 		$packet .= chr(floor($ee_addr/256));
@@ -324,7 +383,7 @@ echo PHP_EOL.'======= Please look at the dump piece '.$arguments.' from '.$sfp.'
 }
 
 function dump_settings_block($addr, $block_data){
-	global $settings_startaddr;
+	global $settings_startaddr, $settings_filesize;
 	$curfsize = filesize('cadi_settings_dump');	// current response file size
 	clearstatcache();				// refresh file size
 	$fp = fopen('cadi_settings_dump', 'rb'); // open in binary read mode.
@@ -336,7 +395,7 @@ function dump_settings_block($addr, $block_data){
 	for ($i=0; $i<strlen($block_data);$i++) {
 		$settings_hex .= sprintf("\\x%02x",ord($block_data[$i]));
 	}
-	echo PHP_EOL."Writing settings data into cadi_settings_dump dump file: ".$settings_hex.PHP_EOL;
+	echo PHP_EOL." !!!!!! Writing settings data from EE addr=".$addr." into cadi_settings_dump dump file: ".$settings_hex.PHP_EOL;
 	$offset = ($addr - $settings_startaddr)*2;	// multiplied by 2 because each value should have 16 bit to store.
 	echo PHP_EOL."at offset: ".$offset.PHP_EOL;
 	for ($i=0; $i<strlen($block_data);$i++) {
@@ -353,8 +412,9 @@ function dump_settings_block($addr, $block_data){
 	}
 	echo PHP_EOL."settings file hex (first byte has STM32 EEPROM address ".$settings_startaddr."): ".PHP_EOL.$settings_file_hex.PHP_EOL;
 	// recreate dump file, now updated
+	define('SIZE',$settings_filesize); // size of the file to be created.
 	$fp = fopen('cadi_settings_dump', 'w');
-	fwrite($fp, $settings_dump);
+	fwrite($fp, implode('',$settings_dump));
 	fclose($fp); // close the file
 }
 
@@ -396,11 +456,17 @@ function parse_response($srtrs){
 	
 
 	if ($packet_type==1 ) {		// parsing Cadi settings
-		$block_addr = ord($last_packet[2])+ord($last_packet[3])*256;		// block address
-		$block_size = 32;
 		$crc = ord($last_packet[($packet_size-3)]);
-		$block_data = substr($last_packet,4,32);
-		dump_settings_block($block_addr, $block_data);		
+		$counted_crc = crc_block(2, $last_packet, (ord($last_packet[1])-3));
+		echo PHP_EOL.'>>>>> ACHTUNG: Settings Packet CRC='.$crc.' and counted one is'.$counted_crc.PHP_EOL;
+		if ($counted_crc==$crc) {
+			$block_addr = ord($last_packet[2])+ord($last_packet[3])*256;		// block address
+			$block_size = 32;
+			$block_data = substr($last_packet,4,32);
+			dump_settings_block($block_addr, $block_data);
+			$repeat_last_cmd = 0;
+			//unset($execmd);
+		}
 	}
 
 	if ($packet_type==7) {		// parsing Cadi command execution confirmation response
@@ -408,7 +474,7 @@ function parse_response($srtrs){
 		echo '### EXTRACTED CMD UID '.$cmd_uid.'###'.PHP_EOL;
 		if ($packet_id == $cmd_uid) {
 			$packet_id++;
-			unset($execmd);
+			// unset($execmd);
 			$repeat_last_cmd = 0;
 			echo PHP_EOL.'%%%%%%%  Command '.$cmd_uid.' executed successfully!!!'.PHP_EOL;
 		}

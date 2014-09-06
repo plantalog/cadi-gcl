@@ -1,3 +1,5 @@
+=== Cadi general purpose firmware ===
+
 v2.1.1 (08.05.2014)
 - new commands and functions to read and write emulated EEPROM values remotely
 - new command to force loadSettings() call

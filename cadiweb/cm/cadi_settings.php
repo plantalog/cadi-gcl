@@ -26,8 +26,8 @@ $_SESSION['csblksize'] = 32;	// 16 variables of 16bit each.
 
 	echo 'dumper running';
 
-	sync_conf2dump();
-	sync_dump2conf();
+//	sync_conf2dump();
+//	sync_dump2conf();
 
 
 // injects Cadi settings config file into dump file
@@ -61,7 +61,7 @@ function sync_conf2dump(){
 			// pack 8 bit value
 			$addr = substr($row[0],0,5);
 			echo 'packing 8 bit at '.$addr.PHP_EOL;
-			$parity = substr($row[0],5,1);	// 0 - lower byte, 1 - higher byte
+			$parity = substr($row[0],5,1);	// 0 - higher byte, 1 - lowers byte
 			$pointer = ($addr-$settings_startaddr)*2+$parity;
 			$settings_dump[$pointer] = chr($sca[$key][2]);
 		}
@@ -75,6 +75,24 @@ function sync_conf2dump(){
 		}
 		if ($row[1]==3) {
 			// 32 bit
+
+			$addr = 0;
+			$addr = $row[0];
+			$val = 0;
+			$val = floor($sca[$key][2]/65536);
+			echo 'packing 16 bit at '.$addr.PHP_EOL;
+			$pointer = ($addr-$settings_startaddr)*2;
+			$settings_dump[$pointer++] = chr(floor($val/256));
+			$settings_dump[$pointer++] = chr($val%256);
+
+			$addr++;
+			$val = 0;
+			$val = $sca[$key][2]%65536;
+			echo 'packing 16 bit at '.$addr.PHP_EOL;
+			$pointer = ($addr-$settings_startaddr)*2;
+			$settings_dump[$pointer++] = chr(floor($val/256));
+			$settings_dump[$pointer] = chr($val%256);
+
 		}
 	}
 
@@ -157,7 +175,7 @@ function sync_dump2conf(){
 				$seekaddr = ($addr-$settings_startaddr)*2;
 				fseek($fp,$seekaddr,0); 
 			    	$data = fread($fp, 4);
-				$sca[$key][2] = $data;
+				$sca[$key][2] = ord($data[0])*16777216+ord($data[1])*65536+ord($data[2])*256+ord($data[3]);
 				fclose($fp);
 			}
 		}

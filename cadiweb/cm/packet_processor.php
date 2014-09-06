@@ -182,14 +182,15 @@ if (isset($_POST['cmd'])) {
 	unset($packet);
 	$packet = $arguments;
 	$cadi_packet = $arguments;
+
+	$packet_crc = crcs($packet);
+	$out = $packet_pref.$packet.$packet_crc;
 }
 
 else {
 	$cadi_packet = "empty packet";
 }
 
-$packet_crc = crcs($packet);
-$out = $packet_pref.$packet.$packet_crc;
 
 function crcs($s){	// generate xor crc checksum
 	$curxor = 0;

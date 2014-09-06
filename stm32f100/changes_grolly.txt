@@ -1,0 +1,81 @@
+=== Grolly firmware and software history ===
+
+v1.0b1
+- Cadi now receives settings data dumps from BTDaemon and stores them into EEPROM memory. BTDaemon now can link cadi_settings.php with sync_ functions to convert Cadi settings CSV config file into binary dump and vice versa.
+
+v1.0a6
+- Cadi now sends packets with EEPROM memory dumps to BTDaemon. BTDaemon has now Cadi EEPROM memory dump
+
+v1.0a5 (04.09.2014)
+- Protobuzz protocol now sends responses about successful Cadiweb remote command execution (ZX7 packets with cmd_uid)
+
+- EE_ReadWord now initialize local variables with 0 value to avoid reusage of same values in memory batch processing
+
+
+The Grolly firmware is based on Cadi FW 2.1, so previous changes could be taken from this Cadi block:
+
+=== Cadi general purpose firmware history ===
+
+v2.1.1 (08.05.2014)
+- new commands and functions to read and write emulated EEPROM values remotely
+- new command to force loadSettings() call
+
+v2.1 (05.05.2014)
+- Sonar init adapted to Cadi MB. Two sonars are driven
+- valve_busy flags to resolve access collisions
+- emergency stop packet
+- Cadi reset command
+- remote RTC adjust command
+- 40bytes status packets
+- auto_flags startup value = 254
+
+
+v2
+- refactored init process for using PA13 and PA14 pins properly to control solenoid valves, now STM32 chip flashing available with RESET button pressed (HOLD "Reset" button, click flash in CoIDE and release the "Reset button" for flashing start)
+
+v2 beta2
+- added response functions for Cadi STATUS reporting
+- valve feedback initialized on PA4 and PA8 (to avoid disabling HSE)
+
+v2 beta
+- changed pinout according Cadi main board layout (HARDWARE/CADI-MAINBOARD/cadi_pcb_140210_polygoned_kamitra.rar)
+- changed some LCD functions to init and drive LCD properly
+- introduced adcAverage[] array for averaging the ADC input, refactored ADC averaging process
+- DHT bits assembled into bytes directly within sensor interrupt routine
+- now SHRINKER used when button ADC input read, for more reliable read
+
+v1.7
+- implemented packet communication protocol for remote function calls
+	uart_task to process packets and it's functions
+- changed dht duty cycle array from 16bit to 8 bit
+
+
+v1.6.3
+
+v1.6.2
+- now the water flow meter tick counter reseted when the valve is fully opened and waer dosing counting is then started, preventing "false" counting.
+- refactored Lcd_write_16b for printing uint16_t values on LCD. Fixed over 255 value bug (and with adjust16bit() function as well).
+
+v1.6.1
+- calibrated values now stored in "EEPROM"
+- more precise calibration of water flow meter
+
+v1.6
+- new function adjust16bit_fast() with additional argument - speed
+- water flow counter calibration function
+- function for water flow meter reading based volume top-up get_water()
+
+v1.5
+- fixed valve feedback init
+- tank level stabilizer function and UI
+- valve failure timeout
+- valve feedback filter, to avoid unnecessary valve triggering
+
+
+v1.4
+- LCD data pins changed to PC10-12
+- PB9 configured as sonar echo input
+- PA5-7 for valve feedback
+- introduced sonar driver
+- introduced water flow meter driver
+

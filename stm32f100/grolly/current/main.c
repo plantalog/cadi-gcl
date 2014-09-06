@@ -71,9 +71,7 @@ uint32_t water_counter[WFM_AMOUNT];
 #define	VALVE_FAILURE_TIMEOUT		600	// timeout for valve open/close function to avoid hanging if valve broken
 #define DRAIN_VALVE_ID				1
 // Valve variables
-static uint8_t valveFlags;
-uint8_t valve_failed;
-uint8_t valve_busy=0;
+uint8_t valveFlags;
 #endif	// EOF VALVES DEFINITIONS
 
 
@@ -81,30 +79,17 @@ uint8_t valve_busy=0;
 #define USE_BLUETOOTH
 #ifdef USE_BLUETOOTH		// START BLUETOOTH USART DEFINITIONS
 #define BT_USART	USART1
-/* Private typedef -----------------------------------------------------------*/
-/* Private define ------------------------------------------------------------*/
 #define USARTx_IRQHandler   USART1_IRQHandler
-//#define TxBufferSize   (countof(TxBuffer) - 1)
-//#define RxBufferSize   0x10
 
-/* Private macro -------------------------------------------------------------*/
-#define countof(a)   (sizeof(a) / sizeof(*(a)))
 
-/* Private variables ---------------------------------------------------------*/
-// uint8_t TxBuffer[] = "\n\rCadi sends HELLO!\n\r";
-uint8_t RxBuffer[42];
-uint8_t TxBuffer[42];
-uint8_t RxByte;
-//uint8_t TxByte;
-uint8_t comm_state=48;	// communication state
-//uint8_t TxDataReady;
-//uint8_t RxDataReady;
-uint8_t NbrOfDataToTransfer = 16;
-//uint8_t NbrOfDataToRead = RxBufferSize
-uint8_t txbuff_ne = 0;
-static uint8_t TxCounter = 0;
-static uint8_t RxCounter = 0;
-uint8_t logstr_crc=0;
+volatile uint8_t RxBuffer[40];
+volatile uint8_t TxBuffer[42];
+volatile static uint8_t RxByte;
+volatile static uint8_t comm_state=48;	// communication state
+static uint8_t NbrOfDataToTransfer = 16;
+static uint8_t txbuff_ne = 0;
+volatile uint8_t TxCounter = 0;
+volatile uint8_t RxCounter = 0;
 #endif				// EOF BLUETOOTH USART DEFINITIONS
 
 
@@ -125,10 +110,8 @@ typedef struct
 __IO uint16_t IC2Value = 0;
 __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
-uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
+static uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
 TIM_ICInitTypeDef  TIM_ICInitStructure;
-// digital humidity and temperature data
-//uint8_t dht_bit_array[50];
 DHT_data DHTValue;
 static uint8_t		dht_data[5];
 static uint8_t		dht_data2[5];
@@ -145,8 +128,6 @@ static uint8_t rhUnderOver = 0;
 
 #define CADI_MB
 #define USE_LCD
-
-
 
 #ifdef CADI_MB
 #define lcd_shift	11				// seems to be not used here anymore?
@@ -209,13 +190,9 @@ static uint8_t rhUnderOver = 0;
 
 
 
-
-
-
-
-u32 del;
-static uint8_t		LCDLine1[16], LCDLine2[16];		// lcd frame buffer
-uint8_t lcd_pointerx=0, lcd_pointery=0;
+volatile static uint8_t	LCDLine1[16], LCDLine2[16];		// lcd frame buffer
+volatile static uint8_t lcd_pointerx=0;
+volatile static uint8_t lcd_pointery=0;
 
 
 // DRIVER: Analog buttons
@@ -226,8 +203,8 @@ uint8_t lcd_pointerx=0, lcd_pointery=0;
 #define BUTTON_BCK				1
 #define BUTTON_FWD				4
 #define BUTTON_RANGE_SHRINKER	30
-uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
-uint8_t buttonReverse=0;
+volatile static uint16_t button_ranges[8];	// 0,2,4,6 - lower, 1,3,5,7 - higher values for buttons
+volatile static uint8_t buttonReverse=0;
 #endif						// EOF BUTTONS DEFINITIONS
 
 
@@ -240,6 +217,8 @@ uint8_t buttonReverse=0;
 #define ADC_AVG_BUTTONS		3
 #define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
 #endif
+
+volatile uint8_t button=0;
 
 
 
@@ -266,14 +245,14 @@ typedef struct
 
 } RTC_DateTime;
 
-RTC_Time toAdjust;
+volatile RTC_Time toAdjust;
 static uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
 static uint8_t auto_failures=0;	// failure bits for corresponding auto programs' flags
 static uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS
 
 
-static uint32_t fup_time = 0;	// first time underpressure met
+volatile static uint32_t fup_time = 0;	// first time underpressure met
 #define PSI_UNDERPRESSURE	650			// minimum pressure meaning there is water in pump, when it is running
 #define PSI_UP_TIMEOUT	40				// seconds to stop PSI pump if underpressure met
 
@@ -295,8 +274,8 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 // DRIVER: SD-card on SPI interface with FatFS
 #define USE_SD
 #ifdef USE_SD
-	int no_sd=1;
-	FATFS   fs;       // file system variable to mount SD card
+	uint8_t no_sd=1;
+//	FATFS   fs;       // file system variable to mount SD card
 	uint16_t logInterval=0;
 #endif
 
@@ -351,7 +330,7 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define MIXING_PUMP					0		// doser MOSFET on T8
 #endif
 
-
+#define MAX_SONAR_READ	400				// drop wrong reads
 
 
 /*  === Watering programs ===
@@ -365,7 +344,7 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 
 // WATERING PROGRAMS SETTINGS ADRESSES
 #define WP_AMOUNT					3		// 3x16=48(hex=30) values (range: 613-643)
-#define WP_SIZE						11		// size of block of settings data of watering program
+#define WP_SIZE						12		// size of block of settings data of watering program
 #define WP_OFFSET					0x0613	// watering program settings offset (first 8 bits of 16bit EEPROM value)
 #define WP_RULES_APPLIED			1		// 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
 #define	WP_VOLUME				1		// amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
@@ -374,7 +353,7 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define WP_END			6		// after this time no triggering for this WP
 #define WP_LAST_RUN_SHIFT			8		// 2x16bit last run of watering program
 #define WP_FLAGS					10		// bit 0 (the last one): - WPEnabled flag
-
+#define WP_MIXING_TIME_SHIFT		11
 #define WP_INTAKE_TIMEOUT			600		// tieout in secs waiting until water fills the mixing tank through FWI valve
 
 
@@ -385,12 +364,10 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 // Fertilizer Mixing Program adresses	()
 #define FMP_OFFSET								0x0644
 #define FMP_SIZE								7
-#define FMP_DOSING_PUMP_ID_SHIFT				1
+#define FMP_DOSING_PUMP_ID_SHIFT				1		// FMP enabled if dosing pump id > 0 (05.09.2014)
 #define FMP_DOSING_TIME_SHIFT					2
-#define FMP_CIRCULATION_MIXING_TIME_SHIFT		3
-#define FMP_2_WP_ASSOC_SHIFT					4
-#define FMP_TRIG_FREQUENCY_SHIFT				5
-#define FMP_ENABLE								6
+#define FMP_2_WP_ASSOC_SHIFT					3
+#define FMP_TRIG_FREQUENCY_SHIFT				4
 
 #define DOSER_SPEEDS			0x0612		// 4 bytes for doser speeds in percent (1..100)
 
@@ -399,10 +376,6 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define COMM_GET_SETTINGS		49
 #define COMM_SET_SETTINGS		50
 #define COMM_DIRECT_DRIVE		51
-
-// two following defines moved to eeprom.h
-//#define SETTINGS_PACKET_SIZE	200	// look NumbOfVar define in eeprom.h
-//#define SETTINGS_START_ADDR		0x05C0	// HARDCODED in eeprom.c look for this address
 
 #define WATER_TANK_TOP			0x0622
 #define WATER_TANK_BOTTOM		0x0632
@@ -441,39 +414,17 @@ static uint16_t psi_cur_adc_value=0;
 #define AVG_ADC_PSI		2			// adcAverage[2]
 
 
-static uint16_t tank_windows_top[1];
-static uint16_t tank_windows_bottom[1];
+uint16_t tank_windows_top[1];
+uint16_t tank_windows_bottom[1];
 
-uint8_t circulationPumpId;
 ErrorStatus  HSEStartUpStatus;
 FLASH_Status FlashStatus;
-uint16_t ph_seven=0;
-uint32_t ph0=0;
-uint16_t ph4=0;
-uint16_t ec1413 = 0, ec0 = 0;
-int cdel=0;
 
-uint16_t adcAverage[4];
-uint16_t jdrBuff1[JDR_BUFFER_SIZE];
-uint16_t jdrBuff2[JDR_BUFFER_SIZE];
-uint16_t jdrBuff3[JDR_BUFFER_SIZE];
-uint16_t jdrBuff4[JDR_BUFFER_SIZE];
-uint8_t curphstr[5];
-uint8_t curecstr[5];
+volatile static uint16_t adcAverage[4];
 
-//uint16_t ecAdcValue;
-uint8_t currentEc=0;
-uint8_t currentPh=0;
-uint8_t phUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 - over window
-uint8_t ecUnderOver = 0;	// 0 - pH value is within window, 1 - under window, 2 - over window
-uint16_t phWindowTop, phWindowBottom;
-uint16_t ecWindowTop, ecWindowBottom;
-uint32_t lastWriteTime=0;
-uint8_t wpStateFlags;
-uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
-uint8_t dosingPumpStateFlags2;
-uint8_t waterSensorStateFlags;
-// uint8_t wsl_buff[3];
+static uint8_t wpStateFlags;
+static uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
+static uint8_t dosingPumpStateFlags2;
 uint16_t wfCalArray[WFM_AMOUNT];
 
 
@@ -488,13 +439,11 @@ uint16_t wfCalArray[WFM_AMOUNT];
 #define RXM_NONE						0
 #define RXM_CMD							4
 #define RXM_SET							3
-uint8_t RxBufferp=0;		// pointer
-uint8_t prefixDetectionIdx=0;
-static uint8_t pb_pntr=0;			// packet buffer pointer
-uint8_t packet_length=0;
-uint8_t rxm_state=0;
-uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
-uint8_t rx_packet_crc = 0;	// RxBuffer and ZXn packet header CRC
+volatile static uint8_t prefixDetectionIdx=0;
+volatile static uint8_t pb_pntr=0;			// packet buffer pointer
+volatile static uint8_t packet_length=0;
+volatile static uint8_t rxm_state=0;
+volatile static uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
 
 void hygroStatSettings(void);
 uint8_t readPercentVal(uint8_t value);
@@ -502,8 +451,8 @@ uint32_t measureDelay(void);
 void phMonSettings(void);
 void setTimer(uint8_t timerId);
 //void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos);
-void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos);
-void Lcd_write_arr(uc8 *STRING, uint8_t chars);
+void copy_arr(uint8_t volatile *source, volatile uint8_t *destination, uint8_t amount, uint8_t pos);
+void Lcd_write_arr(volatile uint8_t *STRING, uint8_t chars);
 void Lcd_write_digit(uint8_t numb);
 void Delay_us(uint32_t delay);
 void buttonCalibration(void);
@@ -515,16 +464,16 @@ void Lcd_write_cmd(uint8_t byte);
 void Lcd_clear(void);
 void Return_home(void);
 void Lcd_goto(uc8 x, uc8 y);
-void Lcd_write_str(char *STRING);
-char* adc2str(uint_fast16_t d, char* out);
-void int32str(uint32_t d, char *out);
+void Lcd_write_str(volatile uint8_t *STRING);
+char* adc2str(uint_fast16_t d, volatile char* out);
+void int32str(uint32_t d, volatile char *out);
 void AdcInit(void);
 uint32_t RTC_GetCounter(void);
 void RTC_SetCounter(uint32_t value);
 unsigned char RtcInit(void);
 uint8_t readButtons(void);
-void focusMenuItem(int itemId);
-int menuSelector(void);
+void focusMenuItem(uint8_t itemId);
+uint8_t menuSelector(void);
 uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays);
 void programRunner(uint8_t programId);
 RTC_DateTime unix2DateTime(uint32_t unixtime);
@@ -537,16 +486,16 @@ uint32_t CTimerAdjust(uint32_t time);
 void plugStateSet(uint8_t plug, uint8_t state);
 void getPh();
 void getEc(void);
-FRESULT string2log(char* str, int bytes);
+FRESULT string2log(char* str, uint8_t bytes);
 FRESULT sdLog2(void);
 uint8_t adjust8bit(uint8_t val);
 void loggerSettings(void);
-int yesNoSelector(char str, int curval);
+uint8_t yesNoSelector(char str, uint8_t curval);
 void loadSettings(void);
 void set4lowBits(uint8_t dta);
 void set4highBits(uint8_t dta);
 void flush_lcd_buffer(void);
-void phStabSettings(void);
+// void phStabSettings(void);
 void Lcd_write_16int(uint16_t);
 void saveButtonRanges(void);
 void readButtonRanges(void);
@@ -562,7 +511,6 @@ void dht_arr_displayer(void);
 void setPwmDc(uint8_t duty_cycle);
 void setDutyCycle(void);
 void displayAdcValues(void);
-// uint16_t get_average_adc(uint8_t amount);
 void EXTI0_IRQHandler(void);
 void EXTI1_IRQHandler(void);
 
@@ -572,13 +520,11 @@ void watering_setup(void);
 void fertilizer_mixing_program_setup(uint8_t progId);
 void run_watering_program(uint8_t progId);
 void run_fertilizer_mixer(uint8_t progId);
-// void calibratEc(void);
 void startWp(void);
 uint16_t adjust16bit_fast(uint16_t val, uint8_t speed);
-char * utoa_fast_div(uint32_t value, char *buffer);
 
 // count crc starting from input and taking buffer from start_byte for length bytes
-uint8_t crc_block(uint8_t input, uint8_t *start_byte, uint8_t length);
+uint8_t crc_block(uint8_t input, volatile uint8_t *start_byte, uint8_t length);
 
 static void uart_task(void *pvParameters);
 static void prvSetupHardware( void );
@@ -610,7 +556,7 @@ uint16_t adjust16bit(uint16_t val);
 void enable_dosing_pump(uint8_t pumpId, uint8_t state);
 void valveMotorStateSet(uint8_t valveId, uint8_t state);
 void USART1_IRQHandler(void);
-void StartDMAChannel4(unsigned int LengthBufer);
+void StartDMAChannel4(uint8_t LengthBufer);
 unsigned char GetStateDMAChannel4(void);
 void TIM1_TRG_COM_TIM17_IRQHandler(void);
 void TIM4_IRQHandler(void);
@@ -676,14 +622,6 @@ void autoSafe(void){
 		else {
 			fup_time = RTC_GetCounter();
 		}
-/*		if ((auto_flags&1)==1 && adcAverage[AVG_ADC_PSI]<PSI_UNDERPRESSURE) {
-			if (diff>PSI_UP_TIMEOUT) {
-				plugStateSet(PSI_PUMP_ID, 0);
-			}
-		}
-		else {
-			fup_time = RTC_GetCounter();
-		} */
 
 		vTaskDelay(1);
 		if (sonar_read[FWTANK_SONAR]<FWTANK_OVERLEVEL && sonar_read[FWTANK_SONAR]>0){
@@ -715,13 +653,13 @@ void Lcd_write_8b(uint8_t tmp) {
 }
 
 void calibrateFlowMeter(void){
-	uint8_t button=0, valve=0, counter_id=0, volume=0;
+	uint8_t valve=0, counter_id=0, volume=0;
 	uint16_t ticks_in_10cl=0;
 	uint32_t cnt_val1=0, cnt_val2=0;
 	Lcd_clear();
 	Lcd_write_str("Choose one:");
 	vTaskDelay(500);
-
+	button = 0;
 	while (button==0) {
 		button = readButtons();
 		Lcd_goto(0,0);
@@ -784,7 +722,6 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 {
 	uint32_t cnt_to_reach=0;
 	cnt_to_reach = ((uint32_t)amount*(uint32_t)wfCalArray[0])/10;
-//	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<cnt_to_reach) {
@@ -795,7 +732,6 @@ void get_water_cl(uint8_t valve, uint8_t counter_id, uint16_t amount)
 
 void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
 {
-//	uint8_t button=0;
 	open_valve(0);		// HARDCODE
 	water_counter[counter_id] = 0;
 	while (water_counter[0]<ticks) {
@@ -807,7 +743,6 @@ void get_water_tick(uint8_t valve, uint8_t counter_id, uint32_t ticks)
 void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount){	// amount in CL (10ml) max 65535x10=650L
 	uint32_t cnt_to_reach=0;
 	uint16_t volume=0;
-	uint8_t button=0;
 	Lcd_clear();
 	Lcd_write_str("Calibrate WFM?");
 	while (button==0) {
@@ -817,17 +752,12 @@ void get_water(uint8_t valve, uint8_t counter_id, uint16_t amount){	// amount in
 	if (button==BUTTON_OK) {
 		calibrateFlowMeter();
 	}
-
-
-//	vTaskDelay(10000);
 	uint8_t repeat=1;
 	while (repeat==1) {
 		Lcd_clear();
 		Lcd_write_str("CL amount:");
 		Lcd_write_16b(wfCalArray[0]);
 		volume = adjust16bit_fast(volume, 5);
-	//	cnt1=water_counter[0];
-	//	cnt_to_reach = water_counter[0]+(volume*wfCalArray[0])/10;
 		cnt_to_reach = ((uint32_t)volume*(uint32_t)wfCalArray[0])/10;
 
 		Lcd_clear();
@@ -871,7 +801,7 @@ void Lcd_write_16b(uint16_t tmp) {
 	Lcd_write_digit((uint16_t)tmp%100);
 }
 
-uint8_t crc_block(uint8_t input, uint8_t *start_byte, uint8_t length){
+uint8_t crc_block(uint8_t input, volatile uint8_t *start_byte, uint8_t length){
 	uint8_t i=0;
 	for (i=0; i<length; i++) {
 		input ^= start_byte[i];
@@ -883,11 +813,8 @@ uint8_t crc_block(uint8_t input, uint8_t *start_byte, uint8_t length){
 void USART1_IRQHandler(void)
 {
 
-//	if (RxCounter>6) {
-//			RxCounter=0;
-//	}
+	uint8_t rx_packet_crc = 0;	// RxBuffer and ZXn packet header CRC
 	if (USART_GetITStatus(BT_USART, USART_IT_RXNE) != RESET) {
-//			RxByte=(USART_ReceiveData(BT_USART) & 0x7F);
 			RxByte = USART_ReceiveData(BT_USART);	// get byte from Data Register
 #ifndef		PRODUCTION_BUILD
 			RxBuffer[RxCounter++] = RxByte;			// write it into RxBuffer
@@ -923,29 +850,6 @@ void USART1_IRQHandler(void)
 				prefixDetectionIdx = 0;
 			}
 		}
-		/* if (rxm_state==RXM_SET) {
-				if (pb_pntr==0) {	// if packet buffer pointer is 0, it points to payload size (payload, including this size byte)
-					packet_length=RxByte;	// get packet length
-				}
-				RxBuffer[pb_pntr++]=RxByte;	// receive byte into cmd buffer and increase command packet buffer pointer
-				if (pb_pntr==packet_length) {	// if packet buffer pointer reached packet length (rely on RXM_NONE set later)
-					// crc count
-					rx_packet_crc = crc_block(48, &RxBuffer[0],packet_length);	// 48 is XOR of "ZX2"
-					// crc check
-					if (rx_packet_crc==0) {
-						packet_ready=1;	// packet received correctly and is ready to process
-					}
-					else {
-						rx_flush();	// discard broken packet
-					}
-					rxm_state=RXM_NONE; // RX machine state set to NONE, completes RX cycle
-					pb_pntr=0;			// packet buffer pointer to 0
-
-				}
-
-		}  */
-
-
 
 		if (RxByte==90) {
 			// ready
@@ -983,24 +887,6 @@ void save_settings(void){	// wrapper for rx_ee, simplifies settings packet recei
 	}
 }
 
-/* static void uart_task(void *pvParameters){
-	while (1) {
-		if (packet_ready==1) {
-			if (rxm_state == RXM_CMD) {
-				run_uart_cmd();	// when
-			}
-			if (rxm_state == RXM_SET) {
-				save_settings();
-			}
-			packet_ready=0;
-		}
-		vTaskDelay(10);
-		if (txbuff_ne==1) {	// if TxBuff is not empty (flag set by, for example, get_settings_block())
-			send_packet();	// send packet from TxBuff
-		}
-		vTaskDelay(10);
-	}
-} */
 
 static void uart_task(void *pvParameters){
 	while (1) {
@@ -1014,9 +900,6 @@ static void uart_task(void *pvParameters){
 			packet_ready=0;
 		}
 		vTaskDelay(10);
-		// if (txbuff_ne==1) {	// if TxBuff is not empty (flag set by, for example, get_settings_block())
-		//	send_packet();	// send packet from TxBuff
-		// }
 	}
 }
 
@@ -1095,7 +978,7 @@ void run_uart_cmd(void){
 			run_doser_for(RxBuffer[2], RxBuffer[3], RxBuffer[4]);
 			break;
 		case 10:
-			valve_failed = RxBuffer[2];
+//			valve_failed = RxBuffer[2];
 			fup_time=RTC_GetCounter();
 			auto_failures=0;
 			break;
@@ -1133,10 +1016,9 @@ void run_uart_cmd(void){
 			loadSettings();
 			break;
 		case 20:
-			valve_busy=0;
+//			valve_busy=0;
 			break;
 		case 21:
-//			wp_next_run(RxBuffer[2](RxBuffer[3]+(RxBuffer[4]<<8)+(RxBuffer[5]<<16)+(RxBuffer[6]<<24)));
 			break;
 
 
@@ -1160,7 +1042,6 @@ void run_uart_cmd(void){
 			send_ee_block(addr);
 			break;
 	}
-//	rx_flush();
 }
 
 
@@ -1184,7 +1065,6 @@ void run_doser_for(uint8_t pump_id, uint8_t amount, uint8_t speed){
 }
 
 void rx_ee(uint16_t addr, uint8_t type){
-	//addr=(RxBuffer[2]+RxBuffer[3]*256);
 	uint32_t val32 = 0;
 	static uint16_t val16 = 0;
 	uint8_t i=0;
@@ -1232,7 +1112,6 @@ void send_ee_addr(uint16_t addr, uint8_t type){	// sends EEPROM cell contents vi
 		TxBuffer[8] = (uint8_t)((val32>>16)&0xFF);
 		TxBuffer[9] = (uint8_t)((val32>>24)&0xFF);
 	}
-//	TxBuffer[39] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
 	TxBuffer[(TxBuffer[3]-1)] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
@@ -1264,7 +1143,6 @@ void send_ee_block(uint16_t addr){
 		TxBuffer[pointer++] = (uint8_t)((val32))&0xFF;
 	}
 
-//	TxBuffer[39] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
 	TxBuffer[pointer] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));
 	NbrOfDataToTransfer = TxBuffer[3];
 	TxCounter=0;
@@ -1325,13 +1203,11 @@ void onPayloadByte(uint8_t b, uint8_t nextState) {
 } */
 
 void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
-//	uint8_t block[8];
-//	if (txbuff_ne==0 && TxCounter==NbrOfDataToTransfer) { // only if nothing is being transfered
-		TxBuffer[0] = 90;	// Z
-		TxBuffer[1] = 88;	// X
-		TxBuffer[2] = 51;	// 3 (sending STATUS)
-		TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
 		if (txbuff_ne==0) {
+			TxBuffer[0] = 90;	// Z
+			TxBuffer[1] = 88;	// X
+			TxBuffer[2] = 51;	// 3 (sending STATUS)
+			TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
 			if (blockId==1) {	// state block 1
 				TxBuffer[4] = comm_state;
 				TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
@@ -1367,11 +1243,9 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 				TxBuffer[35] = auto_flags;	// first sonar higher byte
 				TxBuffer[36] = (uint8_t)(sonar_read[MIXTANK_SONAR]&(0xFF));		// second sonar
 				TxBuffer[37] = (uint8_t)((sonar_read[MIXTANK_SONAR]>>8)&(0xFF));
-		//		adcAverage[AVG_ADC_PSI]>psi_pump_top_level
 				TxBuffer[38] = blockId;
 			}
 			if (blockId==2) {	// state block 2
-		//		uint32_t now = RTC_GetCounter();
 				TxBuffer[4] = (uint8_t)(psi_pump_top_level&(0xFF));
 				TxBuffer[5] = (uint8_t)((psi_pump_top_level>>8)&(0xFF));
 				TxBuffer[6] = (uint8_t)(psi_pump_btm_level&(0xFF));
@@ -1399,16 +1273,16 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 			}
 
 			if (blockId==4) {	// state block 4
-				TxBuffer[4] = currentEc;
-				TxBuffer[5] = currentPh;
-				TxBuffer[6] = phUnderOver+ecUnderOver*4;
-				TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
-				TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
+//				TxBuffer[4] = currentEc;
+//				TxBuffer[5] = currentPh;
+//				TxBuffer[6] = phUnderOver+ecUnderOver*4;
+//				TxBuffer[7] = (uint8_t)(phWindowTop&(0xFF));
+//				TxBuffer[8] = (uint8_t)((phWindowBottom>>8)&(0xFF));
 				TxBuffer[9] = 00;		// EMPTY
 				TxBuffer[10] = dosingPumpStateFlags2;
 				TxBuffer[11] = (uint8_t)(wfCalArray[0]&(0xFF));
 				TxBuffer[12] = (uint8_t)((wfCalArray[0]>>8)&(0xFF));
-				TxBuffer[13] = waterSensorStateFlags;
+				TxBuffer[13] = 77;	// dumb hardcode
 				TxBuffer[38] = blockId;
 			}
 
@@ -1421,8 +1295,8 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 				TxBuffer[9] = (uint8_t)((water_counter[0]>>8)&(0xFF));
 				TxBuffer[10] = (uint8_t)((water_counter[0]>>16)&(0xFF));
 				TxBuffer[11] = (uint8_t)((water_counter[0]>>24)&(0xFF));
-				TxBuffer[12] = valve_failed;		//
-				TxBuffer[13] = waterSensorStateFlags;
+//				TxBuffer[12] = valve_failed;		//
+				TxBuffer[13] = 77;		// dumb hardcode
 				TxBuffer[38] = blockId;
 			}
 
@@ -1524,7 +1398,7 @@ unsigned char GetStateDMAChannel4(void)
 //Function: start exchange in  direction "memory-DMA-USART1"                           //
 //Argument: amount of data                                        //
 //********************************************************************************
-void StartDMAChannel4(unsigned int LengthBufer)
+void StartDMAChannel4(uint8_t LengthBufer)
 {
   DMA1_Channel4->CCR   = ~DMA_CCR4_EN;      //disable DMA channel
   DMA1_Channel4->CNDTR =  LengthBufer;      //load data amount to transmit
@@ -1537,28 +1411,6 @@ void StartDMAChannel4(unsigned int LengthBufer)
 
 void valve_feedback_init(void){		// init PA6-8 as input for 3V valve feedback
 
-	// v1.4 config assumes PA5-7 pins as feedback, implement init function
-	// v2 config assumes PA6-8 pins as feedback
-
-// PA5-7 setup
-	GPIO_InitTypeDef GPIO_InitStructure;
-//	EXTI_InitTypeDef EXTI_InitStructure;
-//	NVIC_InitTypeDef NVIC_InitStructure;
-//	GPIO_PinRemapConfig(GPIO_Remap_PD01, ENABLE);
-	  // Enable GPIOA clock
-//	  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);
-
-	  // Configure PA5-7 pin as input pull-down
-	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_8 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
-//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PD;
-	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
-
-//	  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_0 | GPIO_Pin_1;
-//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-//	  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPD;
-//	  GPIO_Init(VALVE_SENSOR_PORT, &GPIO_InitStructure);
 }
 
 void water_level_input_init(void){
@@ -1614,9 +1466,7 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 
 
 	    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC, ENABLE );
-
 	    RCC_APB1PeriphClockCmd( RCC_APB1Periph_TIM3, ENABLE );
-
 	    GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
 
 	    // Setup Blue & Green LED on STM32-Discovery Board to use PWM.
@@ -1654,16 +1504,12 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 void tankLevelStabSetup(void){
 	Lcd_clear();
 	uint16_t curlevel=0;
-	uint8_t button=0, tmp=0;
+	uint8_t tmp=0;
 	Lcd_clear();
-//	Lcd_write_str("Supply valve ID");
-//	EE_ReadVariable(WATER_TANK_SUPPLY_VALVE, &tmp);
-//	tmp = adjust8bit(tmp);
-//	EE_WriteVariable(WATER_TANK_SUPPLY_VALVE, tmp);
-//	printOk();
 	vTaskDelay(10);
 	Lcd_clear();
 	Lcd_write_str("Set tank top lvl");
+	button = 0;
 	while (button!=BUTTON_OK) {
 		button = readButtons();
 		curlevel = sonar_read[FWTANK_SONAR];
@@ -1678,19 +1524,6 @@ void tankLevelStabSetup(void){
 	vTaskDelay(2000);
 	Lcd_write_str("Set btm lvl");
 	button = 0;
-/*	while (button!=BUTTON_OK) {
-		button = readButtons();
-		curlevel = sonar_read[FWTANK_SONAR];
-		vTaskDelay(5);
-		Lcd_goto(1,0);
-		Lcd_write_digit(curlevel/100);
-		Lcd_write_digit(curlevel);
-	}
-	button=0;
-	vTaskDelay(10);
-	EE_WriteVariable(WATER_TANK_BOTTOM, curlevel);
-	printOk();
-	vTaskDelay(2000); */
 	Lcd_clear();
 	loadSettings();
 }
@@ -1774,8 +1607,9 @@ void EXTI9_5_IRQHandler(void)
 }
 
 void eeprom_test(void){
-	uint8_t button=0;
-	uint16_t addr=1400, val=0;
+	uint16_t addr=1400;
+	uint16_t val=0;
+	button = 0;
 	while (button!=BUTTON_FWD) {
 		button=readButtons();
 		val = 0;
@@ -1808,9 +1642,9 @@ void eeprom_test(void){
 }
 
 void valve_test2(void){
-	uint8_t button=0, curvalve=0;
+	uint8_t curvalve=0;
 	Lcd_clear();
-
+	button=0;
 	while (button!=BUTTON_OK) {
 		vTaskDelay(20);
 		button=readButtons();
@@ -1879,7 +1713,7 @@ void valve_test2(void){
 }
 
 void valve_test3(void){
-	uint8_t button=0, curvalve=2;
+	uint8_t curvalve=2;
 	Lcd_clear();
 
 	while (button!=BUTTON_OK) {
@@ -1934,9 +1768,9 @@ void valve_test3(void){
 
 
 void valve_test(void){
-	uint8_t button=0;
 	uint16_t tmp=0;
 	Lcd_clear();
+	button=0;
 	while (button!=BUTTON_OK) {
 		vTaskDelay(20);
 		button=readButtons();
@@ -2019,11 +1853,12 @@ void valve_test(void){
 
 uint16_t adjustFlags(uint16_t flags, uint8_t from, uint8_t to){
 	uint8_t i=0;
-	uint8_t button=0, cursor=0;
+	uint8_t cursor=0;
 	uint8_t var=0;
 	var = (flags>>from);
 	Lcd_goto(0,0);
 	Lcd_write_str("_");
+	button=0;
 	while (button!=BUTTON_OK) {
 		button=readButtons();
 		Lcd_goto(1,0);
@@ -2088,7 +1923,7 @@ void water_program_setup(uint8_t progId){
 	addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
 	EE_ReadVariable(addr, &flags);
 	flags = adjustFlags(flags,0,3);
-	uint8_t button=0, flag = 0;
+	uint8_t flag = 0;
 	while (button==0) {
 		button=readButtons();
 		if (button==BUTTON_FWD){
@@ -2127,90 +1962,7 @@ void water_program_setup(uint8_t progId){
 
 }
 
-/*
-void water_program_setup2(uint8_t progId){
-	uint16_t addr=0, tempvalue=0;
-	uint32_t tmp32, interval;
 
-	// set fresh water fill timeout, seconds
-	addr = WP_OFFSET+progId*WP_SIZE+WATER_FILL_TIMEOUT_SHIFT;
-	EE_ReadVariable(addr, &tempvalue);
-	Lcd_clear();
-	Lcd_write_str("Wtr fill timeout");
-	tempvalue = adjust16bit(tempvalue);
-	EE_WriteVariable(addr, tempvalue);
-
-
-
-	// set watering timeout, seconds
-	addr = WP_OFFSET+progId*WP_SIZE+WP_WTRNG_TIMEOUT;
-	EE_ReadVariable(addr, &tempvalue);
-	Lcd_clear();
-	Lcd_write_str("Wtrng timeout");
-	tempvalue = adjust16bit(tempvalue);
-	EE_WriteVariable(addr, tempvalue);
-
-	// set watering duration, seconds
-	addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
-	interval = EE_ReadWord(addr);
-	Lcd_clear();
-	Lcd_write_str("Set run interval");
-	vTaskDelay(500);
-	interval = CTimerAdjust(interval);
-	EE_WriteWord(addr, interval);
-
-
-	// enable watering program (=1 enables the WP)
-	addr = WP_OFFSET+progId*WP_SIZE+WP_ENABLE_SHIFT;
-	EE_ReadVariable(addr, &tempvalue);
-	Lcd_clear();
-	Lcd_write_str("Enable WP?");
-	tempvalue = adjust8bit(tempvalue);
-	EE_WriteVariable(addr, tempvalue);
-
-//	EE_ReadWord(addr, &tempvalue);
-	Lcd_clear();
-	Lcd_write_str("Start program?");
-	uint8_t button=0;
-	while (button==0) {
-		button=readButtons();
-		vTaskDelay(10);
-	}
-	if (button==BUTTON_OK) {
-		// set initial time point of watering program
-		addr = WP_OFFSET+progId*WP_SIZE+WP_START;
-		tmp32 = RTC_GetCounter();
-		EE_WriteWord(addr, tmp32);
-
-		addr = WP_OFFSET+progId*WP_SIZE+WP_LAST_RUN_SHIFT;
-		EE_WriteWord(addr, (RTC_GetCounter()-interval+5));
-//			run_watering_program(progId);
-	}
-	if (button==BUTTON_CNL) {
-		Lcd_clear();
-		Lcd_write_str("Start time");
-		vTaskDelay(1000);
-		addr = WP_OFFSET+progId*WP_SIZE+WP_START;
-		tmp32 = EE_ReadWord(addr);
-		tmp32 = timeAdjust(tmp32, 1);
-		EE_WriteWord(addr, tmp32);
-	}
-	Lcd_clear();
-	Lcd_write_str("End time");
-	vTaskDelay(1000);
-	addr = WP_OFFSET+progId*WP_SIZE+WP_END;
-	tmp32 = EE_ReadWord(addr);
-	tmp32 = timeAdjust(tmp32, 1);
-	EE_WriteWord(addr, tmp32);
-	Lcd_clear();
-	vTaskDelay(200);
-
-	vTaskSuspendAll();
-	loadSettings();
-	xTaskResumeAll();
-
-}
-*/
 
 void fertilization_setup(void){
 	uint8_t progId=0;
@@ -2251,7 +2003,7 @@ void fertilizer_mixing_program_setup(uint8_t progId){
 	EE_WriteVariable(addr, tempvalue);
 
 	// set circulation pump mixing time
-	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
+//	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
 	EE_ReadVariable(addr, &tempvalue);
 	Lcd_clear();
 	Lcd_write_str("Aftermix time");		// setting the time for running circulation pump to mix the fertilizer into solution
@@ -2275,7 +2027,7 @@ void fertilizer_mixing_program_setup(uint8_t progId){
 	EE_WriteVariable(addr, tempvalue);
 
 	// set ENABLED/DISABLED status for this program
-	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_ENABLE;
+//	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_ENABLE;
 	EE_ReadVariable(addr, &tempvalue);
 	Lcd_clear();
 	Lcd_write_str("ENABLE FMP?");
@@ -2298,6 +2050,7 @@ void startWp(void){
 	Lcd_write_str("Start WP#");
 	Lcd_write_digit(progId);
 	Lcd_write_str("?");
+	button=0;
 	while (button!=BUTTON_OK && button!=BUTTON_CNL) {
 //		dht_get_data();
 		vTaskDelay(30);
@@ -2386,7 +2139,7 @@ void run_watering_program(uint8_t progId){
 		uint16_t enabled=0;
 		addr = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;
 		EE_ReadVariable(addr, &fmpLink);
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
+//		addr = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
 		EE_ReadVariable(addr, &enabled);
 		if (fmpLink==progId && enabled==1 && rest==0) {
 			run_fertilizer_mixer(i);
@@ -2433,105 +2186,6 @@ void run_watering_program(uint8_t progId){
 
 }
 
-/* void run_watering_program_hptl(uint8_t progId){
-	wpStateFlags|=(1<<progId);	// set active flag for this program
-
-	plugStateSet(3,0);	// close drain valve
-	uint16_t addr, solutionVolume=0, fmpLink, wateringPlugId=0;
-	uint8_t i, tank4lvl=0;
-	uint32_t now=0, end=0, wateringDuration=0, lastTime=0;
-	vTaskDelay(1);
-
-	addr = WP_OFFSET+progId*WP_SIZE+WP_SOLUTION_VOLUME_SHOFT;
-	EE_ReadVariable(addr, &solutionVolume);
-
-	// water fill timeout
-	addr = WP_OFFSET+progId*WP_SIZE+WATER_FILL_TIMEOUT_SHIFT;
-	EE_ReadVariable(addr, &wateringDuration);
-
-	now = RTC_GetCounter();
-	end = now + wateringDuration;
-
-	vTaskDelay(5);
-
-
-	// fill the tank
-	open_valve(FWI_VALVE);	// open Fresh Water Intake (FWI) valve
-	// and keep it open until the water reaches the volume set or timeout exceeds
-	while (sonar_read[MIXTANK_SONAR]<solutionVolume || now<end) {
-		now = RTC_GetCounter();
-		vTaskDelay(25);
-	}
-	close_valve(FWI_VALVE);
-	vTaskDelay(1000);
-
-
-	// mix fertilizers
-	for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
-		// count current N value
-		uint16_t n=0;
-		uint32_t curN=0, interval=0, startime=0;
-		addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
-		interval = EE_ReadWord(addr);
-		addr = WP_OFFSET+progId*WP_SIZE+WP_START;
-		startime = EE_ReadWord(addr);
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
-		EE_ReadVariable(addr, &n);
-		curN = (RTC_GetCounter()-startime)/interval;
-		uint8_t rest = curN/n;
-
-		uint16_t enabled=0;
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;
-		EE_ReadVariable(addr, &fmpLink);
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
-		EE_ReadVariable(addr, &enabled);
-		if (fmpLink==progId && enabled==1 && rest==0) {
-			run_fertilizer_mixer(i);
-		}
-		vTaskDelay(10);
-	}
-
-	// run watering
-	addr = WP_OFFSET+progId*WP_SIZE+WP_DURATION_SHIFT;
-	EE_ReadVariable(addr, &wateringDuration);
-
-	addr = WP_OFFSET+progId*WP_SIZE+WP_WATERING_PUMP_PLUG_ID;
-	EE_ReadVariable(addr, &wateringPlugId);
-
-	vTaskDelay(10);
-//	now=0;
-	now = RTC_GetCounter();
-	end = RTC_GetCounter() + wateringDuration;
-	vTaskDelay(10);
-
-	open_valve(WLINE_61_VALVE);
-#define WLINE_62_VALVE				3
-	i=0;
-	auto_flags |= 1;	// enable PSI level keeper
-	while (now<end && ((wpStateFlags>>progId)&1)) {
-		vTaskDelay(10);
-		i=cTimerStateFlags&1;	// HARDCODE!!! (used CTimer0) apply CTimer to split watering into periods
-		if ((lastTime<RTC_GetCounter()) && i==1 && waterSensorFlag==1) {
-			now++;
-			lastTime=RTC_GetCounter();
-		}
-		vTaskDelay(5);
-	}
-	auto_flags &= ~1;	// disable PSI level keeper
-	plugStateSet(wateringPlugId, 0);
-	// drain the rest of the tank
-
-	vTaskDelay(10);
-	close_valve(DRAIN_VALVE_ID);
-	open_valve(DRAIN_VALVE_ID);
-
-	addr = WP_OFFSET+progId*WP_SIZE+WP_LAST_RUN_SHIFT;
-	EE_WriteWord(addr, RTC_GetCounter());	// write last run time
-
-	wpStateFlags &= ~(1<<progId); // sbrosit' flag
-	vTaskDelay(200);
-} */
-
 void run_fertilizer_mixer(uint8_t progId){
 	uint16_t dosingTime, dosingPumpId, circulationMixingTime, addr;
 	uint32_t dosingEndTime=0;
@@ -2542,7 +2196,7 @@ void run_fertilizer_mixer(uint8_t progId){
 	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
 	EE_ReadVariable(addr, &dosingPumpId);
 
-	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
+//	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
 	EE_ReadVariable(addr, &circulationMixingTime);
 
 	dosingEndTime = RTC_GetCounter()+dosingTime;
@@ -2649,8 +2303,6 @@ void watering_program_trigger(void *pvParameters){
 	valve_init();
 
 	while (1) {
-//
-
 		// additional low speed tasks
 		tankLevelStab();
 		autoSafe();
@@ -2672,8 +2324,6 @@ void watering_program_trigger(void *pvParameters){
 			addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
 			EE_ReadVariable(addr, &enabled);	// program start time point
 			vTaskDelay(10);
-//			wpStateFlag=wpStateFlags&(1<<progId);	// check if WP active now
-//			wpStateFlag>>=progId;	// ostavit' toka flag
 			if (diff>interval && curtime>startTime && curtime<endTime && enabled>0){
 				run_watering_program(progId);
 			}
@@ -2812,9 +2462,6 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   {
     /* Duty cycle computation */
     DutyCycle = ((TIM15->CCR1) * 100) / IC2Value;
-
-    /* Frequency computation */
- //   Frequency = SystemCoreClock / IC2Value;
   }
   else
   {
@@ -2822,13 +2469,6 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
     Frequency = 0;
   }
 
-
-
-  // fill one more value of dht bits array
-//  dht_bit_array[dht_bit_position]=TIM_GetCapture1(TIM15);
-//  dht_bit_array[dht_bit_position]=DutyCycle;
-//  dht_bit_position++;
-//  dht_bit_array[dht_bit_position]=TIM15->CCR2;
   dht_bit_position++;		// holds current DHT response bit sequence number
 
 	if (dht_bit_position>dht_shifter && dht_data_ready==0) {
@@ -2845,17 +2485,15 @@ void TIM1_BRK_TIM15_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 				dht_data_ready=1;
 				dht_byte_pointer = 0;
 				dht_bit_pointer = 7;
-//				dht_bit_position = 0;
 			}
 		}
 		else {
 			dht_bit_pointer--;
 		}
 	}
-
 }
 
-#define MAX_SONAR_READ	400				// drop wrong reads
+
 void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
 {
   /* Clear TIM16 Capture compare interrupt pending bit */
@@ -2872,7 +2510,6 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
 {
   /* Clear TIM16 Capture compare interrupt pending bit */
   TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
-//  TIM17->SR &= ~TIM_SR_CC1IF;
   /* Get the Input Capture value */
   if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ)) {
 	  sonar_read[FWTANK_SONAR]=SONAR1_TIM->CNT;
@@ -2882,26 +2519,20 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
 
 
 void dht_get_data(void){	// function starts getting data from DHT22 sensor
-//	SONAR1_TIM->EGR |= TIM_EGR_CC1G;
 	vTaskDelay(25);
 	  uint8_t i;
 	  for (i=0;i<5;i++) {
 		dht_data[i]=0;
 	  }
-//	  dht_bit_ready = 0;
 	  dht_bit_position = 0;
 	  dht_data_ready=0;
 	  dht_init_out();
 	  DHT_0;
-//	  GPIOA->BRR = (1<<DHT_TRIG_PLUG);		// set 0
 	  vTaskDelay(5);
 	  DHT_1;
 	  dht_init();
 	  vTaskDelay(200);
 
-//	  dht_bit_ready = 1;
-//	  dht_bit_position = 0;
-//	  GPIOA->BSRR = (1<<DHT_TRIG_PLUG);	// set 1
 	  vTaskDelay(5);
 	  dht_conv_data();
 }
@@ -2943,18 +2574,14 @@ void dht_conv_data(void){ // convert DHT impulse lengths array into numbers and 
 }
 
 void dht_arr_displayer(void){
-//	dht_get_data();
-	uint8_t button=0;
+	button=0;
 	while (button!=BUTTON_OK) {
-//		dht_get_data();
 		vTaskDelay(30);
 #ifdef TEST_MODE
 		button=readButtons();
 		Lcd_goto(0,0);
 		Lcd_write_digit(dht_shifter);
 		Lcd_write_str(": ");
-//		Lcd_write_digit(dht_data[arr_pointer]/100);
-//		Lcd_write_digit(dht_bit_array[arr_pointer]);
 		if (button==BUTTON_FWD) {
 			dht_shifter++;
 		}
@@ -2975,40 +2602,10 @@ void dht_arr_displayer(void){
 }
 
 
-uint8_t adc2ph(uint16_t adcval){
-	return ((adcval - ph0)*10)/cdel;
-}
-
-uint16_t ph2adc(uint8_t ph){
-	return (ph*cdel)/10+ph0;
-}
-
-void phStabSettings(void){	// function guides user through setting the pH level stabilizer window
-	uint16_t phadcvalue=0;
-	uint8_t phval=0;
-	Lcd_clear();
-	Lcd_write_str("Set top pH lvl");
-	vTaskDelay(10);
-	EE_ReadVariable(PH_WINDOW_TOP, &phadcvalue);
-	phval = adc2ph(phadcvalue);
-	phval = readPhVal(phval);
-	vTaskDelay(10);
-	EE_WriteVariable(PH_WINDOW_TOP, ph2adc(phval));
-	Lcd_clear();
-	Lcd_write_str("Set btm lvl");
-	vTaskDelay(10);
-	EE_ReadVariable(PH_WINDOW_BOTTOM, &phadcvalue);
-	phval = adc2ph(phadcvalue);
-	phval = readPhVal(phval);
-	vTaskDelay(10);
-	EE_WriteVariable(PH_WINDOW_BOTTOM, ph2adc(phval));
-	Lcd_clear();
-}
-
 uint8_t readPercentVal(uint8_t value){
-	uint8_t button=0;
 	char prcntStr[5];
 	value %= 101;	// drop all except 0..100
+	button=0;
 	while (button!=BUTTON_OK) {
 		button = readButtons();
 		Lcd_goto(1,3);
@@ -3048,7 +2645,6 @@ void hygroStatSettings(void){
 	Lcd_write_str("Set top rH lvl");
 	vTaskDelay(10);
 	EE_ReadVariable(RH_WINDOW_TOP, &rh_value);
-//	rh_val = adc2ph(phadcvalue);
 	rh_val = readPercentVal(rh_value);
 	vTaskDelay(10);
 	EE_WriteVariable(RH_WINDOW_TOP, rh_val);
@@ -3076,9 +2672,9 @@ void convPh2str(uint8_t ph, char* phstr){
 }
 
 uint8_t readPhVal(uint8_t value){
-	uint8_t button=0;
 
 	char phStr[5];
+	button=0;
 	while (button!=BUTTON_OK) {
 		button = readButtons();
 		Lcd_goto(1,3);
@@ -3110,7 +2706,7 @@ uint8_t readPhVal(uint8_t value){
 }
 
 void Lcd_write_16int(uint16_t d){
-	int i;
+	uint8_t i=0;
 	char out[5];
 	out[5] = '\0';
 	out[4] = '0' + ( d       )    % 10;
@@ -3125,21 +2721,12 @@ void Lcd_write_16int(uint16_t d){
 }
 
 void Lcd_write_32int(uint32_t d){
-//	int i;
 	char tmpstr[10];
 	int32str(d, &tmpstr);
 	copy_arr(&tmpstr, LCDLine2, 11, 0);
 }
 
-void phStab(){
-	// compare current pH with top level
-/*	if (curph>pHstab_topLevel && pHstab_min_interval) {
-		addAcid();
-	}
-	if (curph<pHstab_bottomLevel){
-		addBase();
-	} */
-}
+
 
 void enablePlug5ms(uint8_t plug, uint16_t amount){	// 1 amount = 5ms
 	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   //enable TIM2 clock
@@ -3159,7 +2746,7 @@ uint32_t measureDelay(void){	// maximum 300+ (65535/200) seconds
 	 TIM2->PSC     = 40000-1;               //set divider for 5 milliseconds
 	 TIM2->CR1     = TIM_CR1_OPM;          //one pulse mode
 	 TIM2->CR1 |= TIM_CR1_CEN;
-	 uint8_t button=0;
+	button=0;
 	 while (button!=BUTTON_OK) {
 		 button = readButtons();
 		 // display counter value
@@ -3177,48 +2764,18 @@ typedef struct
     uint8_t rem;
 } divmod10_t;
 
-inline static divmod10_t divmodu10(uint32_t n)
-{
-    divmod10_t res;
-// ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¶ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° 0.8
-    res.quot = n >> 1;
-    res.quot += res.quot >> 1;
-    res.quot += res.quot >> 4;
-    res.quot += res.quot >> 8;
-    res.quot += res.quot >> 16;
-    uint32_t qq = res.quot;
-// ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â´ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â° 8
-    res.quot >>= 3;
-// ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â²ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¹ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â»ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº
-    res.rem = n - ((res.quot << 1) + (qq & ~7ul));
-// ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂºÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¦ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¾ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚ÂµÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¼ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âº ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¸ ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â°ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¹ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â¦ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¾ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â‚¬Å¾Ã‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¯ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¿ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â½ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Â ÃƒÂ¢Ã¢â€šÂ¬Ã¢â€žÂ¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦Ãƒâ€šÃ‚Â¡ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã†â€™ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Âµ
-    if(res.rem > 9)
-    {
-        res.rem -= 10;
-        res.quot++;
-    }
-    return res;
-}
+
 
 
 
 /* Virtual address defined by the user: 0xFFFF value is prohibited */
 uint16_t VirtAddVarTab[2] = {
 			CIRCULATION_PUMP_ID_ADDR,
-	/*		RH_WINDOW_BOTTOM,
-			RH_WINDOW_TOP,
-			PH_WINDOW_BOTTOM,
-			PH_WINDOW_TOP,
-			EC1413_ADDR,
-			SD_LOG_INTERVAL,
-			PH_BUFF_SIZE,
-			PH_INTERVAL,
-			PH7_ADDR, */
 			PH4_ADDR
 };
 
 void fill_virtAddrTab(void){
-	uint8_t i;
+	uint8_t i=0;
 	for (i=0; i<17; i++) {
 		VirtAddVarTab[i]=WP_OFFSET+i;
 	}
@@ -3288,7 +2845,7 @@ const char menuItemArray[MENURECS][18]=
 };
 
 // 0 - nr zapisi, 1 - link na tekst, 2 - <, 3 - >, 4 - OK, 5 - CNCL, 6 - tip zapisi (0 - folder, 1 - program)
-const int fatArray[MENURECS][7]=
+const uint8_t fatArray[MENURECS][7]=
 {
 		{0,	0,	33,	1,	1,	0,	1},
 		{1,	1,	0,	5,	2,	1,	1},
@@ -3377,7 +2934,7 @@ const char menuItemArray[MENURECS][18]=
 };
 
 // 0 - nr zapisi, 1 - link na tekst, 2 - <, 3 - >, 4 - OK, 5 - CNCL, 6 - tip zapisi (0 - folder, 1 - program)
-const int fatArray[MENURECS][7]=
+const uint8_t fatArray[MENURECS][7]=
 {
 		{0,	0,	33,	1,	1,	0,	1},
 		{1,	1,	0,	2,	2,	1,	1},
@@ -3423,10 +2980,10 @@ const int fatArray[MENURECS][7]=
 
 #endif
 
-char* adc2str(uint_fast16_t d, char* out)
+char* adc2str(uint_fast16_t d, volatile char* out)
 {
 	char out2[17];
-	int i, k, c;
+	uint8_t i, k, c;
     out2[16] = '\0';
     out2[15] = '0' + ( d       )    % 10;
     out2[14] = '0' + ( d /= 10 )    % 10;
@@ -3463,28 +3020,16 @@ char* adc2str(uint_fast16_t d, char* out)
 }
 
 void Delay_us(uint32_t delay){
-	uint32_t del=delay*250; while (del--){}
-}
+	volatile uint32_t del=0;
+	del = delay*250;
+	while (del--){
 
-/* uint16_t get_average_adc(uint8_t amount){
-	uint8_t i=0;
-	uint32_t sum = 0;
-	for (i=0; i<amount; i++) {
-		sum += JDR_BUTTONS;
 	}
-	return sum/amount;
-} */
+}
 
 void buttonCalibration(void){	// buttons calibration function
 	Lcd_clear();
 	Lcd_goto(0,0);
-//	Lcd_write_arr("no_sd=",5);
-	no_sd+=48;
-	Lcd_write_arr(no_sd,1);
-//	run_valve_motor(0);
-//	run_valve_motor(1);
-//	Delay_us(100000);
-
 	uint16_t button_val[4], diff;
 	Lcd_clear();
 	Lcd_goto(0,0);
@@ -3492,7 +3037,6 @@ void buttonCalibration(void){	// buttons calibration function
 	Delay_us(30000);
 	adcAverager();
 	Delay_us(100);
-//	uint16_t adcAverage[4];
 	button_val[0] = adcAverage[ADC_AVG_BUTTONS];
 	Lcd_goto(0,0);
 	Lcd_write_arr("OK", 2);
@@ -3520,13 +3064,11 @@ void buttonCalibration(void){	// buttons calibration function
 		buttonReverse = 0;
 	}
 	else {
-		// loadButtonSettings();	// no key pressed, loading settings from EEPROM
 		buttonReverse = 2;	//means loading button settings from EEPROM
 	}
 	if (buttonReverse == 0) {
 		diff = ((button_val[1]-button_val[0])/2)-5;
-		button_ranges[0] = (button_val[0]-diff/2);	// 05.09.13. NxtLn commented
-//		button_ranges[0] = button_val[0]-diff;
+		button_ranges[0] = (button_val[0]-diff/2);
 		button_ranges[1] = button_val[0]+diff;
 		button_ranges[2] = button_val[1]-diff;
 		diff = ((button_val[2]-button_val[1])/2)-5;
@@ -3535,8 +3077,7 @@ void buttonCalibration(void){	// buttons calibration function
 		diff = ((button_val[3]-button_val[2])/2)-5;
 		button_ranges[5] = button_val[2]+diff;
 		button_ranges[6] = button_val[3]-diff;
-		button_ranges[7] = (button_val[3]+diff/2); 	// 05.09.13. NxtLn commented
-//		button_ranges[7] = button_val[3]+diff;
+		button_ranges[7] = (button_val[3]+diff/2);
 		saveButtonRanges();
 	}
 	else if (buttonReverse == 1) {
@@ -3567,9 +3108,9 @@ void buttonCalibration(void){	// buttons calibration function
 
 void displayAdcValues(void){
 #ifdef TEST_MODE
-	uint8_t button=0;
 	Lcd_clear();
 	vTaskDelay(500);
+	button=0;
 	while (button!=BUTTON_OK){
 		button=readButtons();
 		Lcd_goto(0,0);
@@ -3594,9 +3135,9 @@ void displayAdcValues(void){
 
 void displayAdcValues_bak(void){
 #ifdef TEST_MODE
-	uint8_t button=0;
 	Lcd_clear();
 	vTaskDelay(500);
+	button=0;
 	while (button!=BUTTON_OK){
 		button=readButtons();
 		Lcd_goto(0,0);
@@ -3620,9 +3161,10 @@ void displayAdcValues_bak(void){
 }
 
 void display_usart_rx2(void){	// another usart test fr displaying RxBuffer contents
-		uint8_t button=0, i=0;
+		uint8_t i=0;
 		Lcd_clear();
 		vTaskDelay(500);
+		button=0;
 		while (button!=BUTTON_OK){
 			button=readButtons();
 			Lcd_goto(0,0);
@@ -3646,9 +3188,10 @@ void display_usart_rx2(void){	// another usart test fr displaying RxBuffer conte
 }
 
 void display_usart_rx(void){
-		uint8_t button=0, i=0;
+		uint8_t i=0;
 		Lcd_clear();
 		vTaskDelay(500);
+		button=0;
 		while (button!=BUTTON_OK){
 			button=readButtons();
 			Lcd_goto(0,0);
@@ -3661,19 +3204,18 @@ void display_usart_rx(void){
 			Lcd_write_8b(RxBuffer[5]);
 			Lcd_write_8b(RxBuffer[6]);
 			Lcd_write_str(" ");
-//			Lcd_write_digit(RxCounter);
 			Lcd_write_digit(rxm_state);
 			copy_arr(&RxBuffer, &LCDLine2, 7,9);
-//			Lcd_write_arr(&RxBuffer, 7);
 			vTaskDelay(20);
 		}
 		Lcd_clear();
 }
 
 void display_usart_tx(void){
-		uint8_t button=0, i=0;
+		uint8_t i=0;
 		Lcd_clear();
 		vTaskDelay(500);
+		button=0;
 		while (button!=BUTTON_OK){
 			button=readButtons();
 			Lcd_goto(0,0);
@@ -3695,214 +3237,39 @@ void display_usart_tx(void){
 
 
 void saveButtonRanges(void){
-	uint8_t i;
+	uint8_t i=0;
 	for (i=0; i<8; i++) {
 		EE_WriteVariable(BUTTON_RANGES_START_ADDR+i, button_ranges[i]);
 	}
 }
 
 void readButtonRanges(void){
-	uint8_t i;
+	uint8_t i=0;
 	for (i=0; i<8; i++) {
 		EE_ReadVariable(BUTTON_RANGES_START_ADDR+i, &button_ranges[i]);
 	}
 }
 
-FRESULT string2log(char* str, int bytes){
-	FRESULT res;
-	if (no_sd==0) {
-		  static FIL logfile;
-		  UINT len;
-		  char FileName[]="0:CADILOG";
-	//	  logfile = malloc(sizeof (FIL));
-	//      taskENTER_CRITICAL();
-		  vTaskSuspendAll();
+FRESULT string2log(char* str, uint8_t bytes){
 
-		  res = f_open(&logfile, FileName, FA_WRITE | FA_READ);
-	//	  vTaskDelay(50);
-		  if(res) {
-			  res = f_open(&logfile, FileName, FA_WRITE | FA_CREATE_ALWAYS);
-	//		  vTaskDelay(50);
-			  if(res) return res;
-		  };
-		  res = f_lseek(&logfile, f_size(&logfile));
-		  if(res) return res;
-
-		  res = f_write(&logfile, str, bytes, &len);
-		  if(res) return res;
-		  res = f_sync(&logfile);
-		  if(res) return res;
-
-		  res = f_close(&logfile);
-	//      taskEXIT_CRITICAL();
-		  xTaskResumeAll();
-	}
-	else {
-		res=0;	// force 0 output for no functioning SD card
-	}
-      return res;
-}
-
-void push2str(char* str1, char* str2, char *out){
-	int len1,len2,i;
-	len1=sizeof(str1);
-	len2=sizeof(str2);
-	for (i=0;i<len1;i++) {
-		out[i]=str1[i];
-	}
-	for (i=len1;i<(len1+len2);i++) {
-		out[i]=str2[(i-len1)];
-	}
-
-}
-
-void calibratePh(){
-	int button = 0;
-	uint16_t ph;
-//	char phstr[4];
-	char buffer[5];
-//	char *pbuffer;
-	while (button!=BUTTON_OK){
-		button = readButtons();
-//		Lcd_clear();
-		vTaskDelay(5);
-		Lcd_goto(0,0);
-		Lcd_write_str("Use pH7");
-//		Lcd_goto(0,8);
-		vTaskDelay(5);
-//		ph_seven32 = ph_seven;
-#ifdef TEST_MODE
-		EE_ReadVariable(PH7_ADDR, &ph_seven);
-		int10str(ph_seven, &buffer);
-		copy_arr(&buffer, &LCDLine1, 4, 8);
-#endif
-//		Lcd_write_str(buffer);
-		Lcd_goto(1,5);
-		int10str(adcAverage[AVG_ADC_PH], &buffer);
-		Lcd_write_str(buffer);
-		vTaskDelay(10);
-		Lcd_goto(1,0);
-    	getPh();
-    	vTaskDelay(10);
-    	Lcd_write_str(curphstr);
-    	vTaskDelay(100);
-    	if (button==button!=BUTTON_CNL) {	// are you sure???
-
-    	}
-	}
-	ph=adcAverage[AVG_ADC_PH];
-	EE_WriteVariable(PH7_ADDR, ph);
-	button = 0;
-
-	Lcd_goto(0,0);
-    	Lcd_write_str("pH7 value saved");
-	vTaskDelay(2000);
-	while (button!=BUTTON_OK){
-		button = readButtons();
-		Lcd_clear();
-		vTaskDelay(25);
-		Lcd_goto(0,0);
-		Lcd_write_str("Use pH4");
-		Lcd_goto(0,8);
-    	getPh();
-		adc2str(ph4, &buffer);
-		Lcd_write_str(buffer);
-		Lcd_goto(1,5);
-		adc2str(adcAverage[AVG_ADC_EC], &buffer);
-		Lcd_write_str(buffer);
-		vTaskDelay(25);
-		Lcd_goto(1,0);
-    	vTaskDelay(25);
-    	Lcd_write_str(curphstr);
-    	vTaskDelay(500);
-	}
-
-	ph=adcAverage[AVG_ADC_PH];
-	EE_WriteVariable(PH4_ADDR, adcAverage[AVG_ADC_EC]);
-	loadSettings();
-}
-
-void calibrateEc(void){
-	int button = 0;
-//	uint16_t ec;
-//	char phstr[4];
-	char buffer[5];
-//	char *pbuffer;
-	Lcd_goto(0,0);
-	Lcd_write_str("Wipe the probe");
-	vTaskDelay(2000);
-	while (button!=BUTTON_OK){
-		button = readButtons();
-//		Lcd_clear();
-//		vTaskDelay(5);
-		Lcd_goto(0,0);
-		vTaskDelay(5);
-		Lcd_write_str("OK to set");
-//		ph_seven32 = ph_seven;
-#ifdef TEST_MODE
-		EE_ReadVariable(EC0_ADDR, &ec0);
-		int10str(ec0, &buffer);
-		copy_arr(&buffer, &LCDLine1, 4, 12);
-#endif
-//		Lcd_write_str(buffer);
-		Lcd_goto(1,6);
-		int10str(adcAverage[AVG_ADC_EC], &buffer);
-		Lcd_write_str(buffer);
-		vTaskDelay(10);
-		Lcd_goto(1,0);
-    	getEc();
-    	vTaskDelay(10);
-    	Lcd_write_str("0mS = ");
-    	vTaskDelay(100);
-	}
-	EE_WriteVariable(EC0_ADDR, adcAverage[AVG_ADC_EC]);
-	button = 0;
-	Lcd_clear();
-    Lcd_write_str("0 mS saved");
-	vTaskDelay(2000);
-
-	while (button!=BUTTON_OK){
-		button = readButtons();
-//		Lcd_clear();
-		vTaskDelay(5);
-		Lcd_clear();
-		Lcd_write_str("Use EC1.413");
-//		Lcd_goto(0,8);
-		vTaskDelay(5);
-//		ph_seven32 = ph_seven;
-#ifdef TEST_MODE
-		EE_ReadVariable(EC1413_ADDR, &ec1413);
-		int10str(ec1413, &buffer);
-		copy_arr(&buffer, &LCDLine1, 4, 12);
-#endif
-//		Lcd_write_str(buffer);
-		Lcd_goto(1,10);
-		int10str(adcAverage[AVG_ADC_EC], &buffer);
-		Lcd_write_str(buffer);
-		vTaskDelay(10);
-		Lcd_goto(1,0);
-    	getEc();
-    	vTaskDelay(10);
-    	Lcd_write_str("1.413mS = ");
-    	vTaskDelay(100);
-//    	if (button==button!=BUTTON_CNL) {	// wtf?
-
-//    	}
-	}
-	EE_WriteVariable(EC1413_ADDR, adcAverage[AVG_ADC_EC]);
-	button = 0;
-
-	Lcd_goto(0,0);
-    	Lcd_write_str("1.413 mS saved");
-	vTaskDelay(2000);
-
-	loadSettings();
 }
 
 
 void adcAverager(void){
-	int i=0, i2=0;
-	uint32_t jdrBuff1Total=0, jdrBuff2Total=0, jdrBuff3Total=0, jdrBuff4Total=0;
+	uint8_t i=0;
+	uint8_t i2=0;
+
+
+	uint16_t jdrBuff1[JDR_BUFFER_SIZE];
+	uint16_t jdrBuff2[JDR_BUFFER_SIZE];
+	uint16_t jdrBuff3[JDR_BUFFER_SIZE];
+	uint16_t jdrBuff4[JDR_BUFFER_SIZE];
+	uint32_t jdrBuff1Total=0;
+	uint32_t jdrBuff2Total=0;
+	uint32_t jdrBuff3Total=0;
+	uint32_t jdrBuff4Total=0;
+
+
 
 	for(i2=0; i2<9; i2++){
 	    for(i=0; i < 9; i++) {
@@ -3926,127 +3293,9 @@ void adcAverager(void){
 	    adcAverage[3] = jdrBuff4Total/10;
 }
 
-void getPh() {	// current PH, please!
-	uint32_t ph;
-	vTaskDelay(5);
-
-    // count pH underOver flag
-	if (adcAverage[AVG_ADC_PH]>phWindowTop) {
-		phUnderOver = 2;
-	}
-	else if (adcAverage[AVG_ADC_PH]<phWindowBottom) {
-		phUnderOver = 1;
-	}
-	else {
-		phUnderOver = 0;
-	}
-
-	//count ec underOver flag
-	if (adcAverage[AVG_ADC_EC]>ecWindowTop) {
-		ecUnderOver = 2;
-	}
-	else if (adcAverage[AVG_ADC_EC]<ecWindowBottom) {
-		ecUnderOver = 1;
-	}
-	else {
-		ecUnderOver = 0;
-	}
-
-	vTaskDelay(5);
-	ph = ((adcAverage[AVG_ADC_EC] - ph0)*10)/cdel;
-	currentPh = ph;
-	curphstr[3] = ph-(ph/10)*10+48;
-	vTaskDelay(5);
-	ph/=10;
-	curphstr[2]=46;
-	curphstr[1] = ph-(ph/10)*10+48;
-	vTaskDelay(5);
-	ph/=10;
-	curphstr[0]=ph-(ph/10)*10+48;
-	curphstr[4] = 0;	// konec stroki
-}
-
-void getEc(void){
-	uint32_t total=0, ec, ec_div;
-	vTaskDelay(5);
-	uint8_t i;
-	if (adcAverage[AVG_ADC_EC]>ecWindowTop) {
-		ecUnderOver = 2;
-	}
-	else if (adcAverage[AVG_ADC_EC]<ecWindowBottom) {
-		ecUnderOver = 1;
-	}
-	else {
-		ecUnderOver = 0;
-	}
-	vTaskDelay(5);
-//	ec1413 = 200;		// this is 1.413ms
-	ec_div = ((ec1413-ec0)*100)/141;		// 0.01mS = ec1413/141. We store it 100 times more for precision
-
-	if (adcAverage[AVG_ADC_EC]>ec0) {
-		ec = ((adcAverage[AVG_ADC_EC]-ec0)*100)/ec_div;	//
-	}
-	else {
-		ec = 0;
-	}
-	currentEc = ec;
-	curecstr[4] = '\0';
-	curecstr[3] = '0' + ( ec       )    % 10;
-	curecstr[2] = '0' + ( ec /= 10 )    % 10;
-	curecstr[1] = '.';
-	curecstr[0] = '0' + ( ec /= 10 )    % 10;
-
-/*	curecstr[3] = ec-(ec/10)*10+48;
-	vTaskDelay(5);
-	ec/=10;
-	curecstr[1]=46;
-	curecstr[2] = ec-(ec/10)*10+48;
-	vTaskDelay(5);
-	ec/=10;
-	curecstr[0]=ec-(ec/10)*10+48;
-	curecstr[4] = 0;	// konec stroki */
-
-
-/*	curecstr[3] = ec-(ec/10)*10+48;
-	vTaskDelay(5);
-	ec/=10;
-	curecstr[2]=46;
-	curphstr[1] = ec-(ec/10)*10+48;
-	vTaskDelay(5);
-	ec/=10;
-	curecstr[0]=ec-(ec/10)*10+48;
-	curecstr[4] = 0;	// konec stroki */
-}
-
-
-char * utoa_fast_div(uint32_t value, char *buffer)
-{
-    buffer += 11;
-    *--buffer = 0;
-    do
-    {
-        divmod10_t res = divmodu10(value);
-        *--buffer = res.rem + '0';
-        value = res.quot;
-    }
-    while (value != 0);
-
-
-    return buffer;
-}
 
 void set16bit(uint16_t value){
-	uint8_t button;
-//	uint16_t Address, timerId;
-//	plugId--;	// pervomu plugu sootvetstvuet nulevaja zapis' v kode (especially for menu calls)
-//	Lcd_clear();
-//	Lcd_goto(0,0);
-//	Lcd_write_str("Plug ");
-//	Lcd_write_digit(plugId);
-//	Lcd_write_str(" timer");
-//	Address = EE_PLUG_SETTINGS+plugId;
-//	EE_ReadVariable(Address, &timerId);
-//	vTaskDelay(50);
+	button=0;
 	while (button!=BUTTON_OK) {
 		button=readButtons();
 		vTaskDelay(25);
@@ -4073,18 +3322,13 @@ void set16bit(uint16_t value){
 		vTaskDelay(25);
 	}
 	vTaskDelay(50);
-//	Address = EE_PLUG_SETTINGS+plugId;
-//	EE_WriteVariable(Address, timerId);
-//	loadSettings();
-//	Lcd_clear();
 	printOk();
 }
 
 
 void setPlug(uint8_t plugId){
-	uint8_t button=0;
-	uint16_t Address, timerId;
-//	plugId--;	// pervomu plugu sootvetstvuet nulevaja zapis' v kode (especially for menu calls)
+	uint8_t timerId=0;
+	uint16_t Address=0;
 	Lcd_clear();
 	Lcd_goto(0,0);
 	Lcd_write_str("Plug ");
@@ -4113,11 +3357,14 @@ void printOk(void){
 }
 
 void timerStateTrigger(void *pvParameters){
-	uint8_t i, timerStateFlag;
-	uint32_t now, timer1, timer2;
+	uint8_t i=0;
+	uint8_t timerStateFlag=0;
+	uint32_t now=0;
+	uint32_t timer1=0;
+	uint32_t timer2=0;
 	uint16_t Address;
 	while (1) {
-//		valve_status_updater();
+		adcAverager();
 		now=RTC_GetCounter();
 		for (i=0; i<3; i++){	// 32 tajmera
 			Address = EE_TIMER1_ON+EE_TIMER_SIZE*i;
@@ -4130,7 +3377,6 @@ void timerStateTrigger(void *pvParameters){
 			now = now % 86400;
 
 			vTaskDelay(1);
-	//		comm_manager();
 			vTaskDelay(1);
 
 			// logika obychnogo tajmera dlja timerOn<timerOff
@@ -4183,29 +3429,21 @@ void timerStateTrigger(void *pvParameters){
 
 void psiStab(void){
 #ifdef PSI_STAB_ENABLE
-/*	if (auto_flags&1==1 && comm_state!=COMM_DIRECT_DRIVE) {			// PSI STAB flag 0
-		if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
-			plugStateSet(psi_pump_load_id, 0);
-		}
-		if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
-			plugStateSet(psi_pump_load_id, 1);
-		}
-	} */
 #endif
 }
 
 
 void plugStateTrigger(void *pvParameters){
-	uint8_t plugStateFlag, plugTimerId, plugType;
-	uint8_t i;
+	uint8_t plugStateFlag=0;
+	uint8_t plugTimerId=0;
+	uint8_t plugType=0;
+	uint8_t i=0;
 	while (1) {
 		if (comm_state!=COMM_DIRECT_DRIVE) {
 			for (i=0; i<PLUG_AMOUNT; i++){		// PC0 to PC2
 				plugType=0;
 				plugTimerId = plugSettings[i];	// get the ID of timer for this plug
 				if (plugTimerId>=0 && plugTimerId<=31) {
-	//				plugType=0;
-					// Timer
 					plugStateFlag=timerStateFlags&(1<<plugTimerId);	// check if timer active now
 					plugStateFlag>>=plugTimerId;	// ostavit' toka flag
 				}
@@ -4220,11 +3458,9 @@ void plugStateTrigger(void *pvParameters){
 
 				if (plugTimerId>69 && plugTimerId<72){	// ph up
 					plugType=4;
-	//				plugTimerId-=35;
 				}
 				if (plugTimerId==80){	// 80 - PSI stab
 					plugType=5;
-	//				plugTimerId-=35;
 				}
 
 				if (plugTimerId==99) {	//always on
@@ -4237,23 +3473,12 @@ void plugStateTrigger(void *pvParameters){
 				}
 
 				if (plugTimerId>31 && plugTimerId<64) {
-				//	plugType=1;
-					// CTimer
 					plugTimerId-=32;
 					plugStateFlag=cTimerStateFlags&(1<<plugTimerId);	// check if timer active now
 					plugStateFlag>>=plugTimerId;	// ostavit' toka flag
 				}
 
 				if (plugType==2) {
-					if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0 && plugTimerId==0 && phUnderOver==1) {
-						plugStateSet(i, 1);	// enable plug for ph up pump
-					}
-					if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0 && plugTimerId==1 && phUnderOver==2) {
-						plugStateSet(i, 1);	// enable plug for ph down pump
-					}
-					if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0 && plugTimerId==2 && phUnderOver>0) {
-						plugStateSet(i, 1);	// enable plug for mixing pump
-					}
 					if (plugStateFlag==0 && ((plugStateFlags2>>i)&1)==1) {
 						plugStateSet(i, 0);	// disable plug
 					}
@@ -4291,32 +3516,13 @@ void plugStateTrigger(void *pvParameters){
 
 				}
 				else {
-	//				if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0) {
-	//					plugStateSet(i, 1);	// enable plug
-	//				}
-	//				if (plugStateFlag==0 && ((plugStateFlags2>>i)&1)==1) {
-	//					plugStateSet(i, 0);	// disable plug
-	//				}
 				}
 				vTaskDelay(1);
 			}
 		}
 		vTaskDelay(1);
 #ifdef USE_VALVES
-//		uint8_t valveId=0, valveMotorStateFlag=0;
-//		for (valveId=0; valveId<3; valveId++) {
-//			valveMotorStateFlag=valveMotorStateFlags&(1<<valveId);	// check if timer active now
-//			valveMotorStateFlag>>=valveId;	// ostavit' toka flag
-//			if (valveMotorStateFlag==1) {
-//				valveMotorStateSet(valveId,1);
-//			}
-//			else {
-//				valveMotorStateSet(valveId,2);
-//			}
-//		}
 #endif
-//		vTaskDelay(1);
-//		valveManager();
 		vTaskDelay(1);
 		psiStab();
 	}
@@ -4328,19 +3534,9 @@ void psiSetup(void){
 	uint16_t curpsiadc=0, tmp2=0, tempvalue=0;
 	comm_state=COMM_DIRECT_DRIVE;
 	Lcd_clear();
-//	Lcd_write_str("PSI pump load id");
-//	EE_ReadVariable(PSI_PUMP_LOAD_ID, &tempvalue);
-//	tempvalue = adjust8bit(tempvalue);
-//	psi_pump_load_id = idSelector(1,4,tempvalue);
-//	EE_WriteVariable(PSI_PUMP_LOAD_ID, psi_pump_load_id);
 	tmp2 = EE_PLUG_SETTINGS+PSI_PUMP_ID;
 	EE_WriteVariable(tmp2, 80);		// HARDCODE!!! program (timer) id for booster pump
 	plugSettings[tempvalue] = 80;
-
-//	psi_pump_load_id = idSelector(0,4,psi_pump_load_id);
-//	tmp2 = (uint16_t)(psi_pump_load_id*0x00FF);
-//	EE_WriteVariable(PSI_PUMP_LOAD_ID, tmp2);
-
 	Lcd_write_str("ADC psi reading");
 	while (curbutton!=BUTTON_FWD){
 		Lcd_goto(1,0);
@@ -4389,7 +3585,8 @@ void psiSetup(void){
 }
 
 void plugTest(void){
-	uint8_t curplug=0, curbutton=0;
+	uint8_t curplug=0;
+	uint8_t curbutton=0;
 	comm_state=COMM_DIRECT_DRIVE;
 	while (curbutton!=BUTTON_FWD){
 		Lcd_goto(0,0);
@@ -4414,9 +3611,6 @@ void plugTest(void){
 }
 
 void plugStateSet(uint8_t plug, uint8_t state){
-//	if (PLUG_INVERT==1) {
-//		state ^= (1<<0);
-//	}
 #ifdef GROLLY
 	if (plug==0) {
 		state = 1 - state;	// invert. PSI pump is "0" driven
@@ -4434,15 +3628,6 @@ void plugStateSet(uint8_t plug, uint8_t state){
 
 void valveMotorStateSet(uint8_t valveId, uint8_t state){
 #ifdef USE_VALVES
-/*	if (state==1) {
-//		VALVE_CTRL_PORT->BRR |= (1<<valveId+VALVE_MOTOR_GPIO_SHIFT); // valve enable 146%
-			valveMotorStateFlags |= (1<<valveId);
-			VALVE_ENABLE = (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-		}
-		else {
-			valveMotorStateFlags &= ~(1<<valveId);
-			VALVE_DISABLE = (1<<valveId+VALVE_MOTOR_GPIO_SHIFT);
-		} */
 #endif
 }
 
@@ -4458,8 +3643,8 @@ void EE_WriteWord(uint16_t Address, uint32_t Data){
 
 void programRunner(uint8_t programId){
 
-	uint32_t tmp;
-	uint8_t tmp8;
+	uint32_t tmp=0;
+	uint8_t tmp8=0;
 	Lcd_clear();
 	switch (programId) {
 	case 1:
@@ -4487,10 +3672,8 @@ void programRunner(uint8_t programId){
 	    setCTimer(--tmp8);
 		break;
 	case 7:
-//		setCTimer(1);
 		break;
 	case 8:
-//		setCTimer(2);
 		break;
 	case 9:
 		Lcd_write_str("Choose plug");
@@ -4498,22 +3681,19 @@ void programRunner(uint8_t programId){
 		setPlug(--tmp8);	// decrement needed because of actual start from 0
 		break;
 	case 10:
-//		setPlug(1);
 		break;
 	case 11:
-//		setPlug(2);
 		break;
 	case 13:
-		phMonSettings();
+//		phMonSettings();
 		break;
 	case 14:
-//		lightRangeSet();
 		break;
 	case 15:
-		calibratePh();
+//		calibratePh();
 		break;
 	case 16:
-		phStabSettings();
+//		phStabSettings();
 		break;
 	case 17:
 		dht_arr_displayer();
@@ -4522,13 +3702,11 @@ void programRunner(uint8_t programId){
 #endif
 		display_usart_rx();
 		display_usart_tx();
-//		setDutyCycle();
 		break;
 	case 18:
 		hygroStatSettings();
 		break;
 	case 19:
-//		thermoStatSetup();
 		break;
 	case 20:
 		valve_test();
@@ -4542,16 +3720,12 @@ void programRunner(uint8_t programId){
 		break;
 	case 23:
 		get_water(0,0,100);
-		//calibrateEc();
 		break;
 	case 24:
-		// ecStabSettings();
 		break;
 	case 25:
-		// buttonTest();
 		break;
 	case 26:
-		// phAndEcTest();
 		break;
 	case 27:
 		startWp();
@@ -4562,20 +3736,8 @@ void programRunner(uint8_t programId){
 	}
 }
 
-/* void phStabSettings(void){
-	Lcd_clear();
-	Lcd_write_str("Set top lvl");
-	readPhVal(value);
-	EE_WriteVariable(SD_LOG_INTERVAL, logSetting);
-	Lcd_write_str("Set bottom lvl");
-	readPhVal(value);
-	EE_WriteVariable(SD_LOG_INTERVAL, logSetting);
-
-} */
-
 void loggerSettings(void){
 	uint32_t logSetting;
-//	char value[8];
 	vTaskDelay(10);
 	Lcd_clear();
 	EE_ReadVariable(SD_LOG_INTERVAL, &logSetting);
@@ -4595,9 +3757,7 @@ void loggerSettings(void){
 }
 
 void phMonSettings(void) {
-//	uint16_t Address;
-	uint32_t phSetting;	// possibly 16 bit?
-//	char value[8];
+	uint16_t phSetting=0;
 	vTaskDelay(10);
 	Lcd_clear();
 	EE_ReadVariable(PH_INTERVAL, &phSetting);
@@ -4627,8 +3787,10 @@ void phMonSettings(void) {
 }
 
 uint8_t adjust8bit(uint8_t val){
-	uint8_t button;
-	if (val>99) {val=99;}
+	if (val>99) {
+		val=99;
+	}
+	button=0;
 	while (button!=BUTTON_OK) {
 		button=readButtons();
 		vTaskDelay(25);
@@ -4659,10 +3821,10 @@ uint8_t adjust8bit(uint8_t val){
 }
 
 uint16_t adjust16bit(uint16_t val){
-	uint8_t button;
 	if (val>65534) {
 		val=0;
 	}
+	button=0;
 	while (button!=BUTTON_OK) {
 		button=readButtons();
 		vTaskDelay(25);
@@ -4694,12 +3856,12 @@ uint16_t adjust16bit(uint16_t val){
 }
 
 uint16_t adjust16bit_fast(uint16_t val, uint8_t speed){
-	uint8_t button=0;
 	char buffer[11];
 	if (val>65534) {
 		val=0;
 	}
 	vTaskDelay(200);
+	button=0;
 	while (button!=BUTTON_OK) {
 		button=readButtons();
 		vTaskDelay(speed);
@@ -4722,8 +3884,6 @@ uint16_t adjust16bit_fast(uint16_t val, uint8_t speed){
 		}
 		Lcd_goto(1,4);
 		Lcd_write_str("< ");
-//		utoa_fast_div(val, &buffer);
-//		copy_arr(&buffer, &LCDLine2, 5, 2);
 		Lcd_write_16b(val);
 		Lcd_write_str(" >");
 		vTaskDelay(speed);
@@ -4778,7 +3938,6 @@ uint32_t CTimerAdjust(uint32_t time){
     	vTaskDelay(5);
     	Lcd_goto(1,3);
     	int32str(time, &timestr);
-//    	Lcd_write_arr(&timestr, 6);
     	copy_arr(&timestr, LCDLine2, 10, 2);
     	vTaskDelay(10);
 	}
@@ -4789,7 +3948,6 @@ uint32_t CTimerAdjust(uint32_t time){
 void setCTimer(uint8_t timerId){
 	uint16_t Address;
 	uint32_t CTimerData;
-//	char value[8];
 	vTaskDelay(10);
 	Lcd_clear();
 	Address = EE_CTIMER_DURATION+timerId*EE_CTIMER_SIZE;
@@ -4821,22 +3979,22 @@ void setCTimer(uint8_t timerId){
 }
 
 uint8_t idSelector(uint8_t min, uint8_t max, uint8_t curid){
-	uint8_t curbutton=0;
-	while (curbutton!=BUTTON_OK){
+	button=0;
+	while (button!=BUTTON_OK){
 		vTaskDelay(25);
 		Lcd_goto(1,0);
 		Lcd_write_digit(curid);
-		if (curbutton==BUTTON_FWD) {
+		if (button==BUTTON_FWD) {
 			if (curid<max) {
 				curid++;
 			}
 		}
-		if (curbutton==BUTTON_BCK) {
+		if (button==BUTTON_BCK) {
 			if (curid>min) {
 				curid--;
 			}
 		}
-		curbutton=readButtons();
+		button=readButtons();
 		vTaskDelay(25);
 	}
 	printOk();
@@ -4876,33 +4034,18 @@ void setTimer(uint8_t timerId){
 	vTaskDelay(50);
 }
 
-int yesNoSelector(char str, int curval){
+uint8_t yesNoSelector(char str, uint8_t curval){
 	Lcd_clear();
 	Lcd_goto(0,0);
 	Lcd_write_str(str);
 	vTaskDelay(50);
-	uint8_t button=0;
 	vTaskDelay(50);
+	button=0;
 	while (button!=BUTTON_OK) {
 		if (button==BUTTON_FWD || button==BUTTON_BCK) {
-/*			Lcd_goto(1,5);
-			curval |= 1;
-			vTaskDelay(50);
-			if (curval==0){
-				Lcd_write_str("< NO >");
-			}
-			vTaskDelay(50);
-			if (curval==1){
-				Lcd_write_str("< SI >");
-			}
-			vTaskDelay(50);
-			button=readButtons();
-			vTaskDelay(50); */
 		}
 		vTaskDelay(50);
-
 	}
-//	vTaskDelay(50);
 	return(curval);
 }
 
@@ -4910,7 +4053,6 @@ uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays)
 {
 	Lcd_clear();
 	uint32_t unixtime2;
-	uint8_t button=0;
 	RTC_DateTime curtime, curtime2;
 	char unixtimestr[11];
 	curtime=unix2DateTime(cnt);
@@ -4983,7 +4125,6 @@ uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays)
 					curtime2=unix2DateTime(unixtime2);
 			    	int32str(unixtime2, &unixtimestr);
 #endif
-			    	//Lcd_clear();
 			    	vTaskDelay(5);
 					Lcd_goto(0,0);
 			    	Lcd_write_digit(curtime.day);
@@ -5016,7 +4157,7 @@ uint32_t timeAdjust(uint32_t cnt, uint8_t includeDays)
 void Lcd_write_arr2(uc8 *STRING, uint8_t chars)
 {
 	char c;
-	uint8_t i;
+	uint8_t i=0;
 	for (i=0; i<chars; i++) {
 		c=STRING[i];
 //		vTaskDelay(5);
@@ -5024,10 +4165,10 @@ void Lcd_write_arr2(uc8 *STRING, uint8_t chars)
 	}
 }
 
-void Lcd_write_arr(uc8 *STRING, uint8_t chars)
+void Lcd_write_arr(volatile uint8_t *STRING, uint8_t chars)
 {
-	char c;
-	uint8_t i;
+	uint8_t c=0;
+	uint8_t i=0;
 	for (i=0; i<chars; i++) {
 		c=STRING[i];
 		Lcd_write_data(c);
@@ -5143,7 +4284,6 @@ RTC_DateTime unix2DateTime(uint32_t unixtime)
 uint32_t DateTime2unix(RTC_DateTime datetime)
 {
 	    uint32_t tmp;
-///	    uint8_t i;
 	    uint16_t days, dayFromYear;
 
 	    switch (datetime.month) {
@@ -5206,17 +4346,16 @@ uint32_t DateTime2unix(RTC_DateTime datetime)
 }
 
 // function returns the programId selected in menu to run the program
-int menuSelector(void)
+uint8_t menuSelector(void)
 {
-	int curItem=0;	// default item to display entering the menu
-	int programId = 0;
-//	int buttonPressed=readButtons();
-	int textId=fatArray[curItem][1];
+	uint8_t curItem=0;	// default item to display entering the menu
+	uint8_t programId = 0;
+	uint8_t textId=fatArray[curItem][1];
 	while (programId==0){
 		textId=fatArray[curItem][1];
 		Lcd_goto(0,0);
 		Lcd_write_str(menuItemArray[textId]);
-		int curButton=readButtons();
+		uint8_t curButton=readButtons();
 		if (curButton>0){
 			vTaskDelay(100);
 			Lcd_clear();
@@ -5245,21 +4384,12 @@ int menuSelector(void)
 	return(programId);
 }
 
-
-
-
-
-
 // mycontroller.ru code
 
 uint32_t RTC_GetCounter(void)
 {
   return  (uint32_t)((RTC->CNTH << 16) | RTC->CNTL);
 }
-
-
-
-
 
 
 void RTC_SetCounter(uint32_t value)
@@ -5269,10 +4399,6 @@ void RTC_SetCounter(uint32_t value)
   RTC->CNTL = value;
   RTC->CRL &= ~RTC_CRL_CNF;
 }
-
-
-
-
 
 
 unsigned char  RtcInit(void)
@@ -5295,7 +4421,6 @@ unsigned char  RtcInit(void)
 
     RTC->CRL &= (uint16_t)~RTC_CRL_RSF;
     while((RTC->CRL & RTC_CRL_RSF) != RTC_CRL_RSF){}
-//    RTC_SetCounter(YEAR12SECS+(212+20)*86400+10*3600+9*60);
     return 1;
   }
   return 0;
@@ -5323,7 +4448,6 @@ unsigned char  RtcInit(void)
  // EOF mycontroller.ru RTC functions
 
 
-
 // function slides the buffer window for pH ADC values (and EC)
 void phMonitor(void *pvParameters){
  	while(1){
@@ -5332,8 +4456,8 @@ void phMonitor(void *pvParameters){
  	}
 }
 
-void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos){
-	int i=0;
+void copy_arr(volatile uint8_t *source, volatile uint8_t *destination, uint8_t amount, uint8_t pos){
+	uint8_t i=0;
 	for (i=0; i<amount;i++) {
 		destination[i+pos] = source[i];
 	}
@@ -5342,19 +4466,11 @@ void copy_arr(uint8_t *source, uint8_t *destination, uint8_t amount, uint8_t pos
 
 void displayClock(void *pvParameters)
 {
-		RTC_DateTime	DateTime;
-		uint32_t tmp;
-		uint8_t button;
-//		char str[6];
+		RTC_DateTime DateTime;
+		uint32_t tmp=0;
 		Lcd_clear();
     	while (1)
 	    {
-
-
-//    		if (GetStateDMAChannel4()==1){
-//    			StartDMAChannel4(64);
-//    		}
-
 	    	vTaskDelay(10);
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
@@ -5368,21 +4484,18 @@ void displayClock(void *pvParameters)
 	    	LCDLine1[7]= (DateTime.year % 10) + 48;
 	    	LCDLine2[6]= 32;
 	    	LCDLine2[7]= 32;
-
-
 	    	Lcd_goto(1,0);
 	    	Lcd_write_digit(DateTime.hour);
 	    	Lcd_write_digit(DateTime.min);
 	    	Lcd_write_digit(DateTime.sec);
-    	//	displayAdcValues();
-
 	    	vTaskDelay(5);
+
+
 
 
 #ifdef	TEST_MODE
 
 #endif
-//			setPwmDc(90);
 #ifndef	TEST_MODE
 	    	uint16_t flg;
 	    	// vyvod flagov dozirujushih nasosov
@@ -5390,8 +4503,6 @@ void displayClock(void *pvParameters)
 	    	for (i=0; i<3; i++) {
 	    		flg=timerStateFlags&(1<<i);
 
-//	    		flg=wpStateFlags&(1<<i);
-//	    		flg=dosingPumpStateFlags2&(1<<i);
 	    		flg>>=i;
 	    		LCDLine1[i+10]=flg+48;
 	    	}
@@ -5404,10 +4515,14 @@ void displayClock(void *pvParameters)
 	    	LCDLine1[9]=phUnderOver+48;
 #endif
 
+
 	    	vTaskDelay(14);
 	    	button=readButtons();
 	    	vTaskDelay(3);
-
+//	    	Lcd_write_digit(button);
+//	    	Lcd_write_16b(ADC1->JDR1);
+//	    	Lcd_goto(0,9);
+//	    	Lcd_write_16b(adcAverage[0]);
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
@@ -5416,44 +4531,28 @@ void displayClock(void *pvParameters)
 	    		uint8_t progId=menuSelector();
 	    		programRunner(progId);
 	    	}
-	    	// USART_SendData(BT_USART, 50);
-//	    	USART1->DR=55;
-
-
 	    	vTaskDelay(10);
-
 	    }
-
-
-
-
-
     	while (1) {
-
-
     	}
 }
 
 uint8_t readButtons(void){
 	uint16_t curval = 0;
 	uint8_t i;
-		curval = adcAverage[ADC_AVG_BUTTONS];
-		for (i=0;i<4;i++) {
-				if (curval>button_ranges[i*2]+BUTTON_RANGE_SHRINKER && curval<button_ranges[i*2+1]-BUTTON_RANGE_SHRINKER) {
-					return i+1;
-				}
-
+	adcAverager();
+	curval = adcAverage[ADC_AVG_BUTTONS];
+	for (i=0;i<4;i++) {
+		if (curval>button_ranges[i*2]+BUTTON_RANGE_SHRINKER && curval<button_ranges[i*2+1]-BUTTON_RANGE_SHRINKER) {
+			return (i+1);
+		}
 	}
 	return 0;
-
-
 }
 
 void adcRegularInit(void){
 
 }
-
-
 
 void AdcInit(void)
 {
@@ -5476,9 +4575,6 @@ void AdcInit(void)
 
 	  GPIOA->CRL   &= ~GPIO_CRL_MODE3;
 	  GPIOA->CRL   &= ~GPIO_CRL_CNF3;
-
-//	  GPIOA->CRL   &= ~GPIO_CRL_MODE4;
-//	  GPIOA->CRL   &= ~GPIO_CRL_CNF4;
 
 	  RCC->APB2ENR |=  RCC_APB2ENR_ADC1EN;
 	  RCC->CFGR    &= ~RCC_CFGR_ADCPRE;
@@ -5532,39 +4628,25 @@ void Lcd_write_digit(uint8_t numb){
 
 void prvSetupHardware()
 {
-
 	// LOAD triggering control pins init
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;     // Enable clock on GPIOC.
-//	        GPIOC->CRH      &= ~GPIO_CRH_CNF8;              //  Push-Pull. LED PC8
-//	        GPIOC->CRH      &= ~GPIO_CRH_CNF9;              //  Push-Pull. LED PC9
-	        GPIOC->CRL      &= ~GPIO_CRL_CNF0;		// LOAD triggering from PC0...
-	        GPIOC->CRL      &= ~GPIO_CRL_CNF1;
-	        GPIOC->CRL      &= ~GPIO_CRL_CNF2;
-	        GPIOC->CRL      &= ~GPIO_CRL_CNF3;		// ... to PC3
+    GPIOC->CRL      &= ~GPIO_CRL_CNF0;		// LOAD triggering from PC0...
+    GPIOC->CRL      &= ~GPIO_CRL_CNF1;
+    GPIOC->CRL      &= ~GPIO_CRL_CNF2;
+    GPIOC->CRL      &= ~GPIO_CRL_CNF3;		// ... to PC3
 
-
-//	        GPIOC->CRH   |= GPIO_CRH_MODE8_0;       //  10MHz.
-	        GPIOC->CRL   |= GPIO_CRL_MODE0_0;
-	        GPIOC->CRL   |= GPIO_CRL_MODE1_0;
-	        GPIOC->CRL   |= GPIO_CRL_MODE2_0;
-	        GPIOC->CRL   |= GPIO_CRL_MODE3_0;
-
-
-
+    GPIOC->CRL   |= GPIO_CRL_MODE0_0;
+    GPIOC->CRL   |= GPIO_CRL_MODE1_0;
+    GPIOC->CRL   |= GPIO_CRL_MODE2_0;
+    GPIOC->CRL   |= GPIO_CRL_MODE3_0;
 }
 
 
 void vTaskLCDdraw(void *pvParameters) {	// draws lcd
-//	uint32_t tmp=0;
-//	int str;
 	for (;;) {
 		vTaskSuspendAll();
 		Lcd_write_cmd(0x80);	// lcd_goto(0,0)
-//		Lcd_goto(0,0);
 		Lcd_write_arr(&LCDLine1, 16);
-//		xTaskResumeAll();
-//		vTaskDelay(15);
-//		vTaskSuspendAll();
 		Lcd_write_cmd(0x80+0x40);	// lcd_goto(1,0)
 		Lcd_write_arr(&LCDLine2, 16);
 		xTaskResumeAll();
@@ -5573,7 +4655,7 @@ void vTaskLCDdraw(void *pvParameters) {	// draws lcd
 }
 
 
-void int32str(uint32_t d, char *out)
+void int32str(uint32_t d, volatile char *out)
 {
     out[10] = '\0';
     out[9] = '0' + ( d       )    % 10;
@@ -5586,7 +4668,6 @@ void int32str(uint32_t d, char *out)
     out[2] = '0' + ( d /= 10 )    % 10;
     out[1] = '0' + ( d /= 10 )    % 10;
     out[0] = '0' + ( d /  10 )    % 10;
-//    return out;
 }
 
 void int10str(uint32_t d, char *out)
@@ -5596,7 +4677,6 @@ void int10str(uint32_t d, char *out)
     out[2] = '0' + ( d /= 10 )    % 10;
     out[1] = '0' + ( d /= 10 )    % 10;
     out[0] = '0' + ( d /  10 )    % 10;
-//    return out;
 }
 
 uint32_t EE_ReadWord(uint16_t Address){
@@ -5645,9 +4725,10 @@ void setDoserSpeed(uint8_t doser, uint8_t speed){
 }
 
 void setDutyCycle(void){
-	uint8_t button=0, duty_cycle;
+	uint8_t duty_cycle;
 	duty_cycle = TIM3->CCR3/10;
 	Lcd_clear();
+	button=0;
 	while (button!=BUTTON_OK) {
 		button = readButtons();
 		Lcd_goto(0,0);
@@ -5688,7 +4769,6 @@ void test_grolly_hw(void){
 		}
 	}
 
-
 	for (i=0; i<5;i++){
 		open_valve(i);
 		for (i2=0;i2<200000;i2++) {
@@ -5728,7 +4808,7 @@ void test_grolly_hw(void){
 
 }
 
-int main(void)
+uint8_t main(void)
 {
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
 	// VALVE control pins init
@@ -5753,7 +4833,6 @@ int main(void)
 	/* EEPROM Init */
 	EE_Init();
 	AdcInit();
-//	dht_init();
 	RtcInit();		//init real time clock
 
 	fup_time = RTC_GetCounter();
@@ -5785,7 +4864,6 @@ int main(void)
 	Lcd_clear();
 
 #ifdef GROLLY
-//	test_grolly_hw();
 #endif
 
 
@@ -5800,11 +4878,7 @@ int main(void)
             NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(plugStateTrigger,(signed char*)"PLUGS",configMINIMAL_STACK_SIZE+35,
             NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(phMonitor,(signed char*)"PHMON",configMINIMAL_STACK_SIZE,
-            NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(vTaskLCDdraw,(signed char*)"LCDDRW",configMINIMAL_STACK_SIZE,
-            NULL, tskIDLE_PRIORITY + 1, NULL);
-    xTaskCreate(watering_program_trigger,(signed char*)"WP",configMINIMAL_STACK_SIZE+80,
             NULL, tskIDLE_PRIORITY + 1, NULL);
 
 /* Start the scheduler. */
@@ -5817,49 +4891,13 @@ int main(void)
 
 void loadSettings(void){	// function loads the predefined data
 	uint16_t i, Address, Data;
-//	uint8_t i2=0;
 	char tmpstr[11], putstring[50];
-	string2log("build date: ", 12);
-	string2log(__DATE__, 11);
-	string2log(" build time: ", 12);
-	string2log(__TIME__, 8);
-	string2log(" build ver.: ", 12);
-//	string2log(VERSION_BUILD, 6);
-
-
-
-
-
-	for (i=0;i<8;i++) {
-		int32str(button_ranges[i],&tmpstr);
-		tmpstr[10] = 0x0A;
-		string2log(tmpstr, 12);
-	}
-
-	/*
-	// dosing pumps speed settings
-	uint32_t speeds1=0;
-	speeds1 = EE_ReadWord(DOSER_SPEEDS);
-	TIM3->CCR1 = (100-(speeds1&0xFF))*10;
-	TIM3->CCR2 = (100-((speeds1&0xFF00)>>8))*10;
-	TIM3->CCR3 = (100-((speeds1&0xFF0000)>>16))*10;
-	TIM3->CCR4 = (100-((speeds1&0xFF000000)>>24))*10; */
-
 
 
 	for (i=0; i<PLUG_AMOUNT; i++) {
 		Address=EE_PLUG_SETTINGS+i;
 		EE_ReadVariable(Address, &Data);
 		plugSettings[i]=Data;
-		if (no_sd==0) {
-			string2log("plug no.", 8);
-			int32str(i,&tmpstr);
-			string2log(tmpstr, 11);
-			string2log(" has timer no.", 14);
-			int32str(plugSettings[i],&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-		}
 	}
 
 	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
@@ -5872,220 +4910,13 @@ void loadSettings(void){	// function loads the predefined data
 		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);
 	}
 
-
-	// log FMP data
-
-	for (i=0; i<WP_AMOUNT; i++) {
-		if (no_sd==0) {
-			string2log("FMP no.", 6);
-			int32str(i,&tmpstr);
-			string2log(tmpstr, 11);
-			string2log(" has:", 5);
-			tmpstr[0] = 0x0A;
-			string2log(tmpstr, 1);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- fert pump id: ", 15);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_TIME_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- dosing duration: ", 19);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- aftermix time: ", 17);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;;
-			EE_ReadVariable(Address, &Data);
-			string2log("- WP link: ", 11);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- trig freq.: ", 14);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
-			EE_ReadVariable(Address, &Data);
-			string2log("- enabled?: ", 12);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-
-		}
-	}
-
-
-	// log WateringPrograms data
-
-/*	for (i=0; i<WP_AMOUNT; i++) {
-		if (no_sd==0) {
-			string2log("WP no.", 6);
-			int32str(i,&tmpstr);
-			string2log(tmpstr, 11);
-			string2log(" has:", 5);
-			tmpstr[0] = 0x0A;
-			string2log(tmpstr, 1);
-
-			Address = WP_OFFSET+i*WP_SIZE+WATER_FILL_TIMEOUT_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- water fill timeout: ", 21);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = WP_OFFSET+i*WP_SIZE+WP_WATERING_PUMP_PLUG_ID;
-			EE_ReadVariable(Address, &Data);
-			string2log("- wtrng pump plug id: ", 21);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = WP_OFFSET+i*WP_SIZE+WP_DURATION_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- wtrng duration: ", 18);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = WP_OFFSET+i*WP_SIZE+WP_INTERVAL;
-			EE_ReadVariable(Address, &Data);
-			string2log("- wtrng interval: ", 18);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-			Address = WP_OFFSET+i*WP_SIZE+WP_ENABLE_SHIFT;
-			EE_ReadVariable(Address, &Data);
-			string2log("- enabled?: ", 12);
-			int32str(Data,&tmpstr);
-			tmpstr[10] = 0x0A;
-			string2log(tmpstr, 11);
-
-
-		}
-	}
-*/
-
-//	Address=LIGHT_RANGE_ADDR;
-//	EE_ReadVariable(Address, &lightRange);
-	EE_ReadVariable(PH4_ADDR, &ph4);
-
-	EE_ReadVariable(CIRCULATION_PUMP_ID_ADDR, &circulationPumpId);
-
-//	Address=PH7_ADDR;
-	EE_ReadVariable(PH7_ADDR, &ph_seven);
-	cdel = (ph_seven - ph4)/3;
-	ph0 = ph4 - cdel*4;
-
-	EE_ReadVariable(PH_WINDOW_TOP, &phWindowTop);
-	EE_ReadVariable(PH_WINDOW_BOTTOM, &phWindowBottom);
-
-
-	EE_ReadVariable(EC0_ADDR, &ec0);
-	EE_ReadVariable(EC1413_ADDR, &ec1413);
-
-
-	if (no_sd==0) {
-
-		// vnesti v log znachenie kalibrovshika EC na 1.413mS
-		string2log("EC1.413 set @: ", 15);
-		int32str(ec1413,&tmpstr);
-		tmpstr[10] = 0x0A;
-		string2log(tmpstr, 11);
-
-		// put the EC0 ADC level into log
-		string2log("EC0 set @: ", 11);
-		int32str(ec0,&tmpstr);
-		tmpstr[10] = 0x0A;
-		string2log(tmpstr, 11);
-
-		// vnesti v log znachenie kalibrovshika ph4
-		int32str(ph4,&tmpstr);
-		for (i=0;i<10;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[10] = 0x0A;
-		string2log("ph4 cal @ ", 10);
-		string2log(putstring, 11);
-
-		// vnesti v log znachenie kalibrovshika ph7
-		int32str(ph_seven,&tmpstr);
-		for (i=0;i<10;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[10] = 0x0A;
-		string2log("ph7 cal @ ", 10);
-		string2log(putstring, 11);
-
-		// vnesti v log raschitayj uroven' ph0
-		int32str(ph0,&tmpstr);
-		for (i=0;i<10;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[14] = 10;
-		string2log("ph0 counted @ ", 14);
-		string2log(putstring, 11);
-
-		// vnesti v log raschitanuju cenu delenija
-		int32str(cdel,&tmpstr);
-		for (i=0;i<10;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[14] = 10;
-		string2log("cena delenija ", 14);
-		string2log(putstring, 11);
-
-		// ph window top
-		int10str(phWindowTop,&tmpstr);
-		for (i=0;i<4;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[4] = 10;
-		string2log("ph window top ", 14);
-		string2log(putstring, 5);
-
-		// ph window bottom
-		int10str(phWindowBottom,&tmpstr);
-		for (i=0;i<4;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[4] = 10;
-		string2log("ph window btm ", 14);
-		string2log(putstring, 5);
-
-		string2log("EC 1.413 cal @", 14);
-		int10str(ec1413,&tmpstr);
-		for (i=0;i<4;i++){
-			putstring[i]=tmpstr[i];
-		}
-		putstring[4] = 10;
-		string2log(putstring, 5);
-	}
-
-	EE_ReadVariable(SD_LOG_INTERVAL, &logInterval);
 	readButtonRanges();
 }
 
 
-void Lcd_write_str(char *STRING)
+void Lcd_write_str(volatile uint8_t *STRING)
 {
-	char c;
+	uint8_t c=0;
 	while (c=*STRING++){
 		if (lcd_pointery==0) {
 			LCDLine1[lcd_pointerx] = c;
@@ -6100,7 +4931,7 @@ void Lcd_write_str(char *STRING)
 
 void Lcd_goto(uc8 x,uc8 y)
 {
-	int str;
+	uint8_t str;
 	str = y + 0x80;
 	if(x == 1)
 	{
@@ -6122,9 +4953,6 @@ void Init_pin_out()
 
 
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD, ENABLE);
-//	GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);
-//	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;
-//	AFIO->MAPR |= AFIO_MAPR_SWJ_CFG_JTAGDISABLE;
 	GPIO_InitTypeDef init_pin;
 	init_pin.GPIO_Pin  = GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12;
 	init_pin.GPIO_Mode = GPIO_Mode_Out_PP;
@@ -6169,7 +4997,7 @@ void Init_pin_in()
 	GPIO_Init (lcd_port_data, &init_pin);
 }
 
-void Lcd_write_cmd(uc8 cmd )
+void Lcd_write_cmd(uint8_t cmd)
 {
 		Delay_us(6);	// stable 240
 		rs_0;rw_0;e_1;
@@ -6204,31 +5032,6 @@ void Lcd_write_data(uint8_t data)
 }
 
 void set4highBits(uint8_t dta){		// setting higher 4 bits of word on corresponding GPIO pins
-/*	if (dta&16) {
-		d4_0;
-	}
-	else {
-		d4_1;
-	}
-	if (dta&32) {
-		d5_0;
-	}
-	else {
-		d5_1;
-	}
-	if (dta&64) {
-		d6_0;
-	}
-	else {
-		d6_1;
-	}
-	if (dta&128) {
-		d7_0;
-	}
-	else {
-		d7_1;
-	} */
-
 	if (dta&16) {
 		d4_1;
 	}
@@ -6286,7 +5089,6 @@ void set4lowBits(uint8_t dta){
 void Init_lcd()
 {
 	Init_pin_out();
-//	  Delay_us(10000);
 	  e_1;rs_0;rw_0;
 	      Delay_us(100);	// assume 10ms
 	      set4lowBits(0b0010);	// set 4 bit bus
@@ -6295,27 +5097,11 @@ void Init_lcd()
 
 	      Lcd_write_cmd(0b00101000);	// again, 4bit bus and the rest 4bits of whole command will get the destination now
 	      Delay_us(10);
-//	  	  del=72000; while (del--){}
 	  	  Lcd_write_cmd(Display_clear);
-//	      del=72000; while (del--){}
-
 		  Lcd_write_cmd(0b00000110);	// function set
-//		  del=72000; while (del--){}
-
 		  Lcd_write_cmd(0b00001100);	// display on cursor off
-//		  del=72000; while (del--){}
-
-
 		  Lcd_write_cmd(Display_clear);	// function set
-//		  del=72000; while (del--){}
-
-//		  Lcd_write_str("A");
-
-
-
 		  Lcd_write_str("12345678");
-
-
 	  	Delay_us(10);
 }
 
@@ -6330,5 +5116,3 @@ void Return_home()
 {
 	Lcd_write_cmd(0b0000001);
 }
-
-
