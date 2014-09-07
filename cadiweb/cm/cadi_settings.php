@@ -57,8 +57,11 @@ function sync_conf2dump(){
 			// pack 8 bit value
 			$addr = substr($row[0],0,5);
 			echo 'packing 8 bit at '.$addr.PHP_EOL;
-			$parity = substr($row[0],5,1);	// 0 - higher byte, 1 - lowers byte
-			$pointer = ($addr-$settings_startaddr)*2+$parity;
+			$parity = substr($row[0],5,1);	// 0 - higher byte, 1 - lower byte
+			$pointer = ($addr-$settings_startaddr)*2;
+			if ($parity!="1") {	//
+				$pointer++;	
+			}
 			$settings_dump[$pointer] = chr($sca[$key][2]);
 		}
 		if ($row[1]==2) {
@@ -76,7 +79,7 @@ function sync_conf2dump(){
 			$addr = $row[0];
 			$val = 0;
 			$val = floor($sca[$key][2]/65536);
-			echo 'packing 16 bit at '.$addr.PHP_EOL;
+			echo 'packing 16 (1/2) bit at '.$addr.PHP_EOL;
 			$pointer = ($addr-$settings_startaddr)*2;
 			$settings_dump[$pointer++] = chr(floor($val/256));
 			$settings_dump[$pointer++] = chr($val%256);
@@ -84,7 +87,7 @@ function sync_conf2dump(){
 			$addr++;
 			$val = 0;
 			$val = $sca[$key][2]%65536;
-			echo 'packing 16 bit at '.$addr.PHP_EOL;
+			echo 'packing 16 (2/2) bit at '.$addr.PHP_EOL;
 			$pointer = ($addr-$settings_startaddr)*2;
 			$settings_dump[$pointer++] = chr(floor($val/256));
 			$settings_dump[$pointer] = chr($val%256);
@@ -144,7 +147,10 @@ function sync_dump2conf(){
 			$addr = substr($row[0],0,5);
 			$parity = substr($row[0],5,1);	// 0 - lower byte, 1 - higher byte
 			if (($fp = fopen("cadi_settings_dump", "rb")) !== FALSE) {
-				$seekaddr = ($addr-$settings_startaddr)*2+$parity;
+				$seekaddr = ($addr-$settings_startaddr)*2;
+				if ($parity == '1'){
+					$seekaddr++;
+				}
 				fseek($fp,$seekaddr,0); 
 			    	$data = fread($fp, 1);
 				$sca[$key][2] = ord($data);
@@ -166,7 +172,7 @@ function sync_dump2conf(){
 		}
 		if ($row[1]==3) {
 			// extract 32 bits from dump file
-			$addr = substr($data[0],0,5);
+			$addr = substr($row[0],0,5);
 			if (($fp = fopen("cadi_settings_dump", "rb")) !== FALSE) {
 				$seekaddr = ($addr-$settings_startaddr)*2;
 				fseek($fp,$seekaddr,0); 

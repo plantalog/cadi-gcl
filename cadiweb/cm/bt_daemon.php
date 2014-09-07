@@ -25,7 +25,7 @@ $sbsa2 = 0;			// starting address in EEPROM memory of cadi
 
 // create cadi settings dump file if not exist
 	if (!file_exists('cadi_settings_dump')) {
-		define('SIZE',2000); // size of the file to be created.
+		define('SIZE',5000); // size of the file to be created.
 		$fp = fopen('cadi_settings_dump', 'w'); // open in write mode.
 		echo PHP_EOL."Creating dump file".PHP_EOL;
 		fseek($fp, SIZE-1,0); //
@@ -91,7 +91,7 @@ while(1){
 
 	else {						// or continue main loop if no tasks waits to execute
 		$command = file_get_contents($btd_cmd_file);
-		unset($execmd);
+		
 		
 		if ($RxCounter>=$NbrOfDataToRead && $TxCounter>=$NbrOfDataToSend){
 			// setting transfer activities are finished
@@ -99,6 +99,7 @@ while(1){
 		}
 
 		if(!empty($command)){
+			unset($execmd);
 			$cmd_arr = explode(",", $command);
 			print_r($cmd_arr);
 			echo '('.date(DATE_RFC2822).') Got CMD ';
@@ -139,10 +140,16 @@ while(1){
 					usleep($csd_value*$sppd_value);	// delay to finish previous transfers
 					//$sbsa2 = $cmd_arr[2];	// start address
 					// $NbrOfDataToRead = $cmd_arr[3];	// amount of 16bit variables of settings dump to send
-					$sbsa = 1500;			// settings start EEPROM address
-					$NbrOfDataToRead = 200;	// amount of settings to read (16bit values)
-					$RxCounter = 0;			// reset counter
-					$execmd='';
+					if ($settings_startaddr==0) {
+						$sbsa = 1400;		// default start point
+					}
+					else {
+						$sbsa = $settings_startaddr;			// settings start EEPROM address
+					}
+					$RxCounter=0;
+					$NbrOfDataToRead = 400;	// amount of settings to read (16bit values)  HARDCODE
+					$execmd='echo';
+					
 					break;
 				case 'kill':
 					$execmd = "'kill -9 $(pidof rfcomm)'";
@@ -246,7 +253,7 @@ while(1){
 					break;
 			}
 
-			echo $execmd.PHP_EOL;
+			echo 'Current CMD='.$execmd.PHP_EOL;
 			exec($execmd);
 		}
 	}
@@ -299,7 +306,7 @@ while(1){
 
 		$RxCounter+=16;		// increment for next block
 
-				
+		// $repeat_last_cmd = 50;
 
 		echo PHP_EOL.'CADI SETTINGS DOWN LOAD: '.$cadi_packet.PHP_EOL;
 
@@ -421,7 +428,7 @@ function dump_settings_block($addr, $block_data){
 }
 
 function parse_response($srtrs){
-	global $packet_id, $repeat_last_cmd, $execmd, $settings_filesize, $settings_startaddr;
+	global $packet_id, $repeat_last_cmd, $execmd, $settings_filesize, $settings_startaddr, $csd_value;
 	echo PHP_EOL.'Trying parse response'.PHP_EOL;
 	// create file pointer
 	$fp = fopen('serialresp.out', 'rb');
@@ -467,6 +474,7 @@ function parse_response($srtrs){
 			$block_data = substr($last_packet,4,32);
 			dump_settings_block($block_addr, $block_data);
 			$repeat_last_cmd = 0;
+			usleep($csd_value*10);
 			//unset($execmd);
 		}
 	}
@@ -474,7 +482,7 @@ function parse_response($srtrs){
 	if ($packet_type==7) {		// parsing Cadi command execution confirmation response
 		$cmd_uid = ord($last_packet[2]);				// relative block_id (incoming blocks are 16vars long, outgoing are 3vars)
 		echo '### EXTRACTED CMD UID '.$cmd_uid.'###'.PHP_EOL;
-		if ($packet_id == $cmd_uid) {
+		if ($packet_id == $cmd_uid && ($RxCounter>=$NbrOfDataToRead)) {
 			$packet_id++;
 			// unset($execmd);
 			$repeat_last_cmd = 0;

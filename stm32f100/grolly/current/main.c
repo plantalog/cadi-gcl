@@ -221,7 +221,7 @@ volatile static uint8_t buttonReverse=0;
 
 volatile uint8_t button=0;
 
-
+volatile uint8_t wpProgress = 0;
 
 // DRIVER:  RTC
 #define USE_RTC
@@ -364,11 +364,12 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 
 // Fertilizer Mixing Program adresses	()
 #define FMP_OFFSET								0x0644
-#define FMP_SIZE								7
+#define FMP_SIZE								5
 #define FMP_DOSING_PUMP_ID_SHIFT				1		// FMP enabled if dosing pump id > 0 (05.09.2014)
 #define FMP_DOSING_TIME_SHIFT					2
 #define FMP_2_WP_ASSOC_SHIFT					3
 #define FMP_TRIG_FREQUENCY_SHIFT				4
+#define	FMP_AFTERMIX_TIME_SHIFT					5
 
 #define DOSER_SPEEDS			0x0612		// 4 bytes for doser speeds in percent (1..100)
 
@@ -605,23 +606,15 @@ void autoSafe(void){
 
 		// if while running PSI pump underpressure was constant during timeout, disable PSI pump
 		vTaskDelay(1);
-		uint32_t diff = RTC_GetCounter()-fup_time;
-		if ((auto_flags&1)==1) {
-			if (adcAverage[AVG_ADC_PSI]<PSI_UNDERPRESSURE){
-				if (diff>PSI_UP_TIMEOUT) {
+		uint32_t now = RTC_GetCounter();
+		if ((auto_flags&1)==1 && adcAverage[AVG_ADC_PSI]<PSI_UNDERPRESSURE) {
+				if (now>fup_time) {
 					plugStateSet(PSI_PUMP_ID, 0);	// disable psi pump
 					auto_failures|=1;	// set PSI program failure flag
 				}
-				else {
-					fup_time = RTC_GetCounter();
-				}
-			}
-			else {
-				fup_time = RTC_GetCounter();
-			}
 		}
 		else {
-			fup_time = RTC_GetCounter();
+			fup_time = RTC_GetCounter()+PSI_UP_TIMEOUT;		// fail under pressure flag set time
 		}
 
 		vTaskDelay(1);
@@ -891,6 +884,7 @@ void save_settings(void){	// wrapper for rx_ee, simplifies settings packet recei
 
 static void uart_task(void *pvParameters){
 	while (1) {
+		IWDG_ReloadCounter();
 		if (packet_ready==1) {
 			run_uart_cmd();	// when command packet received, run the command
 			if (RxBuffer[1]<50) {	// other than get_status_block()
@@ -2076,6 +2070,22 @@ void startWp(void){
 
 
 
+
+
+
+
+/*
+ * This Watering Program has following strategy:
+ * - the mixing tank is always empty before watering program starts
+ * - the watering solution volume is fixed for each watering
+ * - water intaken by opening FWI valve (for Grolly ID 4)
+ * - MIXTANK_SONAR is used for measuring distance to water edge,
+ *  from the top of the tank where sonar installed
+ *
+ */
+
+
+
 void run_watering_program(uint8_t progId){
 /*	wpStateFlags|=(1<<progId);	// set active flag for this program
 	close_valve(DRAIN_VALVE_ID);	// close drain valve
@@ -2100,33 +2110,49 @@ void run_watering_program(uint8_t progId){
 	// count the cm-s we need to get +
 	uint16_t height = 3*vol/((3.142*(r1*r1+r1*r2+r2*r2)));
 */
-
+	wpProgress = 2;
 	wpStateFlags|=(1<<progId);	// set active flag for this program
 	uint32_t wpStartTs = 0;
 	wpStartTs = RTC_GetCounter();
 	// FRESH WATER INTAKE
 	open_valve(FWI_VALVE);	// FWI valve
+	wpProgress = 3;
 	uint16_t n=0;
 	uint8_t i=0;
-	uint32_t curN=0, interval=0, startime=0, now=0, end=0;
-	uint16_t volume = 0, addr=0, fmpLink=0, flags=0;
+	uint32_t curN=0;
+	uint32_t interval=0;
+	uint32_t startime=0;
+	uint32_t now=0;
+	uint32_t overTime=0;
+	uint16_t curprcnt = 0;
+	uint16_t volume = 0;
+	uint16_t addr=0;
+	uint16_t fmpLink=0;
+	uint16_t flags=0;
+	uint8_t startLvl=0;
 	addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;
 	EE_ReadVariable(addr, &volume);
 	volume = sonar_read[MIXTANK_SONAR]-(volume & (0xFF));	// count the sonar value to expect
 	now = RTC_GetCounter();
-	end = now + WP_INTAKE_TIMEOUT;
-	while (sonar_read[MIXTANK_SONAR]>volume && now<end) {
+	startLvl = sonar_read[MIXTANK_SONAR];
+	wpProgress = 4;
+	while (overTime>now) { // 5 seconds sonar should report >100% fill to close FWI valve
+		if ( (startLvl-sonar_read[MIXTANK_SONAR]) <= volume){
+			overTime = now + 5;
+			open_valve(FWI_VALVE);
+		}
 		now = RTC_GetCounter();
 		vTaskDelay(25);
+		wpProgress = 5;
 	}
 	close_valve(FWI_VALVE);
 	vTaskDelay(1000);
-
+	wpProgress = 6;
 
 
 	// mix fertilizers
 	for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
-
+		wpProgress = 7;
 		// count current N value
 		addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
 		interval = EE_ReadWord(addr);
@@ -2135,19 +2161,20 @@ void run_watering_program(uint8_t progId){
 		addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
 		EE_ReadVariable(addr, &n);
 		curN = (RTC_GetCounter()-startime)/interval;
-		uint8_t rest = curN/n;
 
+		uint8_t rest = curN%n;
 		uint16_t enabled=0;
 		addr = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;
 		EE_ReadVariable(addr, &fmpLink);
-//		addr = FMP_OFFSET+i*FMP_SIZE+FMP_ENABLE;
+		addr = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
 		EE_ReadVariable(addr, &enabled);
-		if (fmpLink==progId && enabled==1 && rest==0) {
+		if (fmpLink==progId && enabled>0 && rest==0) {
 			run_fertilizer_mixer(i);
 		}
 		vTaskDelay(10);
+		wpProgress = 8;
 	}
-
+	wpProgress = 9;
 	// open corresponding watering line valve(s)
 	addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
 	EE_ReadVariable(addr, &flags);
@@ -2160,20 +2187,21 @@ void run_watering_program(uint8_t progId){
 		}
 		vTaskDelay(1);
 	}
-
+	wpProgress = 10;
 	// run watering
 	auto_flags|=1;	// enable watering through psi stab function
 	uint8_t srcomm = 0;
 	srcomm = comm_state;	// backup curent commstate. to recover after watering
 	comm_state = COMM_MONITOR_MODE;
-	while (now<end && (auto_failures&1)==0) {
+	while ((auto_failures&1)==0) {
 		vTaskDelay(5);
+		wpProgress = 11;
 	}
 	auto_flags&=~(1);	// disable PSI stab function flag
 	comm_state = srcomm;	// recover comm_state
 	auto_failures  &= ~1;	// reset PSI failure flag
 	plugStateSet(PSI_PUMP_ID, 0);	// force disable PSI pump
-
+	wpProgress = 12;
 	vTaskDelay(10);
 	valve_init();	// close all valves
 
@@ -2197,7 +2225,7 @@ void run_fertilizer_mixer(uint8_t progId){
 	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
 	EE_ReadVariable(addr, &dosingPumpId);
 
-//	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_CIRCULATION_MIXING_TIME_SHIFT;
+	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_AFTERMIX_TIME_SHIFT;
 	EE_ReadVariable(addr, &circulationMixingTime);
 
 	dosingEndTime = RTC_GetCounter()+dosingTime;
@@ -4472,8 +4500,6 @@ void displayClock(void *pvParameters)
 		Lcd_clear();
     	while (1)
 	    {
-
-  		  IWDG_ReloadCounter();
 	    	vTaskDelay(10);
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
@@ -4522,7 +4548,7 @@ void displayClock(void *pvParameters)
 	    	vTaskDelay(14);
 	    	button=readButtons();
 	    	vTaskDelay(3);
-//	    	Lcd_write_digit(button);
+	    	Lcd_write_digit(wpProgress);
 //	    	Lcd_write_16b(ADC1->JDR1);
 //	    	Lcd_goto(0,9);
 //	    	Lcd_write_16b(adcAverage[0]);
@@ -4909,6 +4935,9 @@ uint8_t main(void)
 	Lcd_clear();
 	loadSettings();
 	flush_lcd_buffer();	// fills the LCD frame buffer with spaces
+
+	xTaskCreate(watering_program_trigger,(signed char*)"uart",50,
+	            NULL, tskIDLE_PRIORITY + 2, NULL);
 	xTaskCreate(uart_task,(signed char*)"uart",50,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
