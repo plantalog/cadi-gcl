@@ -72,7 +72,7 @@ uint32_t water_counter[WFM_AMOUNT];
 #define	VALVE_FAILURE_TIMEOUT		600	// timeout for valve open/close function to avoid hanging if valve broken
 #define DRAIN_VALVE_ID				1
 // Valve variables
-uint8_t valveFlags;
+volatile uint8_t valveFlags;
 #endif	// EOF VALVES DEFINITIONS
 
 
@@ -87,8 +87,8 @@ volatile uint8_t RxBuffer[40];
 volatile uint8_t TxBuffer[42];
 volatile static uint8_t RxByte;
 volatile static uint8_t comm_state=48;	// communication state
-static uint8_t NbrOfDataToTransfer = 16;
-static uint8_t txbuff_ne = 0;
+volatile static uint8_t NbrOfDataToTransfer = 16;
+volatile static uint8_t txbuff_ne = 0;
 volatile uint8_t TxCounter = 0;
 volatile uint8_t RxCounter = 0;
 #endif				// EOF BLUETOOTH USART DEFINITIONS
@@ -114,14 +114,13 @@ __IO uint32_t Frequency = 0;
 static uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
 TIM_ICInitTypeDef  TIM_ICInitStructure;
 DHT_data DHTValue;
-static uint8_t		dht_data[5];
-static uint8_t		dht_data2[5];
-static uint8_t dht_bit_position = 0;
-static uint8_t dht_bit_ready = 0;
-static uint8_t	dht_data_ready = 0;
+volatile static uint8_t		dht_data[5];
+volatile static uint8_t		dht_data2[5];
+volatile static uint8_t dht_bit_position = 0;
+volatile static uint8_t	dht_data_ready = 0;
 static uint8_t  dht_byte_pointer;
 static uint8_t  dht_bit_pointer;
-static uint8_t 	dht_rh_str[4], dht_t_str[4];
+volatile static uint8_t 	dht_rh_str[4], dht_t_str[4];
 static uint16_t rhWindowTop, rhWindowBottom;
 static uint8_t rhUnderOver = 0;
 #endif						// EOF DHT DEFINITIONS
@@ -247,9 +246,9 @@ typedef struct
 } RTC_DateTime;
 
 volatile RTC_Time toAdjust;
-static uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
-static uint8_t auto_failures=0;	// failure bits for corresponding auto programs' flags
-static uint32_t timerStateFlags, cTimerStateFlags;
+volatile static uint8_t auto_flags=254;	// enable all except the 0 bit - psi stab
+volatile static uint8_t auto_failures=0;	// failure bits for corresponding auto programs' flags
+volatile static uint32_t timerStateFlags, cTimerStateFlags;
 #endif						// EOF RTC DEFINITIONS
 
 
@@ -285,26 +284,41 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
  */
 
 // CRITCAL VALUES defines
-#define PSI_OVERPRESSURE	2700	// maximal pressure to shut down PSI pump
+#define PSI_OVERPRESSURE		2700	// maximal pressure to shut down PSI pump
 #define FWTANK_OVERLEVEL		15		// minimum distance to top for Fresh Water Tank
 #define MIXTANK_OVERLEVEL		9		// same for Fertilizer Mixing Tank
-#define MIXTANK_UNDERLEVEL	43		// maximum distance to top. if more, the mixing pump could fail
+#define MIXTANK_UNDERLEVEL		43		// maximum distance to top. if more, the mixing pump could fail
 
 
-// define eeprom cells for keeping user settings. memory map
-#define EE_PLUG_SETTINGS	0x05FF	//	each plug one value (16 plugs in total, range 7FF-809)
-#define EE_TIMER1_ON		0x05DA	// for 4 timers 36 (hex=24) values (range: 7DA-7FF)
-#define EE_CTIMER_DURATION	0x05C0	// 2 values for duration of cTimer.
-#define EE_CTIMER_INTERVAL	0x05C2	// and 2 for interval. For 5 timers 25 (hex=19) values 7C0-7D9
-#define EE_TIMER_SIZE		9
-#define EE_CTIMER_SIZE		5
-#define PH4_ADDR			0x0600
-#define PH7_ADDR			0x0601
-#define PH_INTERVAL			0x0602		// pH measurement interval in milliseconds
-#define PH_BUFF_SIZE		0x0603		// pH buffer size
-#define PH_WINDOW_TOP		0x0604		// pH window top adc value
-#define PH_WINDOW_BOTTOM	0x0605	// pH window bottom adc value
-#define SD_LOG_INTERVAL		0x0609		// sd logging interval, seconds
+// define eeprom cells for keeping user settings. memory map (1472-1727 (5C0-6BF))
+#define EE_PLUG_SETTINGS			0x05FF	// each plug one value (1535)
+
+/* Plain Timers have 3 fields (5 bytes in total)
+ * - Timer ON (32bit): Unixtime for Timer ON event
+ * - Timer OFF (32bit): Unixtime for Timer OFF
+ *  - Flags (16bit):
+ *  	- 0: daily flag. When 1 - timer is 24H, when 0 - Full Range
+ */
+#define EE_TIMER1_ON				0x05DA	// for 4 timers 36 (hex=24) values (range: 7DA-7FF)
+
+
+/*
+ * Cyclic Timer has similar struct:
+ * 	- Duration (32bit): Number of seconds the timer is ON
+ * 	- Interval (32bit): Number of seconds between ON rising edges
+ */
+
+#define EE_CTIMER_DURATION			0x05C0	// 2 values for duration of cTimer. (1472)
+#define EE_CTIMER_INTERVAL			0x05C2	// and 2 for interval. For 5 timers 25 (hex=19) values (1474)
+#define EE_TIMER_SIZE				5
+#define EE_CTIMER_SIZE				5
+#define PH4_ADDR					0x0600
+#define PH7_ADDR					0x0601
+#define PH_INTERVAL					0x0602	// pH measurement interval in milliseconds
+#define PH_BUFF_SIZE				0x0603	// pH buffer size
+#define PH_WINDOW_TOP				0x0604	// pH window top adc value
+#define PH_WINDOW_BOTTOM			0x0605	// pH window bottom adc value
+#define SD_LOG_INTERVAL				0x0609	// sd logging interval, seconds
 #define BUTTON_RANGES_START_ADDR	0x060A	// button ranges (8 values in a row) [60A-611]
 
 #define EC1413_ADDR			0x0606
@@ -313,7 +327,6 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define RH_WINDOW_TOP		0x0607		// pH window top adc value
 #define RH_WINDOW_BOTTOM	0x0608	// pH window bottom adc value
 
-#define CIRCULATION_PUMP_ID_ADDR	0x0899		// seems not to be used due to overriding with timerId=70
 
 
 //these defines configure abstract layer for accessing Cadi devices
@@ -343,33 +356,33 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
  */
 
 
+
 // WATERING PROGRAMS SETTINGS ADRESSES
 #define WP_AMOUNT					3		// 3x16=48(hex=30) values (range: 613-643)
 #define WP_SIZE						12		// size of block of settings data of watering program
-#define WP_OFFSET					0x0613	// watering program settings offset (first 8 bits of 16bit EEPROM value)
-#define WP_RULES_APPLIED			1		// 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
-#define	WP_VOLUME				1		// amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
-#define WP_INTERVAL			2		// 2x16bits for WP run interval (in seconds)
-#define WP_START			4		// 2x16bit variables for program start time
-#define WP_END			6		// after this time no triggering for this WP
-#define WP_LAST_RUN_SHIFT			8		// 2x16bit last run of watering program
-#define WP_FLAGS					10		// bit 0 (the last one): - WPEnabled flag
-#define WP_MIXING_TIME_SHIFT		11
-#define WP_INTAKE_TIMEOUT			600		// tieout in secs waiting until water fills the mixing tank through FWI valve
+#define WP_OFFSET					0x0613	// 1555empty. watering program settings offset (first 8 bits of 16bit EEPROM value)
+#define WP_RULES_APPLIED			1		// 1556 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
+#define	WP_VOLUME					1		// 1556 amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
+#define WP_INTERVAL					2		// 1557 2x16bits for WP run interval (in seconds)
+#define WP_START					4		// 1559 2x16bit variables for program start time
+#define WP_END						6		// 1561 after this time no triggering for this WP
+#define WP_LAST_RUN_SHIFT			8		// 1563 2x16bit last run of watering program
+#define WP_FLAGS					10		// 1565 bit 0 (the last one): - WPEnabled flag
+
 
 
 // 9x7=63 (hex=39) 0x0644 - 0x067D
 
-#define FMP_PROGRAMS_AMOUNT			9
+#define FMP_PROGRAMS_AMOUNT						9
 
 // Fertilizer Mixing Program adresses	()
-#define FMP_OFFSET								0x0644
+#define FMP_OFFSET								0x0644	// 1604
 #define FMP_SIZE								5
-#define FMP_DOSING_PUMP_ID_SHIFT				1		// FMP enabled if dosing pump id > 0 (05.09.2014)
-#define FMP_DOSING_TIME_SHIFT					2
-#define FMP_2_WP_ASSOC_SHIFT					3
-#define FMP_TRIG_FREQUENCY_SHIFT				4
-#define	FMP_AFTERMIX_TIME_SHIFT					5
+#define FMP_DOSING_PUMP_ID_SHIFT				1		// 1605 FMP enabled if dosing pump id > 0 (05.09.2014)
+#define FMP_DOSING_TIME_SHIFT					2		// 1606
+#define FMP_2_WP_ASSOC_SHIFT					3		// 16070 H
+#define FMP_TRIG_FREQUENCY_SHIFT				3		// 16071 L
+#define	FMP_AFTERMIX_TIME_SHIFT					4		// 1608
 
 #define DOSER_SPEEDS			0x0612		// 4 bytes for doser speeds in percent (1..100)
 
@@ -379,9 +392,13 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define COMM_SET_SETTINGS		50
 #define COMM_DIRECT_DRIVE		51
 
-#define WATER_TANK_TOP			0x0622
-#define WATER_TANK_BOTTOM		0x0632
-#define WFM_CAL_OFFSET			0x0642
+#define WATER_TANK_TOP			0x05D6
+#define WATER_TANK_BOTTOM		0x05D7
+
+#define MIXTANK_TOP				0x05D8
+#define MIXTANK_BOTTOM			0x05D9
+
+#define WFM_CAL_OFFSET			0x0642	// 1602
 
 
 #define DAY						1
@@ -416,17 +433,17 @@ static uint16_t psi_cur_adc_value=0;
 #define AVG_ADC_PSI		2			// adcAverage[2]
 
 
-uint16_t tank_windows_top[1];
-uint16_t tank_windows_bottom[1];
+volatile uint16_t tank_windows_top[2];
+volatile uint16_t tank_windows_bottom[2];
 
 ErrorStatus  HSEStartUpStatus;
 FLASH_Status FlashStatus;
 
 volatile static uint16_t adcAverage[4];
 
-static uint8_t wpStateFlags;
+volatile static uint8_t wpStateFlags;
 static uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
-static uint8_t dosingPumpStateFlags2;
+volatile static uint8_t dosingPumpStateFlags2;
 uint16_t wfCalArray[WFM_AMOUNT];
 
 
@@ -1835,16 +1852,6 @@ void valve_test(void){
 
 
 
-#define WP_AMOUNT					3		// 3x16=48(hex=30) values (range: 613-643)
-#define WP_SIZE						11		// size of block of settings data of watering program
-#define WP_OFFSET					0x0613	// watering program settings offset (first 8 bits of 16bit EEPROM value)
-#define WP_RULES_APPLIED			1		// 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
-#define	WP_VOLUME				1		// amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
-#define WP_INTERVAL			2		// 2x16bits for WP run interval (in seconds)
-#define WP_START					4		// 2x16bit variables for program start time
-#define WP_END						6		// after this time no triggering for this WP
-#define WP_LAST_RUN_SHIFT			8		// 2x16bit last run of watering program
-#define WP_FLAGS					10
 
 uint16_t adjustFlags(uint16_t flags, uint8_t from, uint8_t to){
 	uint8_t i=0;
@@ -2087,29 +2094,7 @@ void startWp(void){
 
 
 void run_watering_program(uint8_t progId){
-/*	wpStateFlags|=(1<<progId);	// set active flag for this program
-	close_valve(DRAIN_VALVE_ID);	// close drain valve
-//	valveFlags=0;	// all valves to off;
-	uint16_t addr, sensorId, fmpLink, wateringPlugId=0;
-	uint8_t i, waterSensorFlag=0;
-	uint32_t now=0, end=0, wateringDuration=0, lastTime=0;
-	vTaskDelay(1);
-/*
-	//r1 = 45;	// 40..45 depending on water level. top 45^2 = 2025
-	uint8_t r2top = 45;
-	uint8_t r1 = 40;	// bottom	40^2 = 1600
 
-	uint8_t h = (btm_lvl-cur_lvl);
-	uint32_t r2 = r1+((r2top-r1)*100*h/(btm_lvl-top_lvl))/100;
-	// V = 1/3(pi*h*(r1^2+r1*r2+r2^2))
-	// h = (3*V)/(pi*(r1^2+r1*r2+r2^2))
-	// h = (3*10)
-	uint32_t cur_vol = (3142*h*(r1^2+r1*r2+r2^2)/1000)/3;
-
-
-	// count the cm-s we need to get +
-	uint16_t height = 3*vol/((3.142*(r1*r1+r1*r2+r2*r2)));
-*/
 	wpProgress = 2;
 	wpStateFlags|=(1<<progId);	// set active flag for this program
 	uint32_t wpStartTs = 0;
@@ -2117,7 +2102,7 @@ void run_watering_program(uint8_t progId){
 	// FRESH WATER INTAKE
 	open_valve(FWI_VALVE);	// FWI valve
 	wpProgress = 3;
-	uint16_t n=0;
+	volatile uint16_t n=0;
 	uint8_t i=0;
 	uint32_t curN=0;
 	uint32_t interval=0;
@@ -2129,20 +2114,21 @@ void run_watering_program(uint8_t progId){
 	uint16_t addr=0;
 	uint16_t fmpLink=0;
 	uint16_t flags=0;
-	uint8_t startLvl=0;
+	uint16_t curLvl = 0;
 	addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;
 	EE_ReadVariable(addr, &volume);
 	volume = sonar_read[MIXTANK_SONAR]-(volume & (0xFF));	// count the sonar value to expect
 	now = RTC_GetCounter();
-	startLvl = sonar_read[MIXTANK_SONAR];
 	wpProgress = 4;
+	vTaskDelay(100);
 	while (overTime>now) { // 5 seconds sonar should report >100% fill to close FWI valve
-		if ( (startLvl-sonar_read[MIXTANK_SONAR]) <= volume){
+		curLvl = tank_windows_bottom[1] - sonar_read[MIXTANK_SONAR];
+		if ( curLvl <= volume){
 			overTime = now + 5;
 			open_valve(FWI_VALVE);
 		}
+		vTaskDelay(250);
 		now = RTC_GetCounter();
-		vTaskDelay(25);
 		wpProgress = 5;
 	}
 	close_valve(FWI_VALVE);
@@ -2152,57 +2138,75 @@ void run_watering_program(uint8_t progId){
 
 	// mix fertilizers
 	for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
-		wpProgress = 7;
+		wpProgress = i+87;
+		addr=0;
 		// count current N value
 		addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
 		interval = EE_ReadWord(addr);
 		addr = WP_OFFSET+progId*WP_SIZE+WP_START;
 		startime = EE_ReadWord(addr);
+		vTaskDelay(100);
 		addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
 		EE_ReadVariable(addr, &n);
 		curN = (RTC_GetCounter()-startime)/interval;
-
-		uint8_t rest = curN%n;
+		vTaskDelay(100);
+		wpProgress = 200;
+		vTaskDelay(200);
+		uint8_t rest = curN%(n%256);	// lower byte of 16bit of FMP_TRIG_FREQUENCY_SHIFT
 		uint16_t enabled=0;
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_2_WP_ASSOC_SHIFT;
-		EE_ReadVariable(addr, &fmpLink);
+		fmpLink=n/256;	// higher byte of FMP_TRIG_FREQUENCY = WP link
+		addr = 0;
 		addr = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
 		EE_ReadVariable(addr, &enabled);
 		if (fmpLink==progId && enabled>0 && rest==0) {
+			wpProgress = 99;
+			vTaskDelay(400);
 			run_fertilizer_mixer(i);
+			wpProgress = 100+i;
+			vTaskDelay(2000);
 		}
-		vTaskDelay(10);
+		vTaskDelay(100);
 		wpProgress = 8;
 	}
 	wpProgress = 9;
 	// open corresponding watering line valve(s)
 	addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
 	EE_ReadVariable(addr, &flags);
-	for (i=1; i<(VALVE_AMOUNT+1); i++) {
+	for (i=1; i<=VALVE_AMOUNT; i++) {
 		if (((flags>>i)&1)==1) {
 			open_valve(i);
 		}
 		else {
 			close_valve(i);
 		}
-		vTaskDelay(1);
+		vTaskDelay(100);
 	}
 	wpProgress = 10;
 	// run watering
 	auto_flags|=1;	// enable watering through psi stab function
 	uint8_t srcomm = 0;
+	uint16_t tmpval=0;
 	srcomm = comm_state;	// backup curent commstate. to recover after watering
 	comm_state = COMM_MONITOR_MODE;
-	while ((auto_failures&1)==0) {
-		vTaskDelay(5);
-		wpProgress = 11;
+
+	addr = WP_OFFSET+progId*WP_SIZE;
+	volume=0;
+	EE_ReadVariable(addr, &volume);
+	overTime = RTC_GetCounter() + volume;
+	auto_failures  &= ~1;	// reset PSI failure flag
+	while ((auto_failures&1)==0 && now<overTime) {
+		vTaskDelay(500);
+		wpProgress = overTime-now;
+		now=RTC_GetCounter();
 	}
+	wpProgress = 12;
+	vTaskDelay(1000);
 	auto_flags&=~(1);	// disable PSI stab function flag
+	plugStateSet(PSI_PUMP_ID, 0);	// force disable PSI pump
 	comm_state = srcomm;	// recover comm_state
 	auto_failures  &= ~1;	// reset PSI failure flag
-	plugStateSet(PSI_PUMP_ID, 0);	// force disable PSI pump
-	wpProgress = 12;
-	vTaskDelay(10);
+	wpProgress = 13;
+	vTaskDelay(1000);
 	valve_init();	// close all valves
 
 	addr = WP_OFFSET+progId*WP_SIZE+WP_LAST_RUN_SHIFT;
@@ -2224,16 +2228,30 @@ void run_fertilizer_mixer(uint8_t progId){
 
 	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
 	EE_ReadVariable(addr, &dosingPumpId);
-
+	wpProgress = 95;
+	vTaskDelay(400);
+	addr = 0;
 	addr = FMP_OFFSET+progId*FMP_SIZE+FMP_AFTERMIX_TIME_SHIFT;
+	wpProgress = 94;
+	vTaskDelay(400);
 	EE_ReadVariable(addr, &circulationMixingTime);
-
-	dosingEndTime = RTC_GetCounter()+dosingTime;
+	wpProgress = 93;
+	vTaskDelay(400);
+	dosingEndTime = RTC_GetCounter()+(uint32_t)dosingTime;
+	wpProgress = 92;
+	vTaskDelay(400);
 	enable_dosing_pump(dosingPumpId, 1);
+	wpProgress = 91;
+	vTaskDelay(400);
 	while (RTC_GetCounter()<dosingEndTime) {
-		vTaskDelay(10);
+		wpProgress = 91;
+		vTaskDelay(100);
 	}
+	wpProgress = 90;
+	vTaskDelay(400);
 	enable_dosing_pump(dosingPumpId, 0);
+	wpProgress = 89;
+	vTaskDelay(400);
 	run_circulation_pump(circulationMixingTime);
 }
 
@@ -2322,6 +2340,7 @@ void valve_init(void){
 	close_valve(4);
 	close_valve(0);
 	close_valve(1);
+	close_valve(2);
 }
 
 void watering_program_trigger(void *pvParameters){
@@ -2794,40 +2813,6 @@ typedef struct
 } divmod10_t;
 
 
-
-
-
-/* Virtual address defined by the user: 0xFFFF value is prohibited */
-uint16_t VirtAddVarTab[2] = {
-			CIRCULATION_PUMP_ID_ADDR,
-			PH4_ADDR
-};
-
-void fill_virtAddrTab(void){
-	uint8_t i=0;
-	for (i=0; i<17; i++) {
-		VirtAddVarTab[i]=WP_OFFSET+i;
-	}
-	for (i=0; i<17; i++) {
-		VirtAddVarTab[i+17]=FMP_OFFSET+i;
-	}
-	for (i=0; i<17; i++) {
-		VirtAddVarTab[i+17]=EE_PLUG_SETTINGS+i;
-	}
-	for (i=0; i<15; i++) {
-		VirtAddVarTab[i+17]=EE_CTIMER_DURATION+i;
-	}
-
-	for (i=0; i<8; i++) {
-		VirtAddVarTab[i+17]=BUTTON_RANGES_START_ADDR+i;
-	}
-
-	for (i=0; i<8; i++) {
-		VirtAddVarTab[i+17]=EE_TIMER1_ON+i;
-	}
-
-}
-
 #define MENURECS	34
 
 #ifndef TEST_MODE
@@ -3004,7 +2989,6 @@ const uint8_t fatArray[MENURECS][7]=
 		{31,31,	30,	32,	25,	31,	1},	// button test
 		{32,32,	31,	33,	26,	32,	1},	// pH and ec test
 		{33,33,	32,	0,	27,	33,	1}	// test function
-
 };
 
 #endif
@@ -3395,13 +3379,13 @@ void timerStateTrigger(void *pvParameters){
 	while (1) {
 		adcAverager();
 		now=RTC_GetCounter();
-		for (i=0; i<3; i++){	// 32 tajmera
+		for (i=0; i<4; i++){	// 4 tajmera
 			Address = EE_TIMER1_ON+EE_TIMER_SIZE*i;
-			timer1 = EE_ReadWord(Address);
-			timer2 = EE_ReadWord(Address+2);
+			timer1 = EE_ReadWord(Address);		// Timer ON
+			timer2 = EE_ReadWord(Address+2);	// Timer OFF
 
 			// for everyday triggering
-			timer1 = timer1%86400;
+			timer1 = timer1%86400;				// 86400s = 24h
 			timer2 = timer2%86400;
 			now = now % 86400;
 
@@ -4548,10 +4532,8 @@ void displayClock(void *pvParameters)
 	    	vTaskDelay(14);
 	    	button=readButtons();
 	    	vTaskDelay(3);
+	    	Lcd_write_str(" ");
 	    	Lcd_write_digit(wpProgress);
-//	    	Lcd_write_16b(ADC1->JDR1);
-//	    	Lcd_goto(0,9);
-//	    	Lcd_write_16b(adcAverage[0]);
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
@@ -4936,9 +4918,9 @@ uint8_t main(void)
 	loadSettings();
 	flush_lcd_buffer();	// fills the LCD frame buffer with spaces
 
-	xTaskCreate(watering_program_trigger,(signed char*)"uart",50,
+	xTaskCreate(watering_program_trigger,(signed char*)"uart",150,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
-	xTaskCreate(uart_task,(signed char*)"uart",50,
+	xTaskCreate(uart_task,(signed char*)"uart",70,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
             NULL, tskIDLE_PRIORITY + 2, NULL);
@@ -4972,6 +4954,8 @@ void loadSettings(void){	// function loads the predefined data
 
 	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
 	EE_ReadVariable(WATER_TANK_BOTTOM, &tank_windows_bottom[0]);
+	EE_ReadVariable(MIXTANK_TOP, &tank_windows_top[1]);
+	EE_ReadVariable(MIXTANK_BOTTOM, &tank_windows_bottom[1]);
 
 	EE_ReadVariable(PSI_SENSOR_TOP, &psi_pump_top_level);
 	EE_ReadVariable(PSI_SENSOR_BTM, &psi_pump_btm_level);

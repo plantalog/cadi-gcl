@@ -83,8 +83,8 @@
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showPeripheralsAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showVariablesAction"/>
 <hide_menu_item_id id="org.coocox.builder.ui.openProjectExplorerAction"/>
-<hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
 <hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
+<hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showRegistersAction"/>
 <hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
@@ -291,7 +291,7 @@
 </editorArea>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="eeprom.c" partName="eeprom.c" path="D:/repos/cadi-gcl/stm32f100/grolly/current/stm_lib/src/eeprom.c" title="eeprom.c" tooltip="D:/repos/cadi-gcl/stm32f100/grolly/current/stm_lib/src/eeprom.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hellow4/stm_lib/src/eeprom.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="20596" selectionTopPixel="11382"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="12671" selectionTopPixel="6600"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="driver_sonar.c" partName="driver_sonar.c" path="D:/repos/cadi-gcl/grolly/current/cadi_libs/scr/driver_sonar.c" title="driver_sonar.c" tooltip="D:/repos/cadi-gcl/grolly/current/cadi_libs/scr/driver_sonar.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hellow4/cadi_libs/src/driver_sonar.c"/>
@@ -346,12 +346,13 @@
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="42238" selectionTopPixel="18300"/>
 </editor>
 <editor id="org.coocox.builder.ui.editors.ConfigEditor" name="" partName="Configuration" title="Configuration" tooltip="" workbook="DefaultEditorWorkbook">
-<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">&#x0A;<org.coocox.builder.ui.editors.ConfigEditor/>
+<input factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory">
+<org.coocox.builder.ui.editors.ConfigEditor/>
 </input>
 </editor>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="D:/repos/cadi-gcl/stm32f100/grolly/current/main.c" title="main.c" tooltip="D:/repos/cadi-gcl/stm32f100/grolly/current/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/hellow4/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="22518" selectionTopPixel="13740"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="66482" selectionTopPixel="44166"/>
 </editor>
 </editors>
 <views>
@@ -375,12 +376,14 @@
 <viewState/>
 </view>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="0">
+<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="40" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="15">
 <expanded>
 <element path="/hellow4"/>
+<element path="/hellow4/stm_lib"/>
+<element path="/hellow4/stm_lib/inc"/>
 </expanded>
 <selection>
-<element path="/hellow4/main.c"/>
+<element path="/hellow4/stm_lib/inc/stm32f10x_it.h"/>
 </selection>
 </viewState>
 </view>
@@ -430,8 +433,8 @@
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showPeripheralsAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showVariablesAction"/>
 <hide_menu_item_id id="org.coocox.builder.ui.openProjectExplorerAction"/>
-<hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
 <hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
+<hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showRegistersAction"/>
 <hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
@@ -462,7 +465,7 @@
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@b57342" ratio="0.7594554" ratioLeft="502" ratioRight="159" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1ea1abe">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@b57342" ratio="0.57579064" ratioLeft="528" ratioRight="389" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1ea1abe">
 <folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.search.ui.views.SearchView" label="Search"/>
@@ -610,158 +613,159 @@
 <navigationHistory>
 <editors>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/main.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/cmsis_boot/stm32f10x.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/cmsis_boot/system_stm32f10x.c"/>
+<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor">
+<org.coocox.builder.ui.editors.ConfigEditor/>
+</editor>
+<editor factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor">
+<org.coocox.builder.ui.editors.ConfigEditor/>
+</editor>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/stm_lib/src/eeprom.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/hellow4/main.c"/>
 </editors>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="57497" y="11"/>
+<position info="not_deleted" x="120832" y="0"/>
+</item>
+<item historyLabel="Configuration" index="1"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="120658" y="0"/>
+</item>
+<item historyLabel="Configuration" index="2"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="120489" y="0"/>
 </item>
 <item historyLabel="main.c" index="0">
-<position info="not_deleted" x="215520" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216385" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="217095" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="7023" y="10"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216368" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216802" y="0"/>
-</item>
-<item historyLabel="stm32f10x.h" index="1">
-<position info="not_deleted" x="110004" y="18"/>
-</item>
-<item historyLabel="stm32f10x.h" index="1">
-<position info="not_deleted" x="52467" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216399" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="221408" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216231" y="51"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216227" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="216767" y="39"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="217994" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="73324" y="18"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="175019" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="220765" y="12"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="20151" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="73324" y="18"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="32375" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="32341" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="33814" y="13"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="21204" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="21519" y="8"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="22547" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="11076" y="8"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="19248" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="183386" y="16"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="220177" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="183386" y="16"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="191198" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="196953" y="9"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="197623" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="220177" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="183386" y="16"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="187251" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="32460" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="218991" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="74737" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="21519" y="8"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="21205" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="21519" y="8"/>
+<position info="not_deleted" x="127278" y="0"/>
 </item>
 <item historyLabel="main.c" index="0">
 <position/>
 </item>
-<item historyLabel="system_stm32f10x.c" index="2"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="130479" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="96627" y="16"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="130240" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="119449" y="12"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="96753" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="95072" y="17"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="96627" y="16"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="127760" y="2"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="877" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="128171" y="33"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="127353" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="51040" y="81"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="130731" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="127260" y="13"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="130239" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="119449" y="12"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="130138" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="28007" y="9"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="62981" y="20"/>
+</item>
 <item historyLabel="eeprom.c" index="3">
 <position info="not_deleted" x="20596" y="0"/>
 </item>
-<item historyLabel="main.c" index="4">
-<position info="not_deleted" x="0" y="0"/>
+<item historyLabel="eeprom.c" index="3">
+<position info="not_deleted" x="12671" y="0"/>
 </item>
-<item historyLabel="main.c" index="4">
-<position info="not_deleted" x="21204" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="78284" y="0"/>
 </item>
-<item active="true" historyLabel="main.c" index="4">
-<position info="not_deleted" x="21519" y="8"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64579" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64758" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64700" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="66903" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="12355" y="8"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="65393" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="12509" y="20"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="65605" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="66737" y="20"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="67012" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="12382" y="24"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="12372" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64501" y="58"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64753" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="65164" y="2"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="66074" y="77"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64131" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="65164" y="0"/>
+</item>
+<item active="true" historyLabel="main.c" index="0">
+<position info="not_deleted" x="64658" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -770,6 +774,16 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
+<persistable>
+<org.coocox.builder.ui.editors.ConfigEditor/>
+</persistable>
+</file>
+<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.builder.ui.editors.ConfigEditor" name="" tooltip="">
+<persistable>
+<org.coocox.builder.ui.editors.ConfigEditor/>
+</persistable>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="hellow4/main.c">
 <persistable path="/hellow4/main.c"/>
 </file>
@@ -808,12 +822,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f10x_conf.h" tooltip="grolly/cmsis_boot/stm32f10x_conf.h">
 <persistable path="/grolly/cmsis_boot/stm32f10x_conf.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4_discovery.h" tooltip="Chloe/cmsis_boot/stm32f4_discovery.h">
-<persistable path="/Chloe/cmsis_boot/stm32f4_discovery.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4_discovery.h" tooltip="Chloe/cmsis_boot/stm32f4_discovery.h">
-<persistable path="/Chloe/cmsis_boot/stm32f4_discovery.h"/>
 </file>
 </mruList>
 </workbench>

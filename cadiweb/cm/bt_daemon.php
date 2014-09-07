@@ -464,11 +464,11 @@ function parse_response($srtrs){
 
 	
 
-	if ($packet_type==1 ) {		// parsing Cadi settings
+	if ($packet_type==1 && strlen($last_packet)==37) {		// parsing Cadi settings
 		$crc = ord($last_packet[($packet_size-3)]);
 		$counted_crc = crc_block(2, $last_packet, (ord($last_packet[1])-3));
 		echo PHP_EOL.'>>>>> ACHTUNG: Settings Packet CRC='.$crc.' and counted one is'.$counted_crc.PHP_EOL;
-		if ($counted_crc==$crc) {
+		if ($counted_crc==$crc) {	// $crc!=0 - dangerous thing, some block could be lost because crc in fact could be 0
 			$block_addr = ord($last_packet[2])+ord($last_packet[3])*256;		// block address
 			$block_size = 32;
 			$block_data = substr($last_packet,4,32);

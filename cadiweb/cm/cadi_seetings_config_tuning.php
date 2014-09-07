@@ -40,7 +40,7 @@ function csx_dl_proc(){
 }
 
 function rx_ee(addr){
-	alert(addr);
+//	alert(addr);
 	var csx_data = $('#csxform').serialize();
 	$.post('cm/cadi_bt_processor.php', {action: 'upload_csx', csx_data:csx_data}, function(data){
 		var number = $('#settings_number').val();	// amount of 16 bit variables to upload to cadi
@@ -64,7 +64,6 @@ function rx_ee(addr){
 
 
 </form>
-<button onClick="upload_csx()">Upload new settings to Cadi</button>
 <br><br><br>
 
 

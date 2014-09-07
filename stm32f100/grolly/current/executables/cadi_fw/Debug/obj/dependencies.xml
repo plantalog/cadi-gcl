@@ -35,7 +35,7 @@
          <include file="..\..\..\..\freertos\Source\include\list.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
       </source>
-      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7">
+      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="14851fc0418">
          <include file="..\..\..\..\..\..\..\..\..\hw\stm_com_resources\STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_flash.h"/>
          <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
       </source>
@@ -107,6 +107,9 @@
          <include file="..\..\..\..\freertos\Source\include\FreeRTOS.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
          <include file="..\..\..\..\freertos\Source\include\croutine.h"/>
+      </source>
+      <source file="..\..\..\..\stm_lib\inc\stm32f10x_it.h" lastModified="1366443f8f0">
+         <include file="..\..\..\..\cmsis_boot\stm32f10x.h"/>
       </source>
       <source file="..\..\..\..\stm_lib\src\stm32f10x_dma.c" lastModified="13ba1ad1b76">
          <include file="..\..\..\..\..\..\..\..\..\hw\stm_com_resources\STM32F10x_StdPeriph_Lib_V3.5.0\Libraries\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h"/>
@@ -238,10 +241,6 @@
          <include file="..\..\..\..\freertos\Source\include\portable.h"/>
          <include file="..\..\..\..\freertos\Source\include\list.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
-      </source>
-      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7">
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_flash.h"/>
-         <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">
       </source>
@@ -383,10 +382,6 @@
          <include file="..\..\..\..\freertos\Source\include\portable.h"/>
          <include file="..\..\..\..\freertos\Source\include\list.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
-      </source>
-      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7">
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_flash.h"/>
-         <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">
       </source>
@@ -550,10 +545,6 @@
          <include file="..\..\..\..\freertos\Source\include\portable.h"/>
          <include file="..\..\..\..\freertos\Source\include\list.h"/>
          <include file="..\..\..\..\freertos\Source\include\task.h"/>
-      </source>
-      <source file="..\..\..\..\stm_lib\src\eeprom.c" lastModified="144acbc2cd7">
-         <include file="..\..\..\..\stm_lib\inc\stm32f10x_flash.h"/>
-         <include file="..\..\..\..\stm_lib\inc\eeprom.h"/>
       </source>
       <source file="..\..\..\..\freertos\Source\portable\ARM_CM3\portmacro.h" lastModified="13843cf2fc0">
       </source>

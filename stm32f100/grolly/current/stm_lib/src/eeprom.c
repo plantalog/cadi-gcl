@@ -34,7 +34,7 @@
 uint16_t DataVar = 0;
 
 /* Virtual address defined by the user: 0xFFFF value is prohibited */
-extern uint16_t VirtAddVarTab[2];
+// extern uint16_t VirtAddVarTab[2];	// used hardcoded 255b range copy starting from 0x05c0, see defines in header file
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
@@ -578,6 +578,7 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint16_t Data)
 
   /* Transfer process: transfer variables from old to the new active page */
   uint16_t curaddr = 0;
+  // 1472 - 1727
   for (VarIdx = 0; VarIdx < NumbOfVar; VarIdx++)
   {
 	curaddr = SETTINGS_START_ADDR+VarIdx;
