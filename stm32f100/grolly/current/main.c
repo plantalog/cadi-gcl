@@ -253,8 +253,10 @@ volatile static uint32_t timerStateFlags, cTimerStateFlags;
 
 
 volatile static uint32_t fup_time = 0;	// first time underpressure met
-#define PSI_UNDERPRESSURE	650			// minimum pressure meaning there is water in pump, when it is running
-#define PSI_UP_TIMEOUT	40				// seconds to stop PSI pump if underpressure met
+volatile static uint16_t psi_upres_level=0;
+volatile static uint16_t psi_upres_timeout=0;
+#define PSI_UNDERPRESSURE		0x05C8			// 1480 minimum pressure meaning there is water in pump, when it is running
+#define PSI_UP_TIMEOUT			0x05C9			// 1481 seconds to stop PSI pump if underpressure met
 
 // DRIVER: LOAD TRIGGERING
 #define USE_LOADS
@@ -333,9 +335,11 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 // based on schematic picture used in Cadiweb panel
 #define GROLLY
 #ifdef GROLLY
+#define FWTANK						0
+#define MIXTANK						1
 #define PSI_PUMP_ID					0		// load ID for high pressure watering pump
-#define FWTANK_SONAR					0
-#define MIXTANK_SONAR					1
+#define FWTANK_SONAR				0
+#define MIXTANK_SONAR				1
 #define	WI_VALVE					0
 #define FWI_VALVE					4
 #define WLINE_61_VALVE				1
@@ -545,6 +549,7 @@ uint16_t adjust16bit_fast(uint16_t val, uint8_t speed);
 // count crc starting from input and taking buffer from start_byte for length bytes
 uint8_t crc_block(uint8_t input, volatile uint8_t *start_byte, uint8_t length);
 
+static void lstasks(void *pvParameters);
 static void uart_task(void *pvParameters);
 static void prvSetupHardware( void );
 static void displayClock( void *pvParameters );
@@ -624,26 +629,28 @@ void autoSafe(void){
 		// if while running PSI pump underpressure was constant during timeout, disable PSI pump
 		vTaskDelay(1);
 		uint32_t now = RTC_GetCounter();
-		if ((auto_flags&1)==1 && adcAverage[AVG_ADC_PSI]<PSI_UNDERPRESSURE) {
+
+
+		if ((auto_flags&1)==1 && adcAverage[AVG_ADC_PSI]<psi_upres_level) {
 				if (now>fup_time) {
 					plugStateSet(PSI_PUMP_ID, 0);	// disable psi pump
 					auto_failures|=1;	// set PSI program failure flag
 				}
 		}
 		else {
-			fup_time = RTC_GetCounter()+PSI_UP_TIMEOUT;		// fail under pressure flag set time
+			fup_time = RTC_GetCounter()+psi_upres_timeout;		// fail under pressure flag set time
 		}
 
 		vTaskDelay(1);
-		if (sonar_read[FWTANK_SONAR]<FWTANK_OVERLEVEL && sonar_read[FWTANK_SONAR]>0){
+		if (sonar_read[FWTANK_SONAR]<tank_windows_top[FWTANK] && sonar_read[FWTANK_SONAR]>0){
 			close_valve(WI_VALVE);
 		}
 		vTaskDelay(1);
-		if (sonar_read[MIXTANK_SONAR]<MIXTANK_OVERLEVEL && sonar_read[MIXTANK_SONAR]>0){
+		if (sonar_read[MIXTANK_SONAR]<tank_windows_top[MIXTANK] && sonar_read[MIXTANK_SONAR]>0){
 			close_valve(FWI_VALVE);
 		}
 		vTaskDelay(1);
-		if (sonar_read[MIXTANK_SONAR]>MIXTANK_UNDERLEVEL){
+		if (sonar_read[MIXTANK_SONAR]>tank_windows_bottom[MIXTANK]){
 			enable_dosing_pump(MIXING_PUMP,0);	// mixer pump off
 		}
 	}
@@ -899,6 +906,17 @@ void save_settings(void){	// wrapper for rx_ee, simplifies settings packet recei
 }
 
 
+static void lstasks(void *pvParameters){
+	while (1) {
+		// low speed tasks
+		tankLevelStab();
+		autoSafe();
+		sonar_ping();
+		vTaskDelay(10);
+	}
+}
+
+
 static void uart_task(void *pvParameters){
 	while (1) {
 		IWDG_ReloadCounter();
@@ -997,7 +1015,7 @@ void run_uart_cmd(void){
 		case 11:	// stop all processes and force manual control
 			auto_flags=0;
 			comm_state=COMM_DIRECT_DRIVE;
-			auto_flags = 0;
+			auto_failures&=1;
 			plugStateSet(0,0);
 			plugStateSet(1,0);
 			plugStateSet(2,0);
@@ -1006,6 +1024,7 @@ void run_uart_cmd(void){
 			close_valve(3);
 			close_valve(0);
 			close_valve(1);
+			close_valve(4);
 			break;
 		case 12:
 			RTC_SetCounter(RxBuffer[2]*16777216+RxBuffer[3]*65536+RxBuffer[4]*256+RxBuffer[5]);
@@ -1026,11 +1045,11 @@ void run_uart_cmd(void){
 			break;
 		case 17:	// receive 8 bit value to store into EEPROM
 			addr = ((uint16_t)RxBuffer[2]+(uint16_t)RxBuffer[3]*256);
-			rx_ee(addr, 4);
+			rx_ee(addr, 10); 	// higher
 			break;
 		case 18:	// receive 8 lower bits to store into EEPROM
 			addr = ((uint16_t)RxBuffer[2]+(uint16_t)RxBuffer[3]*256);
-			rx_ee(addr, 5);
+			rx_ee(addr, 11);	// lower
 			break;
 		case 19:
 			loadSettings();
@@ -1104,14 +1123,14 @@ void rx_ee(uint16_t addr, uint8_t type){
 			vTaskDelay(1);
 		}
 	}
-	if (type==4) {	// 1 higher byte
+	if (type==10) {	// 1 higher byte
 		uint16_t tmpval=0;
 		EE_ReadVariable(addr, &tmpval);
 		tmpval &= (uint16_t)0xFF;
 		tmpval &= (((uint16_t)RxBuffer[4])<<8);
 		EE_WriteVariable(addr,tmpval);
 	}
-	if (type==5) {	// 1 lower byte
+	if (type==11) {	// 1 lower byte
 		uint16_t tmpval=0;
 		EE_ReadVariable(addr, &tmpval);
 		tmpval &= (uint16_t)0xFF00;
@@ -2223,7 +2242,7 @@ void run_watering_program(uint8_t progId){
 		now=RTC_GetCounter();
 	}
 	wpProgress = 12;
-	vTaskDelay(1000);
+	vTaskDelay(20000);	// release pressure in watering line
 	auto_flags&=~(1);	// disable PSI stab function flag
 	plugStateSet(PSI_PUMP_ID, 0);	// force disable PSI pump
 	comm_state = srcomm;	// recover comm_state
@@ -2374,10 +2393,6 @@ void watering_program_trigger(void *pvParameters){
 	valve_init();
 
 	while (1) {
-		// additional low speed tasks
-		tankLevelStab();
-		autoSafe();
-		sonar_ping();
 
 		// main loop
 		for (progId=0; progId<WP_AMOUNT; progId++){
@@ -3064,6 +3079,83 @@ void Delay_us(uint32_t delay){
 }
 
 void buttonCalibration(void){	// buttons calibration function
+	uint16_t button_val[4], diff;
+	Lcd_clear();
+	Lcd_write_str("<");
+	vTaskDelay(2000);
+	adcAverager();
+	vTaskDelay(40);
+	button_val[0] = adcAverage[ADC_AVG_BUTTONS];
+	Lcd_clear();
+	Lcd_write_str("OK");
+	vTaskDelay(2000);
+	adcAverager();
+	vTaskDelay(40);
+	button_val[1] = adcAverage[ADC_AVG_BUTTONS];
+	Lcd_clear();
+	Lcd_write_str("CANCEL");
+	vTaskDelay(2000);
+	adcAverager();
+	vTaskDelay(40);
+	button_val[2] = adcAverage[ADC_AVG_BUTTONS];
+	Lcd_clear();
+	Lcd_write_str(">");
+	vTaskDelay(2000);
+	adcAverager();
+	vTaskDelay(40);
+	button_val[3] = adcAverage[ADC_AVG_BUTTONS];
+
+	if ((button_val[3]>>3)<(button_val[0]>>3)) {
+		buttonReverse = 1;
+	}
+	else if ((button_val[3]>>3)>(button_val[0]>>3)) {
+		buttonReverse = 0;
+	}
+	else {
+		buttonReverse = 2;	//means loading button settings from EEPROM
+	}
+	if (buttonReverse == 0) {
+		diff = ((button_val[1]-button_val[0])/2)-5;
+		button_ranges[0] = (button_val[0]-diff/2);
+		button_ranges[1] = button_val[0]+diff;
+		button_ranges[2] = button_val[1]-diff;
+		diff = ((button_val[2]-button_val[1])/2)-5;
+		button_ranges[3] = button_val[1]+diff;
+		button_ranges[4] = button_val[2]-diff;
+		diff = ((button_val[3]-button_val[2])/2)-5;
+		button_ranges[5] = button_val[2]+diff;
+		button_ranges[6] = button_val[3]-diff;
+		button_ranges[7] = (button_val[3]+diff/2);
+		saveButtonRanges();
+	}
+	else if (buttonReverse == 1) {
+		diff = ((button_val[0]-button_val[1])/2)-5;
+		button_ranges[0] = button_val[0]-diff;
+		button_ranges[1] = button_val[0]+diff;
+		button_ranges[2] = button_val[1]-diff;
+		diff = ((button_val[1]-button_val[2])/2)-5;
+		button_ranges[3] = button_val[1]+diff;
+		button_ranges[4] = button_val[2]-diff;
+		diff = ((button_val[2]-button_val[3])/2)-5;
+		button_ranges[5] = button_val[2]+diff;
+		button_ranges[6] = button_val[3]-diff;
+		button_ranges[7] = button_val[3]+diff;
+		saveButtonRanges();
+	}
+	else {
+		Lcd_write_str("EEPROM buttons");
+		readButtonRanges();
+	}
+
+	if (button_ranges[0]>button_ranges[8]) {
+		buttonReverse=1;
+	}
+	Lcd_goto(0,0);
+	Lcd_write_str("Complete");
+	Lcd_clear();
+}
+
+void buttonCalibration2(void){	// buttons calibration function / became ol 08.09.2014
 	Lcd_clear();
 	Lcd_goto(0,0);
 	uint16_t button_val[4], diff;
@@ -3136,7 +3228,7 @@ void buttonCalibration(void){	// buttons calibration function
 	}
 
 	if (button_ranges[0]>button_ranges[8]) {
-				buttonReverse=1;
+		buttonReverse=1;
 	}
 	Lcd_goto(0,0);
 	Lcd_write_str("Complete");
@@ -4504,7 +4596,22 @@ void displayClock(void *pvParameters)
 {
 		RTC_DateTime DateTime;
 		uint32_t tmp=0;
+		tmp = RTC_GetCounter();
+		if (tmp<1388534400) {
+			RTC_SetCounter(1400000000);
+		}
 		Lcd_clear();
+		Lcd_write_str("Hello Buddy :)");
+		Lcd_goto(1,0);
+		Lcd_write_str("Let's GROW!");
+		vTaskDelay(2000);
+		Lcd_clear();
+		Lcd_clear();
+		Lcd_write_str("First, calibrate");
+		Lcd_goto(1,0);
+		Lcd_write_str("the buttons...");
+		vTaskDelay(2000);
+		buttonCalibration();
     	while (1)
 	    {
 	    	vTaskDelay(10);
@@ -4927,7 +5034,6 @@ uint8_t main(void)
 
 	bluetooth_init();
 	Init_lcd();
-	buttonCalibration();
 
 	sonar_init();
 
@@ -4941,7 +5047,11 @@ uint8_t main(void)
 	loadSettings();
 	flush_lcd_buffer();	// fills the LCD frame buffer with spaces
 
-	xTaskCreate(watering_program_trigger,(signed char*)"uart",150,
+
+
+	xTaskCreate(lstasks,(signed char*)"LST",configMINIMAL_STACK_SIZE,
+	            NULL, tskIDLE_PRIORITY + 2, NULL);
+	xTaskCreate(watering_program_trigger,(signed char*)"WP",150,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
 	xTaskCreate(uart_task,(signed char*)"uart",70,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
@@ -4980,12 +5090,16 @@ void loadSettings(void){	// function loads the predefined data
 	EE_ReadVariable(MIXTANK_TOP, &tank_windows_top[1]);
 	EE_ReadVariable(MIXTANK_BOTTOM, &tank_windows_bottom[1]);
 
+	EE_ReadVariable(PSI_UNDERPRESSURE, &psi_upres_level);
+	EE_ReadVariable(PSI_UP_TIMEOUT, &psi_upres_timeout);
+
 	EE_ReadVariable(PSI_SENSOR_TOP, &psi_pump_top_level);
 	EE_ReadVariable(PSI_SENSOR_BTM, &psi_pump_btm_level);
 
 	for (i=0; i<WFM_AMOUNT; i++) {
 		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);
 	}
+
 
 	readButtonRanges();
 }
