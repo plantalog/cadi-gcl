@@ -1,4 +1,15 @@
-=== Grolly firmware and software history ===
+=== Grolly firmware and software history (binaries are @ github in cadi-gcl/stm32f100/grolly/current/executables) ===
+
+v1.1b1
+- more volatility for globals
+- enabled automatic watering solution prepare and watering run triggering
+
+v1.1a2
+- watchdog functionality enabled for restart at uart task failure
+
+v1.1a1
+- removed non used functions
+- most of global variables marked as volatile
 
 v1.0b1
 - Cadi now receives settings data dumps from BTDaemon and stores them into EEPROM memory. BTDaemon now can link cadi_settings.php with sync_ functions to convert Cadi settings CSV config file into binary dump and vice versa.
