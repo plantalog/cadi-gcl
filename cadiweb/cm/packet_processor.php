@@ -122,6 +122,10 @@ if (isset($_POST['cmd'])) {
 			$packet .= chr($curtime%256);	// command
 			echo $curtime;
 			break;
+		case 13:		// get_status_block();
+			$packet .= chr(2);	// packet payload size (including this size byte)
+			$packet .= chr(13);	// command
+			break;
 		case 15:		// rx_ee((RxBuffer[2]&(RxBuffer[3]<<8)), 1); writes 16bit variable into STM32's Emulated EEPROM
 			$packet .= chr(6);	// packet payload size (including this size byte)
 			$packet .= chr(15);	// command
