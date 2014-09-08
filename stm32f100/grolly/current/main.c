@@ -1024,6 +1024,14 @@ void run_uart_cmd(void){
 			addr = ((uint16_t)RxBuffer[2]+(uint16_t)RxBuffer[3]*256);
 			rx_ee(addr, 16);
 			break;
+		case 17:	// receive 8 bit value to store into EEPROM
+			addr = ((uint16_t)RxBuffer[2]+(uint16_t)RxBuffer[3]*256);
+			rx_ee(addr, 4);
+			break;
+		case 18:	// receive 8 lower bits to store into EEPROM
+			addr = ((uint16_t)RxBuffer[2]+(uint16_t)RxBuffer[3]*256);
+			rx_ee(addr, 5);
+			break;
 		case 19:
 			loadSettings();
 			break;
@@ -1095,6 +1103,20 @@ void rx_ee(uint16_t addr, uint8_t type){
 			EE_WriteVariable(addr++,val16);
 			vTaskDelay(1);
 		}
+	}
+	if (type==4) {	// 1 higher byte
+		uint16_t tmpval=0;
+		EE_ReadVariable(addr, &tmpval);
+		tmpval &= (uint16_t)0xFF;
+		tmpval &= (((uint16_t)RxBuffer[4])<<8);
+		EE_WriteVariable(addr,tmpval);
+	}
+	if (type==5) {	// 1 lower byte
+		uint16_t tmpval=0;
+		EE_ReadVariable(addr, &tmpval);
+		tmpval &= (uint16_t)0xFF00;
+		tmpval &= (uint16_t)RxBuffer[4];
+		EE_WriteVariable(addr,tmpval);
 	}
 }
 
@@ -1619,20 +1641,21 @@ void EXTI9_5_IRQHandler(void)
 }
 
 void eeprom_test(void){
-	uint16_t addr=1400;
+	uint16_t addr=1500;
 	uint16_t val=0;
 	button = 0;
 	while (button!=BUTTON_FWD) {
 		button=readButtons();
 		val = 0;
 		EE_ReadVariable(addr, &val);
+
+		vTaskDelay(15);
 		Lcd_clear();
 		Lcd_write_str("Addr: ");
 		Lcd_write_16b(addr);
 		Lcd_goto(1,0);
 		Lcd_write_str("Val: ");
 		Lcd_write_16b(val);
-		vTaskDelay(1);
 		if (button==BUTTON_OK){
 			if (addr<2000) {
 				addr++;
@@ -1649,7 +1672,7 @@ void eeprom_test(void){
 				addr=2000;
 			}
 		}
-		vTaskDelay(6);
+		vTaskDelay(15);
 	}
 }
 
