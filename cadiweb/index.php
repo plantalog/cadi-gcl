@@ -159,6 +159,11 @@ $(document).ready(function() {
 		svg.text(150, 75, 'Temp',{fill: 'green', strokeWidth: 0, id:'cadi_temp'});
 		svg.text(150, 95, 'rH',{fill: 'blue', strokeWidth: 0, id:'cadi_rh'});
 
+		svg.text(300, 115, 'TF1',{fill: 'green', strokeWidth: 0, id:'tf1'});
+		svg.text(300, 135, 'TF2',{fill: 'green', strokeWidth: 0, id:'tf2'});
+		svg.text(300, 155, 'TF3',{fill: 'green', strokeWidth: 0, id:'tf3'});
+		svg.text(300, 175, 'TF4',{fill: 'green', strokeWidth: 0, id:'tf4'});
+
 		// draw tank levels in text
 		svg.text(730, 135, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t3l_txt'});
 		svg.text(590, 335, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t4l_txt'});
@@ -191,6 +196,15 @@ $(document).ready(function() {
 			var rh = parseFloat(statusArray[2]).toFixed(1);
 			$('#cadi_temp').html('&nbsp;T: '+temp+'C');
 			$('#cadi_rh').html('rH: '+rh+'%');
+
+			var wpProgress = statusArray[18];
+			$('#tf1').html(wpProgress);
+			var auto_failures = statusArray[19];
+			$('#tf2').html(auto_failures);
+			var runners = statusArray[20];
+			$('#tf3').html(runners);
+
+
 
 			// tank 3 water level redraw
 			

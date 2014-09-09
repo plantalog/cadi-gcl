@@ -94,10 +94,10 @@
     <File name="cmsis_boot/startup" path="" type="2"/>
     <File name="freertos/Source/timers.c" path="freertos/Source/timers.c" type="1"/>
     <File name="stm_lib/src/misc.c" path="stm_lib/src/misc.c" type="1"/>
-    <File name="ff9a/src/ff.c" path="ff9a/src/ff.c" type="1"/>
     <File name="stm_lib/src/stm32f10x_spi.c" path="stm_lib/src/stm32f10x_spi.c" type="1"/>
-    <File name="freertos/Source/include" path="" type="2"/>
     <File name="stm_lib/src/stm32f10x_iwdg.c" path="../../../../../hw/stm_com_resources/STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/STM32F10x_StdPeriph_Driver/src/stm32f10x_iwdg.c" type="1"/>
+    <File name="freertos/Source/include" path="" type="2"/>
+    <File name="ff9a/src/ff.c" path="ff9a/src/ff.c" type="1"/>
     <File name="cmsis_boot/stm32f10x.h" path="cmsis_boot/stm32f10x.h" type="1"/>
     <File name="cmsis_boot/stm32f10x_conf.h" path="cmsis_boot/stm32f10x_conf.h" type="1"/>
     <File name="ff9a/src/diskio.c" path="ff9a/src/diskio.c" type="1"/>

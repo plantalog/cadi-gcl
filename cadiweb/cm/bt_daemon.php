@@ -544,6 +544,9 @@ function parse_response($srtrs){
 				$statarr['psi'] = round((($adc_avg[2]-600)/470), 2); 
 				$statarr['comm_state'] = ord($last_packet[2]);
 				$statarr['auto_flags'] = ord($last_packet[33]);
+				$statarr['wpProgress'] = ord($last_packet[34]);
+				$statarr['auto_failures'] = ord($last_packet[35]);
+				$statarr['runners'] = ord($last_packet[28]);
 
 				// prepare array for CSV
 				$tofile[0] = $cadi_time;
@@ -564,6 +567,9 @@ function parse_response($srtrs){
 				$tofile[15] = $statarr['comm_state'];
 				$tofile[16] = $statarr['dosingPumpsFlags'];
 				$tofile[17] = $statarr['auto_flags'];
+				$tofile[18] = $statarr['wpProgress'];
+				$tofile[19] = $statarr['auto_failures'];
+				$tofile[20] = $statarr['runners'];
 				
 				
 				$csv_string = implode(",", $tofile);

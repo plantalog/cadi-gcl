@@ -27,14 +27,56 @@ function save_settings(){
 	var addr = $('#settings_block_id').val();
 	var value = $('#settings_value').val();
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:value}, function(data){
-			alert('settings saved');
+		alert('settings saved');
 	});
 }
+
+function rx_ee_val(addr, type){
+	if (type == 10) {	// 8 bit higher
+		var value = $('#'+addr+'_value').val();
+		value = Math.floor(value/256);	// get higher 8 bit
+		$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:17, addr:addr, value:value}, function(data){
+			alert('settings bit higher saved');
+		});
+	}
+	if (type == 11) {	// 8 bit lower
+		var value = $('#'+addr+'_value').val();
+		value %= 256;	// get lower 8 bit
+		$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:18, addr:addr, value:value}, function(data){
+			alert('settings bit higher saved');
+		});
+	}
+	if (type == 2) {	// 16 bit
+		var value = $('#'+addr+'_value').val();
+		value %= 65536;	// remove not needed
+		$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:value}, function(data){
+			alert('settings bit higher saved');
+		});
+	}
+	if (type == 4) {	// 32 bit
+		var value = $('#'+addr+'_value').val();
+		var tmp = value % 65536;
+		value = Math.floor(value/65536);
+		$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:value}, function(data){
+			addr++;	// next 16bit cell
+			$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:tmp}, function(data){
+			
+			});
+		});
+	}
+	var value = $('#'+addr+'_value').val();
+	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:15, addr:addr, value:value}, function(data){
+		alert('settings saved');
+	});
+}
+
+
+
 
 function save_settings_block(){
 	var addr = $('#settings_block_id').val();
 	$.post('cm/cadi_bt_processor.php', {action: 'tx', cmd:16, addr:addr}, function(data){
-			alert('sent block of settings to Cadi');
+		alert('sent block of settings to Cadi');
 	});
 }
 
@@ -58,7 +100,7 @@ function apply_settings(){
 	</tr>
 	<tr>
 		<td>Удобрение 1</td>
-		<td><input type="text" value="" />мл</td>
+		<td><input type="text" id="01606_value" onClick="rx_ee_val(01606,2)" value="" />мл</td>
 	</tr>
 	<tr>
 		<td>Удобрение 2</td>

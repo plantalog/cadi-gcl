@@ -59,7 +59,7 @@ function sync_conf2dump(){
 			echo 'packing 8 bit at '.$addr.PHP_EOL;
 			$parity = substr($row[0],5,1);	// 0 - higher byte, 1 - lower byte
 			$pointer = ($addr-$settings_startaddr)*2;
-			if ($parity!="1") {	//
+			if ($parity=="1") {	// lower byte
 				$pointer++;	
 			}
 			$settings_dump[$pointer] = chr($sca[$key][2]);

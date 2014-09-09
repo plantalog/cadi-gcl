@@ -53,12 +53,11 @@ switch ($action) {
 	case 'rx_ee':
 		$toput = "rx_ee,cadi,".$_POST['addr'].", ".$_POST['number'].", ";
 		include_once('cadi_settings.php');
-		
 		file_put_contents('daemon_cmd', $toput);
 		sleep(1);
 		break;
 	case 'tx':
-		bt_tx('rfcomm0', $cadi_packet);
+		bt_tx('cadi', $cadi_packet);
 		print_r($cadi_packet);
 		break;
 	case 'tx_packet':

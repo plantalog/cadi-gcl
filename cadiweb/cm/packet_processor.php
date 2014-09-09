@@ -142,7 +142,21 @@ if (isset($_POST['cmd'])) {
 			$settings_block_data = dump2block($_POST['addr']);
 			$packet .= $settings_block_data;
 			break;
-		case 19:		// reload settings
+		case 17:		// 8 bit value send to Cadi Higher byte
+			$packet .= chr(5);	// packet payload size
+			$packet .= chr(17);	// command
+			$packet .= chr($_POST['addr']%256);	// address lower byte
+			$packet .= chr(floor($_POST['addr']/256));	// higher byte
+			$packet .= chr($_POST['value']);	// value lower byte
+			break;
+		case 18:		// 8 bit value send to Cadi Lower Byte
+			$packet .= chr(5);	// packet payload size
+			$packet .= chr(18);	// command
+			$packet .= chr($_POST['addr']%256);	// address lower byte
+			$packet .= chr(floor($_POST['addr']/256));	// higher byte
+			$packet .= chr($_POST['value']);	// value lower byte
+			break;
+		case 19:		// loadSettings() STM32 function call
 			$packet .= chr(2);	// packet payload size (including this size byte)
 			$packet .= chr(19);	// command
 			break;

@@ -53,7 +53,7 @@
 #define USE_WFM
 #ifdef USE_WFM		//	START WFM DEFINITIONS
 #define WFM_AMOUNT	4	// number of meters to work with
-uint32_t water_counter[WFM_AMOUNT];
+volatile uint32_t water_counter[WFM_AMOUNT];
 #define WFM_PINS_PB0_1	// WFM assigned to pins PB0 and PB1
 #endif				//	EOF WFM DEFINITIONS
 
@@ -89,8 +89,8 @@ volatile static uint8_t RxByte;
 volatile static uint8_t comm_state=48;	// communication state
 volatile static uint8_t NbrOfDataToTransfer = 16;
 volatile static uint8_t txbuff_ne = 0;
-volatile uint8_t TxCounter = 0;
-volatile uint8_t RxCounter = 0;
+volatile static uint8_t TxCounter = 0;
+volatile static uint8_t RxCounter = 0;
 #endif				// EOF BLUETOOTH USART DEFINITIONS
 
 
@@ -111,18 +111,18 @@ typedef struct
 __IO uint16_t IC2Value = 0;
 __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
-static uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
+volatile static uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
 TIM_ICInitTypeDef  TIM_ICInitStructure;
-DHT_data DHTValue;
+volatile DHT_data DHTValue;
 volatile static uint8_t		dht_data[5];
 volatile static uint8_t		dht_data2[5];
 volatile static uint8_t dht_bit_position = 0;
 volatile static uint8_t	dht_data_ready = 0;
-static uint8_t  dht_byte_pointer;
-static uint8_t  dht_bit_pointer;
+volatile static uint8_t  dht_byte_pointer;
+volatile static uint8_t  dht_bit_pointer;
 volatile static uint8_t 	dht_rh_str[4], dht_t_str[4];
-static uint16_t rhWindowTop, rhWindowBottom;
-static uint8_t rhUnderOver = 0;
+volatile static uint16_t rhWindowTop, rhWindowBottom;
+volatile static uint8_t rhUnderOver = 0;
 #endif						// EOF DHT DEFINITIONS
 
 
@@ -218,7 +218,7 @@ volatile static uint8_t buttonReverse=0;
 #define JDR_BUTTONS	ADC1->JDR4		// continuous ADC channel for buttons
 #endif
 
-volatile uint8_t button=0;
+volatile static uint8_t button=0;
 
 volatile uint8_t wpProgress = 0;
 
@@ -255,8 +255,8 @@ volatile static uint32_t timerStateFlags, cTimerStateFlags;
 volatile static uint32_t fup_time = 0;	// first time underpressure met
 volatile static uint16_t psi_upres_level=0;
 volatile static uint16_t psi_upres_timeout=0;
-#define PSI_UNDERPRESSURE		0x05C8			// 1480 minimum pressure meaning there is water in pump, when it is running
-#define PSI_UP_TIMEOUT			0x05C9			// 1481 seconds to stop PSI pump if underpressure met
+#define PSI_UNDERPRESSURE		0x0690			// 1480 minimum pressure meaning there is water in pump, when it is running
+#define PSI_UP_TIMEOUT			0x0691			// 1481 seconds to stop PSI pump if underpressure met
 
 // DRIVER: LOAD TRIGGERING
 #define USE_LOADS
@@ -265,21 +265,12 @@ volatile static uint16_t psi_upres_timeout=0;
 #define PLUG_ENABLE		GPIOC->BRR
 #define	PLUG_INVERT		0		// enable reverse plugStateSet
 #define PLUG_AMOUNT		4
-//uint16_t plugStateFlags;	// not used due to regression (appeared 02.09.2014)
-static uint16_t plugStateFlags2;	// this works ok
-static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plugs HARDCODE
+volatile static uint16_t plugStateFlags;	// this works
+volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number of plugs HARDCODE
 // elementy massiva - nomera programm (ex "tajmerov"), sootvetstvujushih Plug'am.
 // 0 element - pervyj plug, 1 element - plug no 2, etc
 #endif						// EOF LOADS DEFINITIONS
 
-
-// DRIVER: SD-card on SPI interface with FatFS
-#define USE_SD
-#ifdef USE_SD
-	uint8_t no_sd=1;
-//	FATFS   fs;       // file system variable to mount SD card
-	uint16_t logInterval=0;
-#endif
 
 /*
  *   =====  END OF DRIVER SECTION =====
@@ -396,11 +387,11 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 #define COMM_SET_SETTINGS		50
 #define COMM_DIRECT_DRIVE		51
 
-#define WATER_TANK_TOP			0x05D6
-#define WATER_TANK_BOTTOM		0x05D7
+#define FWTANK_TOP			0x05D6		// 1494
+#define FWTANK_BOTTOM		0x05D7		// 1495
 
-#define MIXTANK_TOP				0x05D8
-#define MIXTANK_BOTTOM			0x05D9
+#define MIXTANK_TOP				0x05D8		// 1496
+#define MIXTANK_BOTTOM			0x05D9		// 1497
 
 #define WFM_CAL_OFFSET			0x0642	// 1602
 
@@ -423,22 +414,19 @@ static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT - number
 
 #define PSI_SENSOR_0PSI			0x0645
 #define PSI_SENSOR_32PSI		0x0646
-#define PSI_SENSOR_TOP			0x0647			// 1607
-#define PSI_SENSOR_BTM			0x0648
-#define PSI_PUMP_LOAD_ID		0x0649
-static uint8_t psi_pump_load_id=PSI_PUMP_ID;
-static uint8_t psi_underOver=0;
-static uint16_t psi_pump_top_level=0;
-static uint16_t psi_pump_btm_level=0;
-static uint16_t psi_cur_adc_value=0;
+#define PSI_SENSOR_BTM			0x0692			// 1682
+#define PSI_SENSOR_TOP			0x0693			// 1683
+volatile static uint8_t psi_underOver=0;
+volatile static uint16_t psi_pump_top_level=0;
+volatile static uint16_t psi_pump_btm_level=0;
 
 #define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
 #define AVG_ADC_PH		2			// adcAverage[2]
 #define AVG_ADC_PSI		2			// adcAverage[2]
 
 
-volatile uint16_t tank_windows_top[2];
-volatile uint16_t tank_windows_bottom[2];
+volatile static uint16_t tank_windows_top[2];
+volatile static uint16_t tank_windows_bottom[2];
 
 ErrorStatus  HSEStartUpStatus;
 FLASH_Status FlashStatus;
@@ -446,9 +434,9 @@ FLASH_Status FlashStatus;
 volatile static uint16_t adcAverage[4];
 
 volatile static uint8_t wpStateFlags;
-static uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
+volatile static uint8_t dosingPumpStateFlags;	// this variable seems to be overwritten by some part of this firmware, therefore dosingPumpStateFlags2 used instead
 volatile static uint8_t dosingPumpStateFlags2;
-uint16_t wfCalArray[WFM_AMOUNT];
+volatile uint16_t wfCalArray[WFM_AMOUNT];
 
 
 #define STATE_NOTHING					0
@@ -467,6 +455,9 @@ volatile static uint8_t pb_pntr=0;			// packet buffer pointer
 volatile static uint8_t packet_length=0;
 volatile static uint8_t rxm_state=0;
 volatile static uint8_t packet_ready=0;		// packet readiness flag. reset after command execution
+
+volatile static uint8_t runners=0;
+volatile prostohujnja = 0;
 
 void hygroStatSettings(void);
 uint8_t readPercentVal(uint8_t value);
@@ -508,6 +499,7 @@ void setCTimer(uint8_t timerId);
 uint32_t CTimerAdjust(uint32_t time);
 void plugStateSet(uint8_t plug, uint8_t state);
 void getPh();
+void psiStab(void);
 void getEc(void);
 FRESULT string2log(char* str, uint8_t bytes);
 FRESULT sdLog2(void);
@@ -616,29 +608,35 @@ void eeprom_test(void);
  * 0 - PSI pump stab		(1)
  * 1 - tank level stab		(2)
  * 2 - autoSafe				(4)
+ * 3 - psi underpressure	(8)
  *
  */
 
 void autoSafe(void){
 	if (((auto_flags&4)>>2)==1){
-		// disale PSI pump in case of over pressure. PSI_OVERPRESSURE sets max
+		// disable PSI pump in case of over pressure. PSI_OVERPRESSURE sets max
 		if (adcAverage[AVG_ADC_PSI]>PSI_OVERPRESSURE) {
 			plugStateSet(PSI_PUMP_ID,0);
+			wpProgress = 61;
 		}
+
+
 
 		// if while running PSI pump underpressure was constant during timeout, disable PSI pump
 		vTaskDelay(1);
 		uint32_t now = RTC_GetCounter();
 
 
-		if ((auto_flags&1)==1 && adcAverage[AVG_ADC_PSI]<psi_upres_level) {
+		if (((auto_flags&8)>>3)==1 && adcAverage[AVG_ADC_PSI]<psi_upres_level && (auto_flags&1)==1) {	// underpressure auto
 				if (now>fup_time) {
+					wpProgress=62;
 					plugStateSet(PSI_PUMP_ID, 0);	// disable psi pump
-					auto_failures|=1;	// set PSI program failure flag
+					auto_failures|=8;	// set PSI program failure flag
 				}
 		}
 		else {
 			fup_time = RTC_GetCounter()+psi_upres_timeout;		// fail under pressure flag set time
+			wpProgress = 63;
 		}
 
 		vTaskDelay(1);
@@ -907,9 +905,11 @@ void save_settings(void){	// wrapper for rx_ee, simplifies settings packet recei
 
 
 static void lstasks(void *pvParameters){
+	vTaskDelay(4000);
 	while (1) {
 		// low speed tasks
 		tankLevelStab();
+		psiStab();
 		autoSafe();
 		sonar_ping();
 		vTaskDelay(10);
@@ -920,6 +920,7 @@ static void lstasks(void *pvParameters){
 static void uart_task(void *pvParameters){
 	while (1) {
 		IWDG_ReloadCounter();
+		runners&=(1<<3);
 		if (packet_ready==1) {
 			run_uart_cmd();	// when command packet received, run the command
 			if (RxBuffer[1]<50) {	// other than get_status_block()
@@ -1005,12 +1006,15 @@ void run_uart_cmd(void){
 			break;
 		case 9:
 //			enable_dosing_pump(RxBuffer[2], RxBuffer[3]);
+			send_resp(RxBuffer[RxBuffer[0]]);
 			run_doser_for(RxBuffer[2], RxBuffer[3], RxBuffer[4]);
 			break;
 		case 10:
 //			valve_failed = RxBuffer[2];
-			fup_time=RTC_GetCounter();
+			fup_time=RTC_GetCounter()+60;
 			auto_failures=0;
+			wpProgress=0;
+			runners=0;
 			break;
 		case 11:	// stop all processes and force manual control
 			auto_flags=0;
@@ -1030,7 +1034,7 @@ void run_uart_cmd(void){
 			RTC_SetCounter(RxBuffer[2]*16777216+RxBuffer[3]*65536+RxBuffer[4]*256+RxBuffer[5]);
 			break;
 		case 13:
-			NVIC_SystemReset();
+			vTaskDelay(10000);	// wait a lot for watchdog to trigger reset
 			break;
 		case 14:
 			get_fertilizer(RxBuffer[2], RxBuffer[3]);
@@ -1081,6 +1085,7 @@ void run_uart_cmd(void){
 			send_ee_block(addr);
 			break;
 	}
+
 }
 
 
@@ -1096,9 +1101,10 @@ void run_doser_for(uint8_t pump_id, uint8_t amount, uint8_t speed){
 	enable_dosing_pump(pump_id, speed);
 	while (now<finish) {
 		now = RTC_GetCounter();
-		vTaskDelay(2);
+		IWDG_ReloadCounter();
+		vTaskDelay(10);
 		get_status_block(1);	// send status blocks
-		vTaskDelay(2);
+		vTaskDelay(10);
 	}
 	enable_dosing_pump(pump_id, 0);
 }
@@ -1266,7 +1272,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 				TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
 				TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
 				TxBuffer[7] = valveFlags;
-				TxBuffer[8] = ((uint8_t)plugStateFlags2&0xFF);
+				TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
 				TxBuffer[9] = wpStateFlags;	// watering program run flags
 				TxBuffer[10] = dht_data[0];
 				TxBuffer[11] = dht_data[1];
@@ -1288,14 +1294,14 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 				TxBuffer[27] = (uint8_t)(((adcAverage[2])>>8)&(0xFF));
 				TxBuffer[28] = (uint8_t)(adcAverage[3]&(0xFF));	// ADC4 average reading
 				TxBuffer[29] = (uint8_t)(((adcAverage[3])>>8)&(0xFF));
-				TxBuffer[30] = (uint8_t)(water_counter[0]&(0xFF));		// first wfm counter
+				TxBuffer[30] = (uint8_t)runners;		// first wfm counter
 				TxBuffer[31] = (uint8_t)((water_counter[0]>>8)&(0xFF));
 				TxBuffer[32] = (uint8_t)((water_counter[0]>>16)&(0xFF));
 				TxBuffer[33] = (uint8_t)((water_counter[0]>>24)&(0xFF));
 				TxBuffer[34] = dosingPumpStateFlags2;		// dosing pump flags (dosingPumpStateFlags overwritten by some part of FW)
 				TxBuffer[35] = auto_flags;	// first sonar higher byte
-				TxBuffer[36] = (uint8_t)(sonar_read[MIXTANK_SONAR]&(0xFF));		// second sonar
-				TxBuffer[37] = (uint8_t)((sonar_read[MIXTANK_SONAR]>>8)&(0xFF));
+				TxBuffer[36] = (uint8_t)wpProgress;		// second sonar
+				TxBuffer[37] = (uint8_t)auto_failures;
 				TxBuffer[38] = blockId;
 			}
 			if (blockId==2) {	// state block 2
@@ -1572,7 +1578,7 @@ void tankLevelStabSetup(void){
 		Lcd_write_digit(curlevel);
 	}
 	vTaskDelay(10);
-	EE_WriteVariable(WATER_TANK_TOP, curlevel);
+	EE_WriteVariable(FWTANK_TOP, curlevel);
 	printOk();
 	vTaskDelay(2000);
 	Lcd_write_str("Set btm lvl");
@@ -1590,11 +1596,11 @@ void tankLevelStab(void){
 	vTaskDelay(1);
 //	supply_valve = (uint8_t)(tmp&0x00FF);
 	if (((auto_flags&2)>>1)==1) {		// TANK STAB flag 1
-			if (sonar_read[FWTANK_SONAR]>(tank_windows_top[0]+2)) {
+			if (sonar_read[FWTANK_SONAR]>(tank_windows_top[FWTANK]+2)) {
 				open_valve(WI_VALVE);
 			}
 			vTaskDelay(1);
-			if (sonar_read[FWTANK_SONAR]<tank_windows_top[0]) {
+			if (sonar_read[FWTANK_SONAR]<tank_windows_top[FWTANK]) {
 				close_valve(WI_VALVE);
 			}
 	}
@@ -1668,7 +1674,7 @@ void eeprom_test(void){
 		val = 0;
 		EE_ReadVariable(addr, &val);
 
-		vTaskDelay(15);
+		vTaskDelay(5);
 		Lcd_clear();
 		Lcd_write_str("Addr: ");
 		Lcd_write_16b(addr);
@@ -1691,7 +1697,7 @@ void eeprom_test(void){
 				addr=2000;
 			}
 		}
-		vTaskDelay(15);
+		vTaskDelay(25);
 	}
 }
 
@@ -2151,64 +2157,89 @@ void run_watering_program(uint8_t progId){
 	uint32_t startime=0;
 	uint32_t now=0;
 	uint32_t overTime=0;
+	uint16_t fwl=0;
+	uint16_t swl = 0;
 	uint16_t curprcnt = 0;
 	uint16_t volume = 0;
 	uint16_t addr=0;
 	uint16_t fmpLink=0;
 	uint16_t flags=0;
 	uint16_t curLvl = 0;
-	addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;
-	EE_ReadVariable(addr, &volume);
-	volume = sonar_read[MIXTANK_SONAR]-(volume & (0xFF));	// count the sonar value to expect
+	uint8_t got_fw = 0;
+	uint8_t ninetenth=0;
 	now = RTC_GetCounter();
+	startime = now;
 	wpProgress = 4;
+	overTime = now + 5;
 	vTaskDelay(100);
-	while (overTime>now) { // 5 seconds sonar should report >100% fill to close FWI valve
-		curLvl = tank_windows_bottom[1] - sonar_read[MIXTANK_SONAR];
-		if ( curLvl <= volume){
-			overTime = now + 5;
-			open_valve(FWI_VALVE);
-		}
-		vTaskDelay(250);
-		now = RTC_GetCounter();
-		wpProgress = 5;
-	}
-	close_valve(FWI_VALVE);
-	vTaskDelay(1000);
-	wpProgress = 6;
 
-
-	// mix fertilizers
-	for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
-		wpProgress = i+87;
-		addr=0;
-		// count current N value
-		addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
-		interval = EE_ReadWord(addr);
-		addr = WP_OFFSET+progId*WP_SIZE+WP_START;
-		startime = EE_ReadWord(addr);
-		vTaskDelay(100);
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
-		EE_ReadVariable(addr, &n);
-		curN = (RTC_GetCounter()-startime)/interval;
-		vTaskDelay(100);
-		wpProgress = 200;
-		vTaskDelay(200);
-		uint8_t rest = curN%(n%256);	// lower byte of 16bit of FMP_TRIG_FREQUENCY_SHIFT
-		uint16_t enabled=0;
-		fmpLink=n/256;	// higher byte of FMP_TRIG_FREQUENCY = WP link
-		addr = 0;
-		addr = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
-		EE_ReadVariable(addr, &enabled);
-		if (fmpLink==progId && enabled>0 && rest==0) {
-			wpProgress = 99;
-			vTaskDelay(400);
-			run_fertilizer_mixer(i);
-			wpProgress = 100+i;
-			vTaskDelay(2000);
+	/*
+	 *  Filling water strategy A
+	 *   The water is filled up in amount of 'volume',
+	 *    when there is less than 100% of watering program volume currently
+	 *    in the MIXTANK. This behavior expects already prepared solution in
+	 *    the MIXTANK, suitable for this (any, that could run) watering
+	 *    program
+	 *    swl - start water level
+	 *    fwl - final water level
+	 *
+	 *    !!! REMEMBER !!!
+	 *    More sonar read value, less water in the tank!
+	 */
+	swl = sonar_read[MIXTANK_SONAR];			// remember start water level
+	addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;	// read the volume needed to add in MIXTANK
+	EE_ReadVariable(addr, &volume);
+	fwl = tank_windows_bottom[MIXTANK] - swl;	// how much water we have already
+	if (fwl > volume) {							// if < than WP volume
+		fwl = swl - volume;						// get level: now+WPvol
+		while (overTime > now) { // 5 seconds sonar should report >100% fill to close FWI valve
+			if ( sonar_read[MIXTANK_SONAR] >= fwl){	// more sonar read - less water
+				overTime = now + 5;
+				open_valve(FWI_VALVE);
+			}
+			vTaskDelay(250);
+			now = RTC_GetCounter();
+			wpProgress = 5;
 		}
-		vTaskDelay(100);
-		wpProgress = 8;
+		close_valve(FWI_VALVE);
+		vTaskDelay(1000);
+		wpProgress = 6;
+
+		// mix fertilizers
+		got_fw = (uint8_t)swl - (uint8_t)sonar_read[MIXTANK_SONAR];
+		ninetenth = (uint8_t)((volume*9)/10);
+
+		for (i=0; i<FMP_PROGRAMS_AMOUNT; i++) {
+			wpProgress = i+87;
+			addr=0;
+			// count current N value
+			addr = WP_OFFSET+progId*WP_SIZE+WP_INTERVAL;
+			interval = EE_ReadWord(addr);
+			addr = WP_OFFSET+progId*WP_SIZE+WP_START;
+			startime = EE_ReadWord(addr);
+			vTaskDelay(100);
+			addr = FMP_OFFSET+i*FMP_SIZE+FMP_TRIG_FREQUENCY_SHIFT;
+			EE_ReadVariable(addr, &n);
+			curN = (RTC_GetCounter()-startime)/interval;
+			vTaskDelay(100);
+			wpProgress = 200;
+			vTaskDelay(200);
+			uint8_t rest = curN%(n%256);	// lower byte of 16bit of FMP_TRIG_FREQUENCY_SHIFT
+			uint16_t enabled=0;
+			fmpLink=n/256;	// higher byte of FMP_TRIG_FREQUENCY = WP link
+			addr = 0;
+			addr = FMP_OFFSET+i*FMP_SIZE+FMP_DOSING_PUMP_ID_SHIFT;
+			EE_ReadVariable(addr, &enabled);
+			if (fmpLink==progId && enabled>0 && rest==0) {
+				wpProgress = 99;
+				vTaskDelay(400);
+				run_fertilizer_mixer(i);
+				wpProgress = 100+i;
+				vTaskDelay(2000);
+			}
+			vTaskDelay(100);
+			wpProgress = 8;
+		}
 	}
 	wpProgress = 9;
 	// open corresponding watering line valve(s)
@@ -2225,7 +2256,7 @@ void run_watering_program(uint8_t progId){
 	}
 	wpProgress = 10;
 	// run watering
-	auto_flags|=1;	// enable watering through psi stab function
+	auto_flags|=9;	// enable watering through psi stab function with underpressure trig
 	uint8_t srcomm = 0;
 	uint16_t tmpval=0;
 	srcomm = comm_state;	// backup curent commstate. to recover after watering
@@ -2234,9 +2265,10 @@ void run_watering_program(uint8_t progId){
 	addr = WP_OFFSET+progId*WP_SIZE;
 	volume=0;
 	EE_ReadVariable(addr, &volume);
-	overTime = RTC_GetCounter() + volume;
-	auto_failures  &= ~1;	// reset PSI failure flag
-	while ((auto_failures&1)==0 && now<overTime) {
+	overTime = RTC_GetCounter() + volume;	// volume used to retrieve timeout
+	auto_failures  &= ~1;	// reset PSI main failure flag
+	auto_failures  &= ~(1<<3);	// reset PSI underpressure flag
+	while (((auto_failures&8)>>3)==0 && now<overTime) {
 		vTaskDelay(500);
 		wpProgress = overTime-now;
 		now=RTC_GetCounter();
@@ -2246,7 +2278,7 @@ void run_watering_program(uint8_t progId){
 	auto_flags&=~(1);	// disable PSI stab function flag
 	plugStateSet(PSI_PUMP_ID, 0);	// force disable PSI pump
 	comm_state = srcomm;	// recover comm_state
-	auto_failures  &= ~1;	// reset PSI failure flag
+	auto_failures  &= ~(1<<3);	// reset PSI failure flag
 	wpProgress = 13;
 	vTaskDelay(1000);
 	valve_init();	// close all valves
@@ -2301,6 +2333,7 @@ void run_circulation_pump(uint16_t time){
 	uint32_t endTime=0;
 	endTime = RTC_GetCounter()+time;
 	enable_dosing_pump(MIXING_PUMP,1);	// Grolly has Mixing pump connected to T8 MOSFET of Cadi MB 1402
+	close_valve(FWI_VALVE);
 	while (RTC_GetCounter()<endTime) {
 		vTaskDelay(10);
 	}
@@ -2389,8 +2422,9 @@ void watering_program_trigger(void *pvParameters){
 	uint32_t curtime, lastRun, interval, diff, startTime, endTime;
 	uint16_t addr;
 	uint8_t wpStateFlag=0, progId, enabled;
-	// reinit valves
+	// close all valves
 	valve_init();
+	vTaskDelay(4000);
 
 	while (1) {
 
@@ -2409,11 +2443,11 @@ void watering_program_trigger(void *pvParameters){
 			endTime = EE_ReadWord(addr);	// program end time point
 			addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
 			EE_ReadVariable(addr, &enabled);	// program start time point
-			vTaskDelay(10);
+			vTaskDelay(50);
 			if (diff>interval && curtime>startTime && curtime<endTime && enabled>0){
 				run_watering_program(progId);
 			}
-			vTaskDelay(10);
+			vTaskDelay(50);
 		}
 	}
 
@@ -2586,7 +2620,7 @@ void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
   /* Get the Input Capture value */
-  if (TIM16->CNT < MAX_SONAR_READ) {
+  if (TIM16->CNT < MAX_SONAR_READ && TIM16->CNT>0) {
 	  sonar_read[MIXTANK_SONAR] = TIM16->CNT;
   }
   TIM16->CNT = 0;
@@ -2597,7 +2631,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
   /* Clear TIM16 Capture compare interrupt pending bit */
   TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
   /* Get the Input Capture value */
-  if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ)) {
+  if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ) && (TIM17->CNT > 0)) {
 	  sonar_read[FWTANK_SONAR]=SONAR1_TIM->CNT;
   }
   SONAR1_TIM->CNT = 0;
@@ -3484,6 +3518,21 @@ void printOk(void){
 	vTaskDelay(1);
 }
 
+void psiStab(void){
+//	uint8_t stabFlag=0;
+//	uint8_t af1 = 0;
+//	uint8_t af2 = 0
+	if ((auto_flags&1)==1 && ((auto_failures&8)>>3)==0 && (auto_failures&1)==0 && comm_state==COMM_MONITOR_MODE) {			// PSI STAB flag is number 0
+		if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
+			plugStateSet(PSI_PUMP_ID, 0);
+		}
+		vTaskDelay(1);
+		if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
+			plugStateSet(PSI_PUMP_ID, 1);
+		}
+	}
+}
+
 void timerStateTrigger(void *pvParameters){
 	uint8_t i=0;
 	uint8_t timerStateFlag=0;
@@ -3492,7 +3541,7 @@ void timerStateTrigger(void *pvParameters){
 	uint32_t timer2=0;
 	uint16_t Address;
 	while (1) {
-		adcAverager();
+		runners &= (1<<1);
 		now=RTC_GetCounter();
 		for (i=0; i<4; i++){	// 4 tajmera
 			Address = EE_TIMER1_ON+EE_TIMER_SIZE*i;
@@ -3504,8 +3553,7 @@ void timerStateTrigger(void *pvParameters){
 			timer2 = timer2%86400;
 			now = now % 86400;
 
-			vTaskDelay(1);
-			vTaskDelay(1);
+			vTaskDelay(5);
 
 			// logika obychnogo tajmera dlja timerOn<timerOff
 			if (now<timer2 && now>timer1) {
@@ -3537,7 +3585,7 @@ void timerStateTrigger(void *pvParameters){
 			Address = EE_CTIMER_DURATION+EE_CTIMER_SIZE*i;
 			timer1 = EE_ReadWord(Address);
 			timer2 = EE_ReadWord(Address+2);
-			vTaskDelay(1);
+			vTaskDelay(2);
 			now=RTC_GetCounter();
 
 			// logika ciklicheskogo tajmera
@@ -3550,15 +3598,11 @@ void timerStateTrigger(void *pvParameters){
 				timerStateFlag=0;
 				cTimerStateFlags &= ~(1<<i); // sbrosit' flag
 			}
-			vTaskDelay(1);
+			vTaskDelay(5);
 		}
 	}
 }
 
-void psiStab(void){
-#ifdef PSI_STAB_ENABLE
-#endif
-}
 
 
 void plugStateTrigger(void *pvParameters){
@@ -3567,6 +3611,10 @@ void plugStateTrigger(void *pvParameters){
 	uint8_t plugType=0;
 	uint8_t i=0;
 	while (1) {
+		if (runners>250) {
+			runners=0;
+		}
+		runners++;
 		if (comm_state!=COMM_DIRECT_DRIVE) {
 			for (i=0; i<PLUG_AMOUNT; i++){		// PC0 to PC2
 				plugType=0;
@@ -3607,18 +3655,18 @@ void plugStateTrigger(void *pvParameters){
 				}
 
 				if (plugType==2) {
-					if (plugStateFlag==0 && ((plugStateFlags2>>i)&1)==1) {
+					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
 						plugStateSet(i, 0);	// disable plug
 					}
 				}
 				else if (plugType==3) {	// mister (or another humidity "upper")
-					if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0 && plugTimerId==0 && rhUnderOver==1) {
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==1) {
 						plugStateSet(i, 1);	// enable mister for underwindow
 					}
-					if (plugStateFlag==1 && ((plugStateFlags2>>i)&1)==0 && plugTimerId==0 && rhUnderOver==0) {
+					if (plugStateFlag==1 && ((plugStateFlags>>i)&1)==0 && plugTimerId==0 && rhUnderOver==0) {
 						plugStateSet(i, 1);	// enable mister for in-window
 					}
-					if (plugStateFlag==0 && ((plugStateFlags2>>i)&1)==1) {
+					if (plugStateFlag==0 && ((plugStateFlags>>i)&1)==1) {
 						plugStateSet(i, 0);	// disable plug
 					}
 				}
@@ -3626,7 +3674,7 @@ void plugStateTrigger(void *pvParameters){
 					// watering and circulation pumps for watering controller
 				}
 				else if (plugType==5) {
-					if (auto_flags&1==1 && (auto_failures&1)==0) {			// PSI STAB flag is number 0
+				/*	if (auto_flags&1==1 && (auto_failures&1)==0) {			// PSI STAB flag is number 0
 						if (adcAverage[AVG_ADC_PSI]>psi_pump_top_level) {
 							plugStateSet(PSI_PUMP_ID, 0);
 						}
@@ -3634,7 +3682,7 @@ void plugStateTrigger(void *pvParameters){
 						if (adcAverage[AVG_ADC_PSI]<psi_pump_btm_level) {
 							plugStateSet(PSI_PUMP_ID, 1);
 						}
-					}
+					}	*/
 									// psi pump pressure stabilizer
 				}
 				if (plugType==254) {
@@ -3648,11 +3696,7 @@ void plugStateTrigger(void *pvParameters){
 				vTaskDelay(1);
 			}
 		}
-		vTaskDelay(1);
-#ifdef USE_VALVES
-#endif
-		vTaskDelay(1);
-		psiStab();
+		vTaskDelay(5);
 	}
 }
 
@@ -3684,7 +3728,7 @@ void psiSetup(void){
 		Lcd_write_16b(psi_pump_top_level);
 		curbutton=readButtons();
 	}
-	plugStateSet(psi_pump_load_id, 0);
+	plugStateSet(PSI_PUMP_ID, 0);
 	printOk();
 	curbutton=0;
 	while (curbutton!=BUTTON_FWD){
@@ -3746,11 +3790,11 @@ void plugStateSet(uint8_t plug, uint8_t state){
 #endif
 	if (state==1) {
 		PLUG_DISABLE = (1<<plug);
-		plugStateFlags2 |= (1<<plug);
+		plugStateFlags |= (1<<plug);
 	}
 	else {
 		PLUG_ENABLE = (1<<plug);
-		plugStateFlags2 &= ~(1<<plug);
+		plugStateFlags &= ~(1<<plug);
 	}
 }
 
@@ -4591,12 +4635,12 @@ void copy_arr(volatile uint8_t *source, volatile uint8_t *destination, uint8_t a
 	}
 }
 
-
 void displayClock(void *pvParameters)
 {
 		RTC_DateTime DateTime;
 		uint32_t tmp=0;
 		tmp = RTC_GetCounter();
+		fup_time = RTC_GetCounter()+60;
 		if (tmp<1388534400) {
 			RTC_SetCounter(1400000000);
 		}
@@ -4614,6 +4658,7 @@ void displayClock(void *pvParameters)
 		buttonCalibration();
     	while (1)
 	    {
+    		runners = 24;
 	    	vTaskDelay(10);
     		tmp = RTC_GetCounter();
     		DateTime=unix2DateTime(tmp);
@@ -4651,7 +4696,7 @@ void displayClock(void *pvParameters)
 	    	}
 	    	// vyvod flagov rozetok
 	    	for (i=0; i<3; i++) {
-	    		flg=plugStateFlags2&(1<<i);
+	    		flg=plugStateFlags&(1<<i);
 	    		flg>>=i;
 	    		LCDLine1[i+13]=flg+48;
 	    	}
@@ -4663,7 +4708,11 @@ void displayClock(void *pvParameters)
 	    	button=readButtons();
 	    	vTaskDelay(3);
 	    	Lcd_write_str(" ");
+
 	    	Lcd_write_digit(wpProgress);
+	    	Lcd_write_str(" ");
+	    	Lcd_write_digit(auto_failures);
+	    	Lcd_write_digit(cTimerStateFlags);
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
@@ -4999,6 +5048,13 @@ uint8_t main(void)
 
 	SystemInit();
 
+	// INIT LOADS
+	prvSetupHardware();
+	plugStateSet(PSI_PUMP_ID, 0);	// disable all loads
+	plugStateSet(1, 0);
+	plugStateSet(2, 0);
+	plugStateSet(3, 0);
+
 
 	uint32_t i;
 	dosing_motor_control_init();
@@ -5023,12 +5079,7 @@ uint8_t main(void)
 	GPIO_Init(GPIOA, &init_pin);
 	// EOF SOLENOID VALVE RE-INIT
 
-	// INIT LOADS
-	prvSetupHardware();
-	plugStateSet(PSI_PUMP_ID, 0);	// disable all loads
-	plugStateSet(1, 0);
-	plugStateSet(2, 0);
-	plugStateSet(3, 0);
+
 	// EOF LOADS init
 
 
@@ -5052,12 +5103,12 @@ uint8_t main(void)
 	xTaskCreate(lstasks,(signed char*)"LST",configMINIMAL_STACK_SIZE,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
 	xTaskCreate(watering_program_trigger,(signed char*)"WP",150,
-	            NULL, tskIDLE_PRIORITY + 2, NULL);
-	xTaskCreate(uart_task,(signed char*)"uart",70,
-	            NULL, tskIDLE_PRIORITY + 2, NULL);
+	            NULL, tskIDLE_PRIORITY + 1, NULL);
+	xTaskCreate(uart_task,(signed char*)"UART",70,
+	            NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
-            NULL, tskIDLE_PRIORITY + 2, NULL);
-    xTaskCreate(timerStateTrigger,(signed char*)"TIMERS",configMINIMAL_STACK_SIZE,
+            NULL, tskIDLE_PRIORITY + 1, NULL);
+    xTaskCreate(timerStateTrigger,(signed char*)"TIMERS",configMINIMAL_STACK_SIZE+10,
             NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(plugStateTrigger,(signed char*)"PLUGS",configMINIMAL_STACK_SIZE+35,
             NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -5085,10 +5136,10 @@ void loadSettings(void){	// function loads the predefined data
 		plugSettings[i]=Data;
 	}
 
-	EE_ReadVariable(WATER_TANK_TOP, &tank_windows_top[0]);
-	EE_ReadVariable(WATER_TANK_BOTTOM, &tank_windows_bottom[0]);
-	EE_ReadVariable(MIXTANK_TOP, &tank_windows_top[1]);
-	EE_ReadVariable(MIXTANK_BOTTOM, &tank_windows_bottom[1]);
+	EE_ReadVariable(FWTANK_TOP, &tank_windows_top[FWTANK]);
+	EE_ReadVariable(FWTANK_BOTTOM, &tank_windows_bottom[FWTANK]);
+	EE_ReadVariable(MIXTANK_TOP, &tank_windows_top[MIXTANK]);
+	EE_ReadVariable(MIXTANK_BOTTOM, &tank_windows_bottom[MIXTANK]);
 
 	EE_ReadVariable(PSI_UNDERPRESSURE, &psi_upres_level);
 	EE_ReadVariable(PSI_UP_TIMEOUT, &psi_upres_timeout);
