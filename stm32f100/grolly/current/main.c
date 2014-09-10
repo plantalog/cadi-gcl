@@ -379,7 +379,7 @@ volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT
 #define FMP_TRIG_FREQUENCY_SHIFT				3		// 16071 L
 #define	FMP_AFTERMIX_TIME_SHIFT					4		// 1608
 
-#define DOSER_SPEEDS			0x0612		// 4 bytes for doser speeds in percent (1..100)
+#define DOSER_SPEEDS			0x0694		// 4 bytes for doser speeds in percent (1..100)
 
 
 #define COMM_MONITOR_MODE		48
@@ -2156,7 +2156,7 @@ void run_watering_program(uint8_t progId){
 	uint32_t interval=0;
 	uint32_t startime=0;
 	uint32_t now=0;
-	uint32_t overTime=0;
+	uint32_t overTime=4000000000;
 	uint16_t fwl=0;
 	uint16_t swl = 0;
 	uint16_t curprcnt = 0;
@@ -2170,9 +2170,8 @@ void run_watering_program(uint8_t progId){
 	now = RTC_GetCounter();
 	startime = now;
 	wpProgress = 4;
-	overTime = now + 5;
 	vTaskDelay(100);
-
+	uint8_t rules=0;
 	/*
 	 *  Filling water strategy A
 	 *   The water is filled up in amount of 'volume',
@@ -2189,14 +2188,22 @@ void run_watering_program(uint8_t progId){
 	swl = sonar_read[MIXTANK_SONAR];			// remember start water level
 	addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;	// read the volume needed to add in MIXTANK
 	EE_ReadVariable(addr, &volume);
+	vTaskDelay(100);
+	volume &= (uint16_t)0xFF;	// lower byte - WP volume, higher - WP rules
+//	rules = (uint8_t)((volume>>8)^0xFF);
 	fwl = tank_windows_bottom[MIXTANK] - swl;	// how much water we have already
-	if (fwl > volume) {							// if < than WP volume
-		fwl = swl - volume;						// get level: now+WPvol
+	uint8_t left = 0;							// indicates how much water let to fill
+	if (fwl < volume) {							// if < than WP volume
+		fwl = swl - volume;						// get Final Water Level: now+WPvol
 		while (overTime > now) { // 5 seconds sonar should report >100% fill to close FWI valve
+			left = (uint8_t)(sonar_read[MIXTANK_SONAR] - fwl);
 			if ( sonar_read[MIXTANK_SONAR] >= fwl){	// more sonar read - less water
 				overTime = now + 5;
 				open_valve(FWI_VALVE);
 			}
+			Lcd_goto(0,9);
+			Lcd_write_str("Left=");
+			Lcd_write_8b(left);
 			vTaskDelay(250);
 			now = RTC_GetCounter();
 			wpProgress = 5;
@@ -2288,9 +2295,6 @@ void run_watering_program(uint8_t progId){
 
 	wpStateFlags &= ~(1<<progId); // sbrosit' flag
 	vTaskDelay(200);
-
-
-
 }
 
 void run_fertilizer_mixer(uint8_t progId){
@@ -2314,7 +2318,7 @@ void run_fertilizer_mixer(uint8_t progId){
 	dosingEndTime = RTC_GetCounter()+(uint32_t)dosingTime;
 	wpProgress = 92;
 	vTaskDelay(400);
-	enable_dosing_pump(dosingPumpId, 1);
+	enable_dosing_pump(dosingPumpId, 101);
 	wpProgress = 91;
 	vTaskDelay(400);
 	while (RTC_GetCounter()<dosingEndTime) {
@@ -2336,6 +2340,7 @@ void run_circulation_pump(uint16_t time){
 	close_valve(FWI_VALVE);
 	while (RTC_GetCounter()<endTime) {
 		vTaskDelay(10);
+		enable_dosing_pump(MIXING_PUMP,1);
 	}
 	enable_dosing_pump(MIXING_PUMP,0);
 }
@@ -2366,7 +2371,7 @@ void enable_dosing_pump2(uint8_t pumpId, uint8_t state){
 }
 
 void enable_dosing_pump(uint8_t pumpId, uint8_t state){
-//	uint8_t prcnt = 0;
+	uint16_t prcnt = 0;
 	if (state>0) {
 		dosingPumpStateFlags2 |= (1<<pumpId);
 	}
@@ -2376,6 +2381,11 @@ void enable_dosing_pump(uint8_t pumpId, uint8_t state){
 
 	if (state==1) {
 		state = 0;
+	}
+	else if (state==101) {		// run doser respecting eeprom programmed speeds
+		EE_ReadVariable(DOSER_SPEEDS, &prcnt);
+		vTaskDelay(2);
+		state = (uint8_t)(prcnt&0xFF);
 	}
 	else {
 		state = 100 - state;	// 0 - running motor, 100 - stopped
