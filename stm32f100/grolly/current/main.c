@@ -636,7 +636,7 @@ void autoSafe(void){
 		}
 		else {
 			fup_time = RTC_GetCounter()+psi_upres_timeout;		// fail under pressure flag set time
-			wpProgress = 63;
+			// wpProgress = 63;
 		}
 
 		vTaskDelay(1);
@@ -1269,8 +1269,8 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 			TxBuffer[3] = 40;	// packet size (ZX0+packet_size+payload+crc). Payload is 16bytes
 			if (blockId==1) {	// state block 1
 				TxBuffer[4] = comm_state;
-				TxBuffer[5] = ((uint8_t)timerStateFlags&0xFF);
-				TxBuffer[6] = ((uint8_t)cTimerStateFlags&0xFF);
+				TxBuffer[5] = ((uint8_t)(timerStateFlags&0xFF));
+				TxBuffer[6] = ((uint8_t)(cTimerStateFlags&0xFF));
 				TxBuffer[7] = valveFlags;
 				TxBuffer[8] = ((uint8_t)plugStateFlags&0xFF);
 				TxBuffer[9] = wpStateFlags;	// watering program run flags
@@ -2171,7 +2171,6 @@ void run_watering_program(uint8_t progId){
 	startime = now;
 	wpProgress = 4;
 	vTaskDelay(100);
-	uint8_t rules=0;
 	/*
 	 *  Filling water strategy A
 	 *   The water is filled up in amount of 'volume',
@@ -2190,10 +2189,9 @@ void run_watering_program(uint8_t progId){
 	EE_ReadVariable(addr, &volume);
 	vTaskDelay(100);
 	volume &= (uint16_t)0xFF;	// lower byte - WP volume, higher - WP rules
-//	rules = (uint8_t)((volume>>8)^0xFF);
 	fwl = tank_windows_bottom[MIXTANK] - swl;	// how much water we have already
 	uint8_t left = 0;							// indicates how much water let to fill
-	if (fwl < volume) {							// if < than WP volume
+	/* if (fwl < volume) {							// if < than WP volume
 		fwl = swl - volume;						// get Final Water Level: now+WPvol
 		while (overTime > now) { // 5 seconds sonar should report >100% fill to close FWI valve
 			left = (uint8_t)(sonar_read[MIXTANK_SONAR] - fwl);
@@ -2247,7 +2245,8 @@ void run_watering_program(uint8_t progId){
 			vTaskDelay(100);
 			wpProgress = 8;
 		}
-	}
+	} */
+	vTaskDelay(50);
 	wpProgress = 9;
 	// open corresponding watering line valve(s)
 	addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
@@ -2268,7 +2267,7 @@ void run_watering_program(uint8_t progId){
 	uint16_t tmpval=0;
 	srcomm = comm_state;	// backup curent commstate. to recover after watering
 	comm_state = COMM_MONITOR_MODE;
-
+	vTaskDelay(50);
 	addr = WP_OFFSET+progId*WP_SIZE;
 	volume=0;
 	EE_ReadVariable(addr, &volume);
@@ -2429,13 +2428,21 @@ void valve_init(void){
 }
 
 void watering_program_trigger(void *pvParameters){
-	uint32_t curtime, lastRun, interval, diff, startTime, endTime;
-	uint16_t addr;
-	uint8_t wpStateFlag=0, progId, enabled;
+	uint32_t curtime=0;
+	uint32_t lastRun=0;
+	uint32_t interval=0;
+	uint32_t diff=0;
+	uint32_t startTime=0;
+	uint32_t endTime=0;
+	uint16_t addr=0;
+	uint16_t temp=0;
+	uint8_t wpStateFlag=0;
+	uint8_t progId=0;
+	uint8_t enabled=0;
+	uint8_t rules=0;
 	// close all valves
 	valve_init();
-	vTaskDelay(4000);
-
+	vTaskDelay(20000);
 	while (1) {
 
 		// main loop
@@ -2451,11 +2458,31 @@ void watering_program_trigger(void *pvParameters){
 			startTime = EE_ReadWord(addr);	// program start time point
 			addr = WP_OFFSET+progId*WP_SIZE+WP_END;
 			endTime = EE_ReadWord(addr);	// program end time point
-			addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
-			EE_ReadVariable(addr, &enabled);	// program start time point
 			vTaskDelay(50);
-			if (diff>interval && curtime>startTime && curtime<endTime && enabled>0){
+			addr = WP_OFFSET+progId*WP_SIZE+WP_VOLUME;	// read the volume needed to add in MIXTANK
+			EE_ReadVariable(addr, &temp);
+			rules = (uint8_t)((temp>>8)&0xFF);	// get timer rules applied to WP
+			vTaskDelay(50);
+			enabled = rules&((uint8_t)(timerStateFlags&0xFF));
+			if (enabled>0) {	// if any of the timer rules OK, enable WP
+				rules = 1;
+			}
+			else {
+				rules = 0;
+			}
+			vTaskDelay(20);
+			enabled = 0;
+			addr = WP_OFFSET+progId*WP_SIZE+WP_FLAGS;
+			temp = 0;
+			EE_ReadVariable(addr, &temp);	// program start time point
+			vTaskDelay(500);
+	//		Lcd_goto(0,9);
+	//		Lcd_write_8b(rules);
+			vTaskDelay(500);
+			enabled = (uint8_t)(temp&0xFF);
+			if (diff>interval && curtime>startTime && curtime<endTime && enabled>0 && rules==1){
 				run_watering_program(progId);
+				// wpProgress++;
 			}
 			vTaskDelay(50);
 		}
@@ -3123,7 +3150,8 @@ void Delay_us(uint32_t delay){
 }
 
 void buttonCalibration(void){	// buttons calibration function
-	uint16_t button_val[4], diff;
+	volatile static uint16_t button_val[4];
+	uint16_t diff=0;
 	Lcd_clear();
 	Lcd_write_str("<");
 	vTaskDelay(2000);
@@ -3550,8 +3578,8 @@ void timerStateTrigger(void *pvParameters){
 	uint32_t timer1=0;
 	uint32_t timer2=0;
 	uint16_t Address;
+	vTaskDelay(20000);
 	while (1) {
-		runners &= (1<<1);
 		now=RTC_GetCounter();
 		for (i=0; i<4; i++){	// 4 tajmera
 			Address = EE_TIMER1_ON+EE_TIMER_SIZE*i;
@@ -3584,18 +3612,18 @@ void timerStateTrigger(void *pvParameters){
 			}
 
 			if (timerStateFlag==1) {
-				timerStateFlags|=(1<<i);
+				timerStateFlags|=(1<<i);	// set flag
 			}
 			else {
 				timerStateFlags &= ~(1<<i); // sbrosit' flag
 			}
 		}
-		vTaskDelay(1);
+		vTaskDelay(5);
 		for (i=0; i<3; i++){	// do 3 tajmerov
 			Address = EE_CTIMER_DURATION+EE_CTIMER_SIZE*i;
 			timer1 = EE_ReadWord(Address);
 			timer2 = EE_ReadWord(Address+2);
-			vTaskDelay(2);
+			vTaskDelay(5);
 			now=RTC_GetCounter();
 
 			// logika ciklicheskogo tajmera
@@ -4718,11 +4746,11 @@ void displayClock(void *pvParameters)
 	    	button=readButtons();
 	    	vTaskDelay(3);
 	    	Lcd_write_str(" ");
-
+	    	Lcd_goto(1,8);
 	    	Lcd_write_digit(wpProgress);
 	    	Lcd_write_str(" ");
-	    	Lcd_write_digit(auto_failures);
-	    	Lcd_write_digit(cTimerStateFlags);
+	    	Lcd_write_digit((uint8_t)(timerStateFlags&0xFF));
+	    	Lcd_write_digit((uint8_t)(cTimerStateFlags&0xFF));
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
@@ -5112,7 +5140,7 @@ uint8_t main(void)
 
 	xTaskCreate(lstasks,(signed char*)"LST",configMINIMAL_STACK_SIZE,
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
-	xTaskCreate(watering_program_trigger,(signed char*)"WP",150,
+	xTaskCreate(watering_program_trigger,(signed char*)"WP",180,
 	            NULL, tskIDLE_PRIORITY + 1, NULL);
 	xTaskCreate(uart_task,(signed char*)"UART",70,
 	            NULL, tskIDLE_PRIORITY + 1, NULL);
@@ -5252,7 +5280,9 @@ void Init_pin_in()
 void Lcd_write_cmd(uint8_t cmd)
 {
 		Delay_us(6);	// stable 240
-		rs_0;rw_0;e_1;
+		rs_0;
+		rw_0;
+		e_1;
 		Delay_us(1);
 		set4highBits(cmd);
 		e_0;
