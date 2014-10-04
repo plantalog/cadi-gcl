@@ -1,6 +1,12 @@
 cadi-gcl
 ========
+Meet these two:
 Cadi GCL project is an open-source plant growth controller.
+Grolly - is complete plant watering and feeding solution.
+
+Grolly system is just based on Cadi hardware
+
+Grolly is aimed to be standalone watering robot with communication capabilities
 
 
 FOLDER STRUCTURE

@@ -1,5 +1,19 @@
 === Grolly firmware and software history (binaries are @ github in cadi-gcl/stm32f100/grolly/current/executables) ===
 
+
+
+v1.1b6
+- fixed bug with Tx start. Effect - communication speed increased, less watchdog restarts, less communication load on both sides.
+
+v1.1b5
+- timers are linked to Watering Programs now
+
+v1.1b3
+- introduced Watering Strategy A
+
+v1.1b2
+- Low Speed tasks FreeRTOS task introduced
+
 v1.1b1
 - more volatility for globals
 - enabled automatic watering solution prepare and watering run triggering
