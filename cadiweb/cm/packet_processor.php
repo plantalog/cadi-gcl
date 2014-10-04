@@ -184,6 +184,7 @@ if (isset($_POST['cmd'])) {
 
 	// SOME HARDCODE
 	$packet[3] = chr(ord($packet[3])+1);	// increase packet length byte for CRC use (TEMPORARY solution, use fixed values when stable)
+	
 //	$packet[3] = chr(ord($packet[3])+1);	// increase packet length byte for packet ID use (same story as before)
 								// Packet ID is being generated and added to the end of packet within Cadi BTDaemon
 

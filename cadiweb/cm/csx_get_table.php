@@ -37,7 +37,7 @@
 					</select></td>';				// type
 				echo '<td>'.$cs_arr[$i][1].'</td>';				// value
 				echo '<td><input type="text" onChange="rx_ee('.(intval(substr($idpref,4,5))).')" name="'.$idpref.'value" value="'.$cs_arr[$i][2].'" /></td>';				// value
-				echo '<td><input type="text" name="'.$idpref.'text" value="'.$cs_arr[$i][3].'" /></td>';				// text description
+				echo '<td><input style="width:600px" type="text" name="'.$idpref.'text" value="'.$cs_arr[$i][3].'" /></td>';				// text description
 			echo '</tr>';
 				
 

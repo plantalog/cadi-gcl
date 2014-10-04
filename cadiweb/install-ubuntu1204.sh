@@ -131,6 +131,12 @@ sudo echo -e '#!/bin/sh\nsleep 10\ncd /var/www/cm/\nphp /var/www/cm/bt_daemon.ph
 echo 'changing permissions for Cadi BTDaemon startup script (/var/www/html/cm/btds/btd_start.sh)'
 sudo chmod 777 /var/www/cm/btds/btd_start.sh
 
+echo 'flushes file before downloading new settings from Cadi'
+echo > /var/www/cm/cadi_settings_dump
+echo 'setting permissions for Cadi settings dump file'
+chmod 777 /var/www/cm/cadi_settings_dump
+echo 'setting permissions for Cadi settings csv file'
+chmod 777 /var/www/cm/cadi_settings_conf.csv
 
 echo 'creating default BTDaemon config file'
 sudo echo '80,25000,37,5,0,150,3' > /var/www/cm/btds/btd.conf

@@ -3,6 +3,8 @@ session_start();
 
 //include_once('cadi_response_parser.php');
 include_once('packet_processor.php');
+$btd_state_text = '';
+
 
 if (isset($_GET['action'])) {
 	$action = $_GET['action'];
@@ -16,12 +18,12 @@ switch ($action) {
 	case 'bt_connect':
 		$toput = "release,".$_POST['rfcomm'].", ";
 		file_put_contents('daemon_cmd', $toput);
-		sleep(1);
+		sleep(4);
 		file_put_contents('daemon_cmd', $toput);
-		sleep(1);
+		sleep(4);
 		$toput = "bind,".$_POST['rfcomm'].",".$_POST['mac'];
 		file_put_contents('daemon_cmd', $toput);
-		sleep(1);
+		sleep(4);
 		$toput = "stream,".$_POST['rfcomm'].", ";
 		file_put_contents('daemon_cmd', $toput);
 		break;
@@ -81,7 +83,6 @@ switch ($action) {
 		break;
 	case 'get_status':
 //		include_once('cadi_status.php');
-		
 		include_once('status_view_1.php');
 		echo '---socalledseparator---';
 		include_once('status_view_2.php');
@@ -129,16 +130,33 @@ switch ($action) {
 		file_put_contents('daemon_cmd', 'ee2server,1500,200,');
 		break;
 	case 'get_btd_state':
-		$btd_state = file_get_contents('btds/btd_state');
-		if ($btd_state==1) {
-			$btd_state_text='1<font color="green">BTD: Idle</font>';
+
+		$fp = fopen("btds/btd_state", "r");
+
+		if (flock($fp, LOCK_SH | LOCK_NB)) { // read lock
+		    $btd_state = fread($fp, 1);
+		    flock($fp, LOCK_UN); // release the lock
+		} else {
+		    echo "Couldn't lock the file !";
 		}
-		if ($btd_state==2) {
-			$btd_state_text='2<font color="yellow">BTD: CSX DL</font>';
+
+		fclose($fp);
+
+		switch ($btd_state) {
+			case '1':
+				$btd_state_text='1<font color="green">BTD: Idle</font>';
+			break;
+			case '2':
+				$btd_state_text='2<font color="yellow">BTD: CSX DL</font>';
+			break;
+			case '3':
+				$btd_state_text='3<font color="yellow">BTD: CSX UL</font>';
+			break;
+			default:
+				$btd_state_text='1<font color="green">N/A</font>';
+			break;
 		}
-		if ($btd_state==3) {
-			$btd_state_text='3<font color="yellow">BTD: CSX UL</font>';
-		}
+		
 		echo $btd_state_text;
 		break;
 }

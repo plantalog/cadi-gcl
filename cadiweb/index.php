@@ -164,6 +164,9 @@ $(document).ready(function() {
 		svg.text(300, 155, 'TF3',{fill: 'green', strokeWidth: 0, id:'tf3'});
 		svg.text(300, 175, 'TF4',{fill: 'green', strokeWidth: 0, id:'tf4'});
 
+		svg.text(450, 155, 'TSF',{fill: 'black', strokeWidth: 0, id:'tsf'});
+		svg.text(450, 175, 'CTSF',{fill: 'black', strokeWidth: 0, id:'ctsf'});
+
 		// draw tank levels in text
 		svg.text(730, 135, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t3l_txt'});
 		svg.text(590, 335, '2Top',{fill: 'white', strokeWidth: 1, stroke: "black", id:'t4l_txt'});
@@ -203,6 +206,12 @@ $(document).ready(function() {
 			$('#tf2').html(auto_failures);
 			var runners = statusArray[20];
 			$('#tf3').html(runners);
+
+			var tsf = statusArray[3];		// timer state flags
+			$('#tsf').html(tsf);
+			var ctsf = statusArray[4];		// ctimer state flags
+			$('#ctsf').html(ctsf);
+
 
 
 

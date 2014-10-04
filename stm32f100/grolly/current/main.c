@@ -113,7 +113,7 @@ __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
 volatile static uint8_t dht_shifter=DHT_DATA_START_POINTER;		// could be removed in production version
 TIM_ICInitTypeDef  TIM_ICInitStructure;
-volatile DHT_data DHTValue;
+volatile static DHT_data DHTValue;
 volatile static uint8_t		dht_data[5];
 volatile static uint8_t		dht_data2[5];
 volatile static uint8_t dht_bit_position = 0;
@@ -255,8 +255,8 @@ volatile static uint32_t timerStateFlags, cTimerStateFlags;
 volatile static uint32_t fup_time = 0;	// first time underpressure met
 volatile static uint16_t psi_upres_level=0;
 volatile static uint16_t psi_upres_timeout=0;
-#define PSI_UNDERPRESSURE		0x0690			// 1480 minimum pressure meaning there is water in pump, when it is running
-#define PSI_UP_TIMEOUT			0x0691			// 1481 seconds to stop PSI pump if underpressure met
+#define PSI_UNDERPRESSURE		0x0613			// 1555 minimum pressure meaning there is water in pump, when it is running
+#define PSI_UP_TIMEOUT			0x0614			// 1556 seconds to stop PSI pump if underpressure met
 
 // DRIVER: LOAD TRIGGERING
 #define USE_LOADS
@@ -353,16 +353,16 @@ volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT
 
 
 // WATERING PROGRAMS SETTINGS ADRESSES
-#define WP_AMOUNT					3		// 3x16=48(hex=30) values (range: 613-643)
+#define WP_AMOUNT					8		// 3x16=48(hex=30) values (range: 61D-64D)
 #define WP_SIZE						12		// size of block of settings data of watering program
-#define WP_OFFSET					0x0613	// 1555empty. watering program settings offset (first 8 bits of 16bit EEPROM value)
-#define WP_RULES_APPLIED			1		// 1556 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
-#define	WP_VOLUME					1		// 1556 amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
-#define WP_INTERVAL					2		// 1557 2x16bits for WP run interval (in seconds)
-#define WP_START					4		// 1559 2x16bit variables for program start time
-#define WP_END						6		// 1561 after this time no triggering for this WP
-#define WP_LAST_RUN_SHIFT			8		// 1563 2x16bit last run of watering program
-#define WP_FLAGS					10		// 1565 bit 0 (the last one): - WPEnabled flag
+#define WP_OFFSET					0x061D	// 1565empty. watering program settings offset (first 8 bits of 16bit EEPROM value)
+#define WP_RULES_APPLIED			1		// 1566 24H timer and Full range timer rules (ids: 0..15 for each) [1.1 (8bits)]
+#define	WP_VOLUME					1		// 1566 amount of water to be intaken for solution preparation (sonar units, 1..255) [1.2 (8bits)]
+#define WP_INTERVAL					2		// 1567 2x16bits for WP run interval (in seconds)
+#define WP_START					4		// 1569 2x16bit variables for program start time
+#define WP_END						6		// 1571 after this time no triggering for this WP
+#define WP_LAST_RUN_SHIFT			8		// 1573 2x16bit last run of watering program
+#define WP_FLAGS					10		// 1575 bit 0 (the last one): - WPEnabled flag
 
 
 
@@ -371,15 +371,15 @@ volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT
 #define FMP_PROGRAMS_AMOUNT						9
 
 // Fertilizer Mixing Program adresses	()
-#define FMP_OFFSET								0x0644	// 1604
+#define FMP_OFFSET								0x068A	// 1674
 #define FMP_SIZE								5
-#define FMP_DOSING_PUMP_ID_SHIFT				1		// 1605 FMP enabled if dosing pump id > 0 (05.09.2014)
-#define FMP_DOSING_TIME_SHIFT					2		// 1606
-#define FMP_2_WP_ASSOC_SHIFT					3		// 16070 H
-#define FMP_TRIG_FREQUENCY_SHIFT				3		// 16071 L
-#define	FMP_AFTERMIX_TIME_SHIFT					4		// 1608
+#define FMP_DOSING_PUMP_ID_SHIFT				1		// 1675 FMP enabled if dosing pump id > 0 (05.09.2014)
+#define FMP_DOSING_TIME_SHIFT					2		// 1676
+#define FMP_2_WP_ASSOC_SHIFT					3		// 16770 H
+#define FMP_TRIG_FREQUENCY_SHIFT				3		// 16771 L
+#define	FMP_AFTERMIX_TIME_SHIFT					4		// 1678
 
-#define DOSER_SPEEDS			0x0694		// 4 bytes for doser speeds in percent (1..100)
+#define DOSER_SPEEDS			0x0617		// 4 bytes for doser speeds in percent (1..100)
 
 
 #define COMM_MONITOR_MODE		48
@@ -414,8 +414,8 @@ volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT
 
 #define PSI_SENSOR_0PSI			0x0645
 #define PSI_SENSOR_32PSI		0x0646
-#define PSI_SENSOR_BTM			0x0692			// 1682
-#define PSI_SENSOR_TOP			0x0693			// 1683
+#define PSI_SENSOR_BTM			0x0615			// 1557
+#define PSI_SENSOR_TOP			0x0616			// 1558
 volatile static uint8_t psi_underOver=0;
 volatile static uint16_t psi_pump_top_level=0;
 volatile static uint16_t psi_pump_btm_level=0;
@@ -602,6 +602,7 @@ void setDoserSpeed(uint8_t doser, uint8_t speed);
 void send_resp(uint8_t cmd_uid);
 void send_ee_block(uint16_t addr);
 void eeprom_test(void);
+void push_tx(void);
 
 // auto_flags
 /*
@@ -611,6 +612,8 @@ void eeprom_test(void);
  * 3 - psi underpressure	(8)
  *
  */
+
+
 
 void autoSafe(void){
 	if (((auto_flags&4)>>2)==1){
@@ -649,7 +652,7 @@ void autoSafe(void){
 		}
 		vTaskDelay(1);
 		if (sonar_read[MIXTANK_SONAR]>tank_windows_bottom[MIXTANK]){
-			enable_dosing_pump(MIXING_PUMP,0);	// mixer pump off
+		// 	enable_dosing_pump(MIXING_PUMP,0);	// mixer pump off
 		}
 	}
 	vTaskDelay(1);
@@ -837,13 +840,14 @@ void USART1_IRQHandler(void)
 #endif
 			USART1->SR &= ~USART_FLAG_RXNE;			// clear Rx Not Empty flag
 	}
-	BT_USART->SR &= ~USART_SR_TC;
+
+
 
 	// sending packet in case of Tx Not Empty flag is set and buffer not sent completely yet
 	if (txbuff_ne==1 && TxCounter<NbrOfDataToTransfer) {
 		USART1->DR = TxBuffer[TxCounter++];	// write TxBuff byte into Data Register for sending
-		USART1->SR &= ~USART_SR_TC;		// clear Transfer Complete flag
 	}
+	BT_USART->SR &= ~USART_SR_TC;		// clear Transfer Complete flag
 
 	if (packet_ready==0) {
 		if (rxm_state==RXM_CMD) {
@@ -855,15 +859,15 @@ void USART1_IRQHandler(void)
 				// crc count
 				rx_packet_crc = crc_block(48, &RxBuffer[0],packet_length);	// 48 is XOR of "ZX2", -1 for skipping cmd id resp
 				// crc check
+				rxm_state=RXM_NONE; // RX machine state set to NONE, completes RX cycle
+				pb_pntr=0;			// packet buffer pointer to 0
+				prefixDetectionIdx = 0;
 				if (rx_packet_crc==0) {	//
 					packet_ready=1;	// packet received correctly and is ready to process
 				}
 				else {
 					rx_flush();	// discard broken packet
 				}
-				rxm_state=RXM_NONE; // RX machine state set to NONE, completes RX cycle
-				pb_pntr=0;			// packet buffer pointer to 0
-				prefixDetectionIdx = 0;
 			}
 		}
 
@@ -887,7 +891,6 @@ void USART1_IRQHandler(void)
 				// command
 				rxm_state=RXM_CMD;
 				rx_flush();
-				pb_pntr=0;	// packet buffer pointer to zero to start reading new payload
 			}
 			prefixDetectionIdx = 0;
 		}
@@ -955,22 +958,32 @@ void tx_flush(void){
 	}
 }
 
+void push_tx(void){
+	txbuff_ne=0;	// stop Tx transfers
+	NbrOfDataToTransfer = TxBuffer[3]+1;	// packet size with code 13
+	TxBuffer[TxBuffer[3]] = 13;
+	TxCounter=0;							// reset tx buffer pointer
+	txbuff_ne=1;
+	BT_USART->DR = 0;						// volshebnyj pendal
+	while (TxCounter<NbrOfDataToTransfer){
+		vTaskDelay(5);
+		IWDG_ReloadCounter();
+	}
+	NbrOfDataToTransfer=0;
+	tx_flush();		// flush Tx buffer
+	txbuff_ne=0;	// packet sent, reset tx not empty flag
+}
+
 void send_resp(uint8_t cmd_uid){
+	tx_flush();
 	TxBuffer[0] = 90;	// "Z"
 	TxBuffer[1] = 88;	// "X"
 	TxBuffer[2] = 55;	// "7" command execution success response packet
-	TxBuffer[3] = 5;	// packet size
+	TxBuffer[3] = 6;	// packet size
 	TxBuffer[4] = cmd_uid;
-	TxBuffer[5] = crc_block(0, &TxBuffer[0],(TxBuffer[3]));	// with crc
+	TxBuffer[(TxBuffer[3]-1)] = crc_block(0, &TxBuffer[0],(TxBuffer[3-1]));	// with crc
 	vTaskDelay(1);
-	NbrOfDataToTransfer = TxBuffer[3]+1;	// packet size with cmd id
-	TxCounter=0;							// reset tx buffer pointer
-	txbuff_ne=1;
-	while (TxCounter<NbrOfDataToTransfer){
-		vTaskDelay(3);
-	}
-	tx_flush();
-	txbuff_ne=0;	// packet sent, reset tx not empty flag
+	push_tx();
 }
 
 void run_uart_cmd(void){
@@ -1103,6 +1116,7 @@ void run_doser_for(uint8_t pump_id, uint8_t amount, uint8_t speed){
 		now = RTC_GetCounter();
 		IWDG_ReloadCounter();
 		vTaskDelay(10);
+//		send_resp();
 		get_status_block(1);	// send status blocks
 		vTaskDelay(10);
 	}
@@ -1373,14 +1387,7 @@ void get_status_block(uint8_t blockId){	// sends block with Cadi STATUS data
 				TxBuffer[22] = blockId;
 			}
 			TxBuffer[(TxBuffer[3]-1)] = crc_block(0, &TxBuffer[0],(TxBuffer[3]-1));	// with crc
-			NbrOfDataToTransfer = TxBuffer[3];	// packet size
-			TxCounter=0;						// reset tx buffer pointer
-			txbuff_ne = 1;
-			while (TxCounter<NbrOfDataToTransfer) {
-				vTaskDelay(2);
-			}
-			tx_flush();
-			txbuff_ne = 0;
+			push_tx();
 		}
 }
 
@@ -2191,7 +2198,7 @@ void run_watering_program(uint8_t progId){
 	volume &= (uint16_t)0xFF;	// lower byte - WP volume, higher - WP rules
 	fwl = tank_windows_bottom[MIXTANK] - swl;	// how much water we have already
 	uint8_t left = 0;							// indicates how much water let to fill
-	/* if (fwl < volume) {							// if < than WP volume
+	if (fwl < volume) {							// if < than WP volume
 		fwl = swl - volume;						// get Final Water Level: now+WPvol
 		while (overTime > now) { // 5 seconds sonar should report >100% fill to close FWI valve
 			left = (uint8_t)(sonar_read[MIXTANK_SONAR] - fwl);
@@ -2245,7 +2252,7 @@ void run_watering_program(uint8_t progId){
 			vTaskDelay(100);
 			wpProgress = 8;
 		}
-	} */
+	}
 	vTaskDelay(50);
 	wpProgress = 9;
 	// open corresponding watering line valve(s)
@@ -2657,7 +2664,7 @@ void TIM1_UP_TIM16_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2013
   TIM_ClearITPendingBit(TIM16, TIM_IT_CC1);
 
   /* Get the Input Capture value */
-  if (TIM16->CNT < MAX_SONAR_READ && TIM16->CNT>0) {
+  if ((TIM16->CNT) < MAX_SONAR_READ && (TIM16->CNT)>0) {
 	  sonar_read[MIXTANK_SONAR] = TIM16->CNT;
   }
   TIM16->CNT = 0;
@@ -2668,7 +2675,7 @@ void TIM1_TRG_COM_TIM17_IRQHandler(void)		// DHT moved from PA7 to PB15. 11.07.2
   /* Clear TIM16 Capture compare interrupt pending bit */
   TIM_ClearITPendingBit(TIM17, TIM_IT_CC1);
   /* Get the Input Capture value */
-  if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ) && (TIM17->CNT > 0)) {
+  if (!(GPIOB->IDR & (1<<9)) && (TIM17->CNT < MAX_SONAR_READ) && ((TIM17->CNT) > 0)) {
 	  sonar_read[FWTANK_SONAR]=SONAR1_TIM->CNT;
   }
   SONAR1_TIM->CNT = 0;
@@ -3404,8 +3411,9 @@ void display_usart_rx(void){
 			Lcd_write_8b(RxBuffer[5]);
 			Lcd_write_8b(RxBuffer[6]);
 			Lcd_write_str(" ");
-			Lcd_write_digit(rxm_state);
-			copy_arr(&RxBuffer, &LCDLine2, 7,9);
+			Lcd_write_digit(prefixDetectionIdx);
+			Lcd_write_digit(pb_pntr);
+//			copy_arr(&RxBuffer, &LCDLine2, 5,11);
 			vTaskDelay(20);
 		}
 		Lcd_clear();
@@ -3428,6 +3436,7 @@ void display_usart_tx(void){
 			Lcd_write_8b(TxBuffer[5]);
 			Lcd_write_8b(TxBuffer[6]);
 			Lcd_write_str(" ");
+			push_tx();
 			Lcd_write_digit(TxCounter);
 			copy_arr(&TxBuffer, &LCDLine2, 7,9);
 			vTaskDelay(20);
@@ -4898,15 +4907,6 @@ void int32str(uint32_t d, volatile char *out)
     out[0] = '0' + ( d /  10 )    % 10;
 }
 
-void int10str(uint32_t d, char *out)
-{
-    out[4] = '\0';
-    out[3] = '0' + ( d       )    % 10;
-    out[2] = '0' + ( d /= 10 )    % 10;
-    out[1] = '0' + ( d /= 10 )    % 10;
-    out[0] = '0' + ( d /  10 )    % 10;
-}
-
 uint32_t EE_ReadWord(uint16_t Address){
 	uint16_t tmp=0, tmp2=0;
 	uint32_t Data = 0;
@@ -5142,7 +5142,7 @@ uint8_t main(void)
 	            NULL, tskIDLE_PRIORITY + 2, NULL);
 	xTaskCreate(watering_program_trigger,(signed char*)"WP",180,
 	            NULL, tskIDLE_PRIORITY + 1, NULL);
-	xTaskCreate(uart_task,(signed char*)"UART",70,
+	xTaskCreate(uart_task,(signed char*)"UART",100,
 	            NULL, tskIDLE_PRIORITY + 1, NULL);
     xTaskCreate(displayClock,(signed char*)"CLK",140,
             NULL, tskIDLE_PRIORITY + 1, NULL);

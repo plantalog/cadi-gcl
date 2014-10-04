@@ -1,6 +1,14 @@
 <?php
+error_reporting( E_ALL );
+ini_set('display_errors', 1);
+
+// "echo > cadi_settings_dump" flushes file before downloading new settings from Cadi
+
+
 
 include_once('cadi_settings.php');
+//$btd_os = 0;	// Ubuntu (default)
+$btd_os = 1;	// ArchLinux
 
 echo "Bluetooth daemon for Cadi started";
 $btd_cmd_file = 'daemon_cmd';
@@ -18,10 +26,13 @@ $NbrOfDataToSend = 0;	// amount of 16bit variables of settings dump to send
 $TxCounter = 0;		// settings transmit pointer
 $sbsa = 0;			// Settings Block Start Address
 
+$execmd = 'echo';
 
 $NbrOfDataToRead = 0;	// amount of 16bit variables of settings dump to read from Cadi
 $RxCounter = 0;		// settings Rx pointer
 $sbsa2 = 0;			// starting address in EEPROM memory of cadi
+
+$globcounter = 0;
 
 // create cadi settings dump file if not exist
 	if (!file_exists('cadi_settings_dump')) {
@@ -95,7 +106,18 @@ while(1){
 		
 		if ($RxCounter>=$NbrOfDataToRead && $TxCounter>=$NbrOfDataToSend){
 			// setting transfer activities are finished
-			file_put_contents('btds/btd_state', '1');	// BTD status - 1:Idle
+			// echo 'pums';
+			$fp = fopen("btds/btd_state", "w");
+			if (flock($fp, LOCK_EX | LOCK_NB)) { // do an exclusive lock
+			    fwrite($fp, "1");
+			    flock($fp, LOCK_UN); // release the lock
+			} else {
+			    echo "Couldn't lock the file !";
+			}
+
+			fclose($fp);
+
+			// file_put_contents('btds/btd_state', '1');	// BTD status - 1:Idle
 		}
 
 		if(!empty($command)){
@@ -107,22 +129,30 @@ while(1){
 			switch ($cmd_arr[0]) {	
 				case 'bind':
 					$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
+					echo PHP_EOL.'Binding RFCOMM: '.$execmd.PHP_EOL;
 					exec($execmd);
+					echo 'applying port settings - raw data exchange';
+					exec('stty -F /dev/'.$cmd_arr[1].' raw');
+					exec('stty -F /dev/'.$cmd_arr[1].' -echo -echoe -echok');
 					$execmd = 'ln -s /dev/'.$cmd_arr[1].' /dev/cadi';
 					break;
 				case 'disconnect':
 					$execmd = "'kill -9 $(pidof rfcomm)'";
 					break;
 				case 'stream':
-		//			$execmd = 'rfcomm -r bind /dev/'.$cmd_arr[1].' '.$cmd_arr[2].' 1';
-		//			exec($execmd);
+					sleep(2);	// hardcoded delay before streaming. For stable bluetooth connection
 					$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
 					$respfs = 0;
 					break;
 				case 'release':
 					$execmd = 'rfcomm release 0 ; rm -rf /dev/'.$cmd_arr[1].' ; rm -rf /dev/cadi';
 					exec($execmd);
-					$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
+					if ($btd_os==0) {
+						$execmd = 'service bluetooth restart';	// Ubuntu 12.04 LTS
+					}
+					if ($btd_os==1) {
+						$execmd = "'./bt_restart_arch.sh'";	// ArchLinux for Raspberry Pi
+					}
 					exec($execmd);
 					break;
 					// rx_ee, cadi, <start_addr>, <number_of_data>
@@ -178,6 +208,7 @@ while(1){
 						$packet_id=1;
 					}
 					$repeat_last_cmd = 200;	// enable repeater. Disabled within response parser
+					$ping_delay = 10;
 				break;
 				case 'reboot':
 					$execmd = "reboot now";
@@ -260,7 +291,9 @@ while(1){
 
 	usleep($csd_value);
 	if ($cycle_counter%$photo_divider==0) {	// photo_divider needed for making photo NOT every while() iteration
-		exec('fswebcam -d /dev/video'.$video.' -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
+// uncomment next line if fswebcam used to make photo shots from usb camera (default for Ubuntu)
+//		exec('fswebcam -d /dev/video'.$video.' -r 640x480 --jpeg 85 ../img/curimage.jpeg >> /dev/null &');
+		echo 'taki si';
 	}
 	if ($cycle_counter>9999999){
 		$cycle_counter=0;
@@ -271,10 +304,12 @@ while(1){
 	if ($curespfs>($respfs+$fsd_value)) {	// compare new and old values if they match. if not, file changed (35B for minimum file difference)
 		$respfs = $curespfs;		// update old file size value
 		parse_response($srtrs_value);		// parse response if change detected
+		echo 'parse';
 	}
 
 
-
+	usleep(1000);
+	//  send_ee_block()
 	if ($RxCounter<$NbrOfDataToRead && $repeat_last_cmd == 0) {
 
 		$rxblock++;	// to see iterations of this if
@@ -316,6 +351,9 @@ while(1){
 		file_put_contents($btd_cmd_file,$btdcmd);
 		$ping_delay=10;
 	}
+
+
+	usleep(1000);
 
 	// sends block of settings dump file into Cadi EEPROM. This block triggered by 'rx_ee' case
 	if ($TxCounter<$NbrOfDataToSend && $repeat_last_cmd == 0) {
@@ -380,14 +418,17 @@ echo PHP_EOL.'======= Please look at the dump piece '.$arguments.' from '.$sfp.'
 		}
 		// $command .= sprintf("\\x%02x",ord($ping_packet));
 		$command .= "' >> /dev/cadi";
-		echo $ping_packet.PHP_EOL.$command.PHP_EOL;
+//		echo $ping_packet.PHP_EOL.$command.PHP_EOL;
 		exec($command);
 	}
 	
 	if ($ping_delay>0) {
 		$ping_delay--;
 	}
-
+	echo PHP_EOL.$globcounter++.PHP_EOL;
+	if ($globcounter>4000000000) {
+		$globcounter = 0;
+	}
 //	exec('streamer -f jpeg -o ../img/curimage.jpeg');
 }
 
@@ -429,6 +470,7 @@ function dump_settings_block($addr, $block_data){
 
 function parse_response($srtrs){
 	global $packet_id, $repeat_last_cmd, $execmd, $settings_filesize, $settings_startaddr, $csd_value;
+	global $RxCounter, $NbrOfDataToRead;
 	echo PHP_EOL.'Trying parse response'.PHP_EOL;
 	// create file pointer
 	$fp = fopen('serialresp.out', 'rb');
@@ -444,30 +486,30 @@ function parse_response($srtrs){
 
 
 	// test output
-	$hexpacket = '';
-	echo 'HexPacket:';
-	for ($i=0; $i<=strlen($last_packet);$i++) {
-		$hexpacket .= sprintf("\\x%02x",ord($last_packet[$i]));
-	}
+//	$hexpacket = '';
+//	echo 'HexPacket:';
+//	for ($i=0; $i<strlen($last_packet);$i++) {
+//		$hexpacket .= sprintf("\\x%02x",ord($last_packet[$i]));
+//	}
 
-	echo $hexpacket.PHP_EOL.'EOF HexPacket'.PHP_EOL;
+//	echo $hexpacket.PHP_EOL.'EOF HexPacket'.PHP_EOL;
 
 
 	$packet_type = $last_packet[0];
 	$packet_size = ord($last_packet[1]);
 
-	echo "Packet type = ".$packet_types.PHP_EOL;
+//	echo "Packet type = ".$packet_types.PHP_EOL;
 
-	for ($i=0; $i<strlen($last_packet); $i++) {
-		echo $last_packet[$i];
-	}
+//	for ($i=0; $i<strlen($last_packet); $i++) {
+//		echo $last_packet[$i];
+//	}
 
 	
 
 	if ($packet_type==1 && strlen($last_packet)==37) {		// parsing Cadi settings
 		$crc = ord($last_packet[($packet_size-3)]);
 		$counted_crc = crc_block(2, $last_packet, (ord($last_packet[1])-3));
-		echo PHP_EOL.'>>>>> ACHTUNG: Settings Packet CRC='.$crc.' and counted one is'.$counted_crc.PHP_EOL;
+	//	echo PHP_EOL.'>>>>> ACHTUNG: Settings Packet CRC='.$crc.' and counted one is'.$counted_crc.PHP_EOL;
 		if ($counted_crc==$crc) {	// $crc!=0 - dangerous thing, some block could be lost because crc in fact could be 0
 			$block_addr = ord($last_packet[2])+ord($last_packet[3])*256;		// block address
 			$block_size = 32;
@@ -481,20 +523,21 @@ function parse_response($srtrs){
 
 	if ($packet_type==7) {		// parsing Cadi command execution confirmation response
 		$cmd_uid = ord($last_packet[2]);				// relative block_id (incoming blocks are 16vars long, outgoing are 3vars)
-		echo '### EXTRACTED CMD UID '.$cmd_uid.'###'.PHP_EOL;
+	//	echo '### EXTRACTED CMD UID '.$cmd_uid.'###'.PHP_EOL;
 		if ($packet_id == $cmd_uid && ($RxCounter>=$NbrOfDataToRead)) {
 			$packet_id++;
 			// unset($execmd);
 			$repeat_last_cmd = 0;
 			echo PHP_EOL.'%%%%%%%  Command '.$cmd_uid.' executed successfully!!!'.PHP_EOL;
+			echo PHP_EOL.'RxC='.$RxCounter.' / '.'NbrOfFataToRead='.$NbrOfDataToRead.PHP_EOL;
 		}
 	}
 
 	if ($packet_type==3 && strlen($last_packet)>37) {		// parsing Cadi status
-		echo "PacketT=3".PHP_EOL;
-		echo "LastPacket length>37".PHP_EOL;
+//		echo "PacketT=3".PHP_EOL;
+//		echo "LastPacket length>37".PHP_EOL;
 		// STATUS data provider
-		print_r($last_packet);
+//		print_r($last_packet);
 		$block_id = ord($last_packet[36]);
 		if ($block_id==1) {
 			$comm_state = ord($last_packet[2]);		// TxBuffer[4] in STM32 firmware
@@ -826,5 +869,6 @@ function crc_block_ord($input, $ord_arr, $length){	// $input is XORin init
 }
 
 //exec("rfcomm -r connect /dev/rfcomm0 20:13:07:18:09:12 1");
+
 
 ?>
