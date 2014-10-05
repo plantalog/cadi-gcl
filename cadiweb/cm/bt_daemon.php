@@ -140,7 +140,7 @@ while(1){
 					$execmd = "'kill -9 $(pidof rfcomm)'";
 					break;
 				case 'stream':
-					sleep(2);	// hardcoded delay before streaming. For stable bluetooth connection
+					sleep(4);	// hardcoded delay before streaming. For stable bluetooth connection
 					$execmd = "cat /dev/".$cmd_arr[1]." > serialresp.out &";
 					$respfs = 0;
 					break;

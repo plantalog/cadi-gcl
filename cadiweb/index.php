@@ -192,103 +192,104 @@ $(document).ready(function() {
 
 		$.post('cm/cadi_bt_processor.php', {action: 'get_status_csv'}, function(data){
 		//	alert(data);
-			var statusArray = data.split(',');
-			var date = new Date(statusArray[0]*1000);
-			$('#cadi_time2').html(date);
-			var temp = parseFloat(statusArray[1]).toFixed(1);
-			var rh = parseFloat(statusArray[2]).toFixed(1);
-			$('#cadi_temp').html('&nbsp;T: '+temp+'C');
-			$('#cadi_rh').html('rH: '+rh+'%');
+			if (data.length>42) {
+				var statusArray = data.split(',');
+				var date = new Date(statusArray[0]*1000);
+				$('#cadi_time2').html(date);
+				var temp = parseFloat(statusArray[1]).toFixed(1);
+				var rh = parseFloat(statusArray[2]).toFixed(1);
+				$('#cadi_temp').html('&nbsp;T: '+temp+'C');
+				$('#cadi_rh').html('rH: '+rh+'%');
 
-			var wpProgress = statusArray[18];
-			$('#tf1').html(wpProgress);
-			var auto_failures = statusArray[19];
-			$('#tf2').html(auto_failures);
-			var runners = statusArray[20];
-			$('#tf3').html(runners);
+				var wpProgress = statusArray[18];
+				$('#tf1').html(wpProgress);
+				var auto_failures = statusArray[19];
+				$('#tf2').html(auto_failures);
+				var runners = statusArray[20];
+				$('#tf3').html(runners);
 
-			var tsf = statusArray[3];		// timer state flags
-			$('#tsf').html(tsf);
-			var ctsf = statusArray[4];		// ctimer state flags
-			$('#ctsf').html(ctsf);
-
-
+				var tsf = statusArray[3];		// timer state flags
+				$('#tsf').html(tsf);
+				var ctsf = statusArray[4];		// ctimer state flags
+				$('#ctsf').html(ctsf);
 
 
-			// tank 3 water level redraw
+
+
+				// tank 3 water level redraw
 			
-		<?php echo 't3top = '.$svg_t3top.';'.PHP_EOL; ?>
-		<?php echo 't3btm = '.$svg_t3btm.';'.PHP_EOL; ?>
-		<?php echo 't3wx = '.$svg_t3wx.';'.PHP_EOL; ?>
-		<?php echo 't3wy = '.$svg_t3wy.';'.PHP_EOL; ?>
+			<?php echo 't3top = '.$svg_t3top.';'.PHP_EOL; ?>
+			<?php echo 't3btm = '.$svg_t3btm.';'.PHP_EOL; ?>
+			<?php echo 't3wx = '.$svg_t3wx.';'.PHP_EOL; ?>
+			<?php echo 't3wy = '.$svg_t3wy.';'.PHP_EOL; ?>
 
-			ctl = Math.floor((120*(t3btm-statusArray[8]+t3top))/(t3btm-t3top));
-			$('#tank3water').attr('points', t3wx+','+t3wy+' '+t3wx+','+(t3wy-ctl)+' '+(t3wx+30)+','+(t3wy-ctl-50)+' '+(t3wx+120)+','+(t3wy-ctl-50)+' '+(t3wx+123)+','+(t3wy-50+5)+' '+(t3wx+98)+','+t3wy);
+				ctl = Math.floor((120*(t3btm-statusArray[8]+t3top))/(t3btm-t3top));
+				$('#tank3water').attr('points', t3wx+','+t3wy+' '+t3wx+','+(t3wy-ctl)+' '+(t3wx+30)+','+(t3wy-ctl-50)+' '+(t3wx+120)+','+(t3wy-ctl-50)+' '+(t3wx+123)+','+(t3wy-50+5)+' '+(t3wx+98)+','+t3wy);
 
-			// tank 4 water lvl redraw
-		<?php echo 't4top = '.$svg_t4top.';'.PHP_EOL; ?>
-		<?php echo 't4btm = '.$svg_t4btm.';'.PHP_EOL; ?>
-		<?php echo 't4wx = '.$svg_t4wx.';'.PHP_EOL; ?>
-		<?php echo 't4wy = '.$svg_t4wy.';'.PHP_EOL; ?>
-			var ctl = Math.floor((120*(t4btm-statusArray[9]+t4top))/(t4btm-t4top));
-			//ctl=120;
-			//alert(ctl);
-			$('#tank4water').attr('points', t4wx+','+t4wy+' '+t4wx+','+(t4wy-ctl)+' '+(t4wx+30)+','+(t4wy-ctl-50)+' '+(t4wx+120)+','+(t4wy-ctl-50)+' '+(t4wx+123)+','+(t4wy-50+5)+' '+(t4wx+93)+','+t4wy);
+				// tank 4 water lvl redraw
+			<?php echo 't4top = '.$svg_t4top.';'.PHP_EOL; ?>
+			<?php echo 't4btm = '.$svg_t4btm.';'.PHP_EOL; ?>
+			<?php echo 't4wx = '.$svg_t4wx.';'.PHP_EOL; ?>
+			<?php echo 't4wy = '.$svg_t4wy.';'.PHP_EOL; ?>
+				var ctl = Math.floor((120*(t4btm-statusArray[9]+t4top))/(t4btm-t4top));
+				//ctl=120;
+				//alert(ctl);
+				$('#tank4water').attr('points', t4wx+','+t4wy+' '+t4wx+','+(t4wy-ctl)+' '+(t4wx+30)+','+(t4wy-ctl-50)+' '+(t4wx+120)+','+(t4wy-ctl-50)+' '+(t4wx+123)+','+(t4wy-50+5)+' '+(t4wx+93)+','+t4wy);
 
-			// draw labels for tanks, displaying current level
-			$('#t3l_txt').html('2Top: '+statusArray[8]+'cm');
-			$('#t4l_txt').html('2Top: '+statusArray[9]+'cm');
-			$('#psi_val').html('Pressure@7.2 = '+statusArray[14]+'bar');
+				// draw labels for tanks, displaying current level
+				$('#t3l_txt').html('2Top: '+statusArray[8]+'cm');
+				$('#t4l_txt').html('2Top: '+statusArray[9]+'cm');
+				$('#psi_val').html('Pressure@7.2 = '+statusArray[14]+'bar');
 
-			// get valve state circles' colors
-			var valves = statusArray[5];
-			for (var i=0;i<4;i++) {
-				if (valves.charAt(3-i)=="1") {
-					$('#cv'+i).attr('fill', 'green');
+				// get valve state circles' colors
+				var valves = statusArray[5];
+				for (var i=0;i<4;i++) {
+					if (valves.charAt(3-i)=="1") {
+						$('#cv'+i).attr('fill', 'green');
+					}
+					else {
+						$('#cv'+i).attr('fill', 'red');
+					}
+				}
+
+				// set colors for plugs (Loads) state rectangles
+				for (var i=0;i<4;i++) {
+					if (statusArray[6].charAt(3-i)=="1") {
+						$('#cp'+i).attr('fill', 'green');
+					}
+					else {
+						$('#cp'+i).attr('fill', 'red');
+					}
+				}
+
+				// dosing pumps status squares colors
+				for (var i=1;i<5;i++) {
+					if (statusArray[16].charAt(4-i)=="1") {
+						$('#cdp'+i).attr('fill', 'green');
+					}
+					else {
+						$('#cdp'+i).attr('fill', 'red');
+					}
+				}
+
+				if (statusArray[15]==51){	
+					$('#cdds').html('CDD Enabled');
+					$('#cdds').attr('fill', 'green');
 				}
 				else {
-					$('#cv'+i).attr('fill', 'red');
+					$('#cdds').html('CDD Disabled');
+					$('#cdds').attr('fill', 'red');
+				}
+				var af_bin = statusArray[17].toString(2);
+				$('#auto_flags').html(statusArray[17]+' ('+af_bin+')');
+
+				var vs_flag = $('#vs_flag').is(':checked');
+				if (vs_flag==1) {
+					d = new Date();
+				//	alert('vs checked');
+					$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
 				}
 			}
-
-			// set colors for plugs (Loads) state rectangles
-			for (var i=0;i<4;i++) {
-				if (statusArray[6].charAt(3-i)=="1") {
-					$('#cp'+i).attr('fill', 'green');
-				}
-				else {
-					$('#cp'+i).attr('fill', 'red');
-				}
-			}
-
-			// dosing pumps status squares colors
-			for (var i=1;i<5;i++) {
-				if (statusArray[16].charAt(4-i)=="1") {
-					$('#cdp'+i).attr('fill', 'green');
-				}
-				else {
-					$('#cdp'+i).attr('fill', 'red');
-				}
-			}
-
-			if (statusArray[15]==51){	
-				$('#cdds').html('CDD Enabled');
-				$('#cdds').attr('fill', 'green');
-			}
-			else {
-				$('#cdds').html('CDD Disabled');
-				$('#cdds').attr('fill', 'red');
-			}
-			var af_bin = statusArray[17].toString(2);
-			$('#auto_flags').html(statusArray[17]+' ('+af_bin+')');
-
-			var vs_flag = $('#vs_flag').is(':checked');
-			if (vs_flag==1) {
-				d = new Date();
-			//	alert('vs checked');
-				$("#cadi_img").attr("src", "img/curimage.jpeg?"+d.getTime());
-			}
-
 		});
 	}
 
