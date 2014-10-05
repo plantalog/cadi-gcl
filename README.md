@@ -6,11 +6,11 @@ Grolly - is complete plant watering and feeding solution.
 
 Grolly system is just based on Cadi hardware
 
-Grolly is aimed to be standalone watering robot with communication capabilities
+Goal: to have an irrigation system that mixes up plant feeding solutions and provides it to the root system of the plants automatically. Has communication capabilities and two main working modes - automatic and manual. Has interface for remote advanced tuning of device's behavior.
 
 
 FOLDER STRUCTURE
-
+ 
 android:
     - Cadi Bluetooth Monitor for Android
     
