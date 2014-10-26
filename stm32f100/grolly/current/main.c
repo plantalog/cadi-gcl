@@ -72,7 +72,7 @@ volatile uint32_t water_counter[WFM_AMOUNT];
 #define	VALVE_FAILURE_TIMEOUT		600	// timeout for valve open/close function to avoid hanging if valve broken
 #define DRAIN_VALVE_ID				1
 // Valve variables
-volatile uint8_t valveFlags;
+volatile static uint8_t valveFlags;
 #endif	// EOF VALVES DEFINITIONS
 
 
@@ -108,6 +108,7 @@ typedef struct
   uint16_t 			DHT_Humidity;  // from 0 (0%) to 1000 (100%)
   uint8_t 			DHT_CRC;  // from 0 (0%) to 1000 (100%)
 }DHT_data;
+
 __IO uint16_t IC2Value = 0;
 __IO uint16_t DutyCycle = 0;
 __IO uint32_t Frequency = 0;
@@ -408,7 +409,8 @@ volatile static uint8_t plugSettings[PLUG_AMOUNT] = {0, 1, 2, 3};	// PLUG_AMOUNT
 // analog inputs
 #define JDR_EC		ADC1->JDR3		// continuous ADC channel for EC
 #define JDR_PH		ADC1->JDR2		// continuous ADC channel for pH
-#define JDR_PSI		ADC1->JDR3		// pressure sensor
+#define JDR_PSI		ADC1->JDR2		// pressure sensor
+#define JDR_CO2		ADC1->JDR3		// CO2 sensor
 #define JDR_BUFFER_SIZE 10
 
 
@@ -423,6 +425,7 @@ volatile static uint16_t psi_pump_btm_level=0;
 #define AVG_ADC_EC		3			// adcAverage[AVG_ADC_EC]
 #define AVG_ADC_PH		2			// adcAverage[2]
 #define AVG_ADC_PSI		2			// adcAverage[2]
+#define AVG_ADC_CO2		2
 
 
 volatile static uint16_t tank_windows_top[2];
@@ -603,6 +606,11 @@ void send_resp(uint8_t cmd_uid);
 void send_ee_block(uint16_t addr);
 void eeprom_test(void);
 void push_tx(void);
+void psi_motor_init(void);
+void psiPwm(uint8_t val);
+void psi_pwm_test(void);
+void getco2(void);
+void co2_sens_supply(void);
 
 // auto_flags
 /*
@@ -614,6 +622,99 @@ void push_tx(void);
  */
 
 
+#define CO2_TOP		0x0619			// if ADC reading lower than this value, CO2 valve closes
+#define CO2_BTM		0x061A			// if ADC reading is higher than this value, CO2 valve opens
+#define CO2_400PPM	0x061B			//
+#define CO2_VALVE	2				// co2 valve id
+
+volatile static uint16_t curco2 = 0;
+volatile static uint16_t co2_400ppm = 0;
+volatile static uint16_t co2_top = 0;	// higher value, lower CO2 level
+volatile static uint16_t co2_btm = 0;
+volatile static uint32_t next_co2_run = 0;
+volatile static uint16_t co2_timeout = 120;
+volatile static uint32_t co2_sens_start = 0;	// when co2 sensor enabled
+volatile static uint8_t co2_sensor_ready = 0;	//
+
+#define CO2_SENSOR_12V					1		// co2 sensor driven by 12V valve id
+volatile static uint8_t co2temp = 0;
+void getco2(void){
+	uint16_t diff = 0;
+	if (next_co2_run<RTC_GetCounter() && ((auto_failures&16)>>4)==0 && co2_sensor_ready==1){	// if it's time to make a measurement
+		open_valve(CO2_SENSOR_12V);		// enable CO2 sensor 12V supply
+		vTaskDelay(50);		// delay to
+		co2temp |= (1<<1);
+		curco2 = adcAverage[AVG_ADC_CO2];	// read current CO2 ADC value
+
+		if (curco2>co2_btm && ((valveFlags&(1<<CO2_VALVE))>>CO2_VALVE)==0) {		// if current CO2 PPM level below needed and CO2 valve still closed
+			co2temp |= (1<<2);
+			open_valve(CO2_VALVE);	// open valve
+			co2_sens_start = RTC_GetCounter();	// remember the CO2 stab start time
+		}
+		vTaskDelay(10);
+		diff = (uint16_t)(RTC_GetCounter() - co2_sens_start);
+		if (curco2<co2_top) {					// if CO2 level reached desired
+			close_valve(CO2_VALVE);				// close CO2 valve
+			close_valve(CO2_SENSOR_12V);		// disable sensor 12V supply
+			next_co2_run = RTC_GetCounter()+10;	// +10 seconds delay until next measure
+			co2temp |= (1<<3);
+		}
+		if (diff>co2_timeout) {				// if CO2 control timeout exceeded
+			auto_failures |= (1<<4);		// set CO2 failure flag (bit 5)
+			close_valve(CO2_VALVE);				// close CO2 valve
+			close_valve(CO2_SENSOR_12V);		// disable sensor 12V supply
+			co2temp |= (1<<4);
+		}
+	}
+}
+
+#define CO2_WARMUP	60			// co2 sensor warmup
+uint32_t co2_warmup_end = 0;	// co sensor warmup finish time
+
+void co2_sens_supply(void){
+	if (RTC_GetCounter()>co2_warmup_end) {
+		co2_sensor_ready=1;
+	}
+	else {
+		open_valve(CO2_SENSOR_12V);		// force 12v supply to co2 sensor
+		co2_sensor_ready=0;
+	}
+}
+
+void co2_setup(void){
+	uint16_t tmpval=0;
+	Lcd_write_str("Set CO2 top lvl");
+	Lcd_goto(1,0);
+	Lcd_write_str("Curr = ");
+	Lcd_write_16b(adcAverage[AVG_ADC_CO2]);
+	vTaskDelay(3000);
+	EE_ReadVariable(CO2_TOP, &co2_top);
+	co2_top = adjust16bit_fast(co2_top, 1);
+	EE_WriteVariable(CO2_TOP, co2_top);
+	printOk();
+	vTaskDelay(200);
+	Lcd_write_str("Set CO2 btm lvl");
+	Lcd_goto(1,0);
+	Lcd_write_str("Curr = ");
+	Lcd_write_16b(adcAverage[AVG_ADC_CO2]);
+	vTaskDelay(3000);
+	EE_ReadVariable(CO2_BTM, &co2_btm);
+	tmpval = adjust16bit_fast(co2_btm, 1);
+	EE_WriteVariable(CO2_BTM, co2_btm);
+	printOk();
+	vTaskDelay(200);
+	Lcd_write_str("Set CO2=400ppm");
+	Lcd_goto(1,0);
+	Lcd_write_str("Curr = ");
+	Lcd_write_16b(adcAverage[AVG_ADC_CO2]);
+	vTaskDelay(3000);
+	EE_ReadVariable(CO2_400PPM, &co2_400ppm);
+	tmpval = adjust16bit_fast(co2_400ppm, 1);
+	EE_WriteVariable(CO2_400PPM, co2_400ppm);
+	printOk();
+	vTaskDelay(200);
+	loadSettings();
+}
 
 void autoSafe(void){
 	if (((auto_flags&4)>>2)==1){
@@ -907,6 +1008,7 @@ void save_settings(void){	// wrapper for rx_ee, simplifies settings packet recei
 }
 
 
+
 static void lstasks(void *pvParameters){
 	vTaskDelay(4000);
 	while (1) {
@@ -916,6 +1018,8 @@ static void lstasks(void *pvParameters){
 		autoSafe();
 		sonar_ping();
 		vTaskDelay(10);
+		co2_sens_supply();
+		getco2();
 	}
 }
 
@@ -935,11 +1039,6 @@ static void uart_task(void *pvParameters){
 		}
 		vTaskDelay(10);
 	}
-}
-
-
-void send_packet(){
-	// wrap packet
 }
 
 void rx_flush(void){
@@ -1083,6 +1182,11 @@ void run_uart_cmd(void){
 		case 51:
 			get_status_block(RxBuffer[2]);
 			break;
+		// send full status sequence
+		case 52:
+			get_status_block(1);
+			get_status_block(2);
+			break;
 		case 56:	// receive 32 bit value to store into EEPROM
 			rx_ee((RxBuffer[2]&(RxBuffer[3]<<8)), 2);
 			break;
@@ -1098,7 +1202,6 @@ void run_uart_cmd(void){
 			send_ee_block(addr);
 			break;
 	}
-
 }
 
 
@@ -1567,6 +1670,70 @@ void dosing_motor_control_init(void){	// init PC6-PC9 as PWM output for dosing p
 }
 
 
+// initializes the PWM pin for PSI pump motor variable speed drive
+void psi_motor_init(void){
+	GPIO_InitTypeDef GPIO_InitStructure;
+	TIM_TimeBaseInitTypeDef TIM_TimeBaseInitStruct;
+	TIM_OCInitTypeDef TIM_OCInitStruct;
+
+
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
+	GPIO_StructInit(&GPIO_InitStructure); // Reset init structure
+
+	// Setup Blue & Green LED on STM32-Discovery Board to use PWM.
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10 | GPIO_Pin_11;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;            // Alt Function - Push Pull
+	GPIO_Init(GPIOB, &GPIO_InitStructure);
+	GPIO_PinRemapConfig( GPIO_FullRemap_TIM2, ENABLE);        // Map TIM3_CH3 to GPIOC.Pin8, TIM3_CH4 to GPIOC.Pin9
+
+	// Let PWM frequency equal 100Hz.
+	// Let period equal 1000. Therefore, timer runs from zero to 1000. Gives 0.1Hz resolution.
+	// Solving for prescaler gives 240.
+	TIM_TimeBaseStructInit( &TIM_TimeBaseInitStruct );
+	TIM_TimeBaseInitStruct.TIM_ClockDivision = TIM_CKD_DIV4;
+	TIM_TimeBaseInitStruct.TIM_Period = 1000 - 1;   // 0..999
+	TIM_TimeBaseInitStruct.TIM_Prescaler = 240 - 1; // Div 240
+	TIM_TimeBaseInit( TIM2, &TIM_TimeBaseInitStruct );
+
+	TIM_OCStructInit( &TIM_OCInitStruct );
+	TIM_OCInitStruct.TIM_OutputState = TIM_OutputState_Enable;
+	TIM_OCInitStruct.TIM_OCMode = TIM_OCMode_PWM1;
+	// Initial duty cycle equals 0%. Value can range from zero to 1000.
+	TIM_OCInitStruct.TIM_Pulse = 0; // 0 .. 1000 (0=Always Off, 1000=Always On)
+
+	TIM_OC3Init( TIM2, &TIM_OCInitStruct ); // Channel 3 Blue LED
+	TIM_OC4Init( TIM2, &TIM_OCInitStruct ); // Channel 4 Green LED
+
+	TIM_Cmd(TIM2, ENABLE);
+	TIM2->CCR3 = 1000;
+	TIM2->CCR4 = 1000;
+}
+
+void psi_pwm_test(void){
+	uint8_t button = 0;
+	uint8_t curpwm = 0;
+	while (button!=BUTTON_FWD) {
+		button = readButtons();
+		vTaskDelay(5);
+		if (button==BUTTON_BCK && curpwm>0) {
+			curpwm--;
+		}
+		if (button==BUTTON_OK && curpwm<255) {
+			curpwm++;
+		}
+		TIM2->CCR3 = 1000-curpwm*10;
+		TIM2->CCR3 = 1000-curpwm*10;
+		Lcd_clear();
+		Lcd_write_str("PSI PWM= ");
+		Lcd_write_8b(curpwm);
+	}
+	Lcd_clear();
+}
+
+
+
 void tankLevelStabSetup(void){
 	Lcd_clear();
 	uint16_t curlevel=0;
@@ -1613,6 +1780,8 @@ void tankLevelStab(void){
 	}
 #endif
 }
+
+
 
 
 void open_valve(uint8_t valveId){
@@ -1709,6 +1878,7 @@ void eeprom_test(void){
 }
 
 void valve_test2(void){
+	vTaskDelay(5);
 	uint8_t curvalve=0;
 	Lcd_clear();
 	button=0;
@@ -1843,14 +2013,10 @@ void valve_test(void){
 		button=readButtons();
 #ifdef USE_VALVES
 		Lcd_goto(0,0);
-//		tmp=water_counter[0];
-//		Lcd_write_16b(tmp);
 
 		tmp=sonar_read[FWTANK_SONAR];
-//		Lcd_write_digit(tmp/100);
 		Lcd_write_digit(tmp);
 		tmp=sonar_read[MIXTANK_SONAR];
-//		Lcd_write_digit(tmp/100);
 		Lcd_write_digit(tmp);
 		Lcd_write_str("cm");
 
@@ -1898,6 +2064,7 @@ void valve_test(void){
 		Lcd_write_str("W");
 
 	}
+	psi_pwm_test();
 	eeprom_test();
 	Lcd_clear();
 	valve_test2();
@@ -2892,7 +3059,7 @@ void Lcd_write_32int(uint32_t d){
 
 
 
-void enablePlug5ms(uint8_t plug, uint16_t amount){	// 1 amount = 5ms
+/* void enablePlug5ms(uint8_t plug, uint16_t amount){	// 1 amount = 5ms
 	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   //enable TIM2 clock
 	 TIM2->PSC     = 40000-1;               //set divider for 5 milliseconds
 	 TIM2->ARR = amount;
@@ -2904,6 +3071,7 @@ void enablePlug5ms(uint8_t plug, uint16_t amount){	// 1 amount = 5ms
 	 }
 	 plugStateSet(plug, 0);
 }
+*/
 
 uint32_t measureDelay(void){	// maximum 300+ (65535/200) seconds
 	 RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;   //enable TIM2 clock
@@ -3022,6 +3190,67 @@ const uint8_t fatArray[MENURECS][7]=
 
 #ifdef TEST_MODE
 // menu items
+
+/*
+ * *
+ * |-MONITOR MODE 			/ 0
+ * |-TESTS					/ 1
+ * |	|-Valves			/ 2
+ * |	|-Temp&Humidity		/ 3
+ * |	|-EEPROM			/ 4
+ * |	|-Plugs				/ 5
+ * |	|-Dosers			/ 6
+ * |	|-rest				/ 7
+ * |-TIMERS					/ 8
+ * |	|-24H/Full Range	/ 9
+ * |	|-Cyclic			/ 10
+ * |-STABILIZERS			/ 11
+ * |	|-CO2				/ 12
+ * |	|-Pressure			/ 13
+ * |	|-Tank levels		/ 14
+ * |	|-Temperature		/ 15
+ * |	|-Humidity			/ 16
+ * |	|-pH				/ 17
+ * |-SETTINGS				/ 18
+ * |	|-Dosers			/ 19
+ * |	|-Plug settings		/ 20
+ * |	|-Set clock			/ 21
+ * |-WATERING				/ 22
+ * |	|-Watering progs	/ 23
+ * |	|-Fertilization		/ 24
+ */
+
+const char menuItemArray[MENURECS][18]=
+{
+		{"MONITOR MODE"},		// 0
+		{"TESTS"},				// 1
+			{"Valves"},	    		// 2
+			{"Temp&Humidity"},			// 3
+			{"EEPROM"},			// 4
+			{"Plugs"},			// 5
+			{"Dosers"},			// 6
+			{"rest"},			// 7
+		{"TIMERS"},			// 8
+			{"24h / Full range"},	// 9
+			{"Cyclic"},			// 10
+		{"STABILIZERS"},			// 11
+			{"CO2"},			// 12
+			{"Pressure"},			// 13
+			{"Tank levels"},		// 14
+			{"Temperature"},	// 15
+			{"Humidity"},	// 16
+			{"pH"},		// 17
+		{"SETTINGS"},	// 18
+			{"Dosers"},	// 19
+			{"Plugs"},// 20
+			{"Set clock"},// 21
+		{"WATERING"},// 22
+			{"Watering progs"},// 23
+			{"Fertilization"}// 24
+
+};
+
+/*
 const char menuItemArray[MENURECS][18]=
 {
 		{"MONITOR MODE"},		// 0
@@ -3040,7 +3269,7 @@ const char menuItemArray[MENURECS][18]=
 		{"Plug 3"},			// 13
 		{"pH-monitor"},		// 14
 		{"Calibration"},	// 15
-		{"pH-stabilizer"},	// 16
+		{"CO2-stabilizer"},	// 16
 
 		{"EC-monitor"},		// 17
 		{"Calibration"},	// 18
@@ -3062,49 +3291,37 @@ const char menuItemArray[MENURECS][18]=
 		{"Start watering"}	// 33
 
 };
+*/
+
 
 // 0 - nr zapisi, 1 - link na tekst, 2 - <, 3 - >, 4 - OK, 5 - CNCL, 6 - tip zapisi (0 - folder, 1 - program)
 const uint8_t fatArray[MENURECS][7]=
 {
-		{0,	0,	33,	1,	1,	0,	1},
-		{1,	1,	0,	2,	2,	1,	1},
-		{2,	2,	1,	5,	3,	2,	0},
-		{3,	3,	4,	4,	3,	1,	1},
-		{4,	4,	3,	3,	4,	1,	1},
-		{5,	5,	1,	6,	5,	5,	1},
-		{6,	6,	5,	10,	7,	6,	0},
-		{7,	7,	9,	8,	6,	6,	1},
-		{8,	8,	7,	9,	7,	6,	1},
-		{9,	9,	8,	7,	8,	6,	1},
-		{10,10,	6,	14,	9,	10,	1},
-		{11,11,	13,	12,	9,	10,	1},
-		{12,12,	11,	13,	10,	10,	1},
-		{13,13,	12,	11,	11,	10,	1},
-		{14,14,	10,	17,	15,	14,	0},
-		{15,15,	16,	16,	15,	14,	1},
-		{16,16,	15,	15,	16,	14,	1},
-
-		{17,17,	14,	20,	18,	17,	0},
-		{18,18,	19,	19,	23,	17,	1},	// ec calibration
-		{19,19,	18,	18,	24,	17,	1},	// ec stab settings
-
-
-
-
-		{20,20,	17,	21,	14,	17,	1},	// daylight sensor
-		{21,21,	20,	25,	22,	18,	0},	// keepers
-		{22,22,	24,	23,	28,	22,	1},	// tank keeper level window setup
-		{23,23,	22,	24,	23,	23,	1},	// t+2ct
-		{24,24,	23,	22,	17,	24,	1},	// add light
-		{25,25,	21,	26,	17,	25,	1},	// temp and humidity
-		{26,26,	25,	27,	18,	26,	1},	// hygrostat
-		{27,27,	26,	28,	19,	27,	1},	// thermostat
-		{28,28,	27,	29,	20,	28,	1},	// valve test
-		{29,29,	28,	30,	21,	29,	1},	// watering progs
-		{30,30,	29,	31,	22,	30,	1},	// fertilization
-		{31,31,	30,	32,	25,	31,	1},	// button test
-		{32,32,	31,	33,	26,	32,	1},	// pH and ec test
-		{33,33,	32,	0,	27,	33,	1}	// test function
+		{0,	0,	22,	1,	1,	0,	1},		// MONITOR MODE
+		{1,	1,	0,	8,	2,	1,	0},		// TESTS
+			{2,	2,	7,	3,	2,	1,	1},		// Valves
+			{3,	3,	2,	4,	3,	1,	1},		// Temp and Humidity
+			{4,	4,	3,	5,	4,	1,	1},		// EEPROM
+			{5,	5,	4,	6,	5,	1,	1},		// Dosers
+			{6,	6,	5,	7,	7,	1,	1},		// Plugs
+			{7,	7,	7,	2,	6,	1,	1},		// Rest
+		{8,	8,	1,	11,	9,	8,	0},		// TIMERS
+			{9,	9,	10,	10,	8,	8,	1},		// 24H/Full range
+			{10,10,	9,	9,	9,	8,	1},		// Cyclic
+		{11,11,	8,	18,	12,	11,	0},		// STABILIZERS
+			{12,12,	17,	13,	10,	11,	1},		// CO2
+			{13,13,	12,	14,	11,	11,	1},		// Pressure
+			{14,14,	13,	15,	15,	11,	0},		// Tank levels
+			{15,15,	14,	16,	15,	11,	1},		// Temperature
+			{16,16,	15,	17,	16,	11,	1},		// Humidity
+			{17,17,	16,	12,	18,	11,	0},		// pH
+		{18,18,	11,	22,	19,	18,	0},		// SETTINGS
+			{19,19,	21,	20,	24,	18,	1},		// Dosers
+			{20,20,	19,	21,	14,	18,	1},		// Plugs
+			{21,21,	20,	19,	14,	18,	1},		// Plugs
+		{22,22,	18,	0,	23,	18,	0},		// WATERING
+			{23,23,	24,	24,	28,	22,	1},	// Watering progs
+			{24,24,	23,	23,	23,	22,	1}	// Fertilization
 };
 
 #endif
@@ -3862,59 +4079,47 @@ void EE_WriteWord(uint16_t Address, uint32_t Data){
 
 void programRunner(uint8_t programId){
 
+
+	/*
+	 * *
+	 * |-MONITOR MODE 			/ 0
+	 * |-TESTS					/ 1
+	 * |	|-Valves			/ 2
+	 * |	|-Temp&Humidity		/ 3
+	 * |	|-EEPROM			/ 4
+	 * |	|-Plugs				/ 5
+	 * |	|-Dosers			/ 6
+	 * |	|-rest				/ 7
+	 * |-TIMERS					/ 8
+	 * |	|-24H/Full Range	/ 9
+	 * |	|-Cyclic			/ 10
+	 * |-STABILIZERS			/ 11
+	 * |	|-CO2				/ 12
+	 * |	|-Pressure			/ 13
+	 * |	|-Tank levels		/ 14
+	 * |	|-Temperature		/ 15
+	 * |	|-Humidity			/ 16
+	 * |	|-pH				/ 17
+	 * |-SETTINGS				/ 18
+	 * |	|-Dosers			/ 19
+	 * |	|-Plug settings		/ 20
+	 * |	|-Set clock			/ 21
+	 * |-WATERING				/ 22
+	 * |	|-Watering progs	/ 23
+	 * |	|-Fertilization		/ 24
+	*/
+
+
 	uint32_t tmp=0;
 	uint8_t tmp8=0;
 	Lcd_clear();
 	switch (programId) {
 	case 1:
 		break;
-	case 2:
-		Lcd_write_str("Timer to adjust:");
-		tmp8 = idSelector(1,4,1);
-	    setTimer(--tmp8);
+	case 2:		// valve_test
+		valve_test2();
 		break;
-	case 3:
-		plugTest();
-		break;
-	case 4:
-		psiSetup();
-		break;
-	case 5:
-		tmp = RTC_GetCounter();
-		uint32_t unixtime = timeAdjust(tmp, 1);
-		RTC_SetCounter(unixtime);
-		Lcd_clear();
-		break;
-	case 6:
-		Lcd_write_str("CTimer 2 adjust:");
-		tmp8 = idSelector(1,4,1);
-	    setCTimer(--tmp8);
-		break;
-	case 7:
-		break;
-	case 8:
-		break;
-	case 9:
-		Lcd_write_str("Choose plug");
-		tmp8 = idSelector(1,4,1);
-		setPlug(--tmp8);	// decrement needed because of actual start from 0
-		break;
-	case 10:
-		break;
-	case 11:
-		break;
-	case 13:
-//		phMonSettings();
-		break;
-	case 14:
-		break;
-	case 15:
-//		calibratePh();
-		break;
-	case 16:
-//		phStabSettings();
-		break;
-	case 17:
+	case 3:		// temp. and humidity test
 		dht_arr_displayer();
 #ifdef	TEST_MODE
 		displayAdcValues();	// test function to display ADC values
@@ -3922,14 +4127,56 @@ void programRunner(uint8_t programId){
 		display_usart_rx();
 		display_usart_tx();
 		break;
-	case 18:
+	case 4:		// eeprom test
+		psiSetup();
+		break;
+	case 5:		// plug test
+		plugTest();
+		break;
+	case 6:		// doser test
+		break;
+	case 7:		// rest tests
+		break;
+	case 8:		// 24h / full range timer setup
+		Lcd_write_str("Timer to adjust:");
+		tmp8 = idSelector(1,4,1);
+	    setTimer(--tmp8);
+		break;
+	case 9:		// cyclic timer setup
+		Lcd_write_str("CTimer 2 adjust:");
+		tmp8 = idSelector(1,4,1);
+	    setCTimer(--tmp8);
+		break;
+	case 10:	// co2 stabilizer
+		co2_setup();
+		break;
+	case 11:	// pressure stabilizer setup
+		break;
+	case 13:	// tank level stabilizer
+		tankLevelStabSetup();
+		break;
+	case 14:	// temp stab setup
+		break;
+	case 15:	// humidity stab setup
 		hygroStatSettings();
 		break;
-	case 19:
+	case 16:	// pH stab setup
+//		phStabSettings();
+		break;
+	case 17:	// doser settings
+		break;
+	case 18:	// plug settings
+		Lcd_write_str("Choose plug");
+		tmp8 = idSelector(1,4,1);
+		setPlug(--tmp8);	// decrement needed because of actual start from 0
+		break;
+	case 19:	// set clock
+		tmp = RTC_GetCounter();
+		uint32_t unixtime = timeAdjust(tmp, 1);
+		RTC_SetCounter(unixtime);
+		Lcd_clear();
 		break;
 	case 20:
-		valve_test();
-		valve_test();
 		break;
 	case 21:
 		watering_setup();
@@ -3950,7 +4197,6 @@ void programRunner(uint8_t programId){
 		startWp();
 		break;
 	case 28:
-		tankLevelStabSetup();
 		break;
 	}
 }
@@ -4570,31 +4816,33 @@ uint8_t menuSelector(void)
 	uint8_t curItem=0;	// default item to display entering the menu
 	uint8_t programId = 0;
 	uint8_t textId=fatArray[curItem][1];
+	uint8_t button=0;
 	while (programId==0){
+		psiPwm(button);
 		textId=fatArray[curItem][1];
 		Lcd_goto(0,0);
 		Lcd_write_str(menuItemArray[textId]);
-		uint8_t curButton=readButtons();
-		if (curButton>0){
-			vTaskDelay(100);
+		button = readButtons();
+		if (button>0){
 			Lcd_clear();
+			vTaskDelay(100);
 		}
 		vTaskDelay(10);
-		if (curButton==BUTTON_OK){
+		if (button==BUTTON_OK){
 			if (fatArray[curItem][6]==1)		// run program
 				{programId=fatArray[curItem][4];}
 			else	{curItem=fatArray[curItem][4];}			// enter folder
 			Lcd_clear();
 		}
-		else if (curButton==BUTTON_CNL){
+		else if (button==BUTTON_CNL){
 			curItem=fatArray[curItem][5];
 			Lcd_clear();
 		}
-		else if (curButton==BUTTON_BCK){
+		else if (button==BUTTON_BCK){
 			curItem=fatArray[curItem][2];
 			Lcd_clear();
 		}
-		else if (curButton==BUTTON_FWD){
+		else if (button==BUTTON_FWD){
 			curItem=fatArray[curItem][3];
 			Lcd_clear();
 		}
@@ -4682,6 +4930,12 @@ void copy_arr(volatile uint8_t *source, volatile uint8_t *destination, uint8_t a
 	}
 }
 
+void psiPwm(uint8_t val){
+	TIM2->CCR3 = 1000-(val&(uint16_t)(0xFF))*(uint16_t)200;
+	TIM2->CCR4 = 1000-(val&(uint16_t)(0xFF))*(uint16_t)200;
+}
+
+
 void displayClock(void *pvParameters)
 {
 		RTC_DateTime DateTime;
@@ -4705,6 +4959,9 @@ void displayClock(void *pvParameters)
 		buttonCalibration();
     	while (1)
 	    {
+
+    		psiPwm(button);
+
     		runners = 24;
 	    	vTaskDelay(10);
     		tmp = RTC_GetCounter();
@@ -4756,10 +5013,13 @@ void displayClock(void *pvParameters)
 	    	vTaskDelay(3);
 	    	Lcd_write_str(" ");
 	    	Lcd_goto(1,8);
-	    	Lcd_write_digit(wpProgress);
-	    	Lcd_write_str(" ");
-	    	Lcd_write_digit((uint8_t)(timerStateFlags&0xFF));
-	    	Lcd_write_digit((uint8_t)(cTimerStateFlags&0xFF));
+//	    	Lcd_write_digit(wpProgress);
+	    	Lcd_write_digit(auto_failures&0xFF);
+	    	Lcd_write_digit(valveFlags&0xFF);
+	    	Lcd_write_digit(co2temp);
+	    	if (button==BUTTON_OK) {
+	    		co2temp=0;
+	    	}
 	    	if (button==BUTTON_OK)
 	    	{
 	    		vTaskDelay(100);
@@ -4776,6 +5036,29 @@ void displayClock(void *pvParameters)
 
 uint8_t readButtons(void){
 	uint16_t curval = 0;
+	uint8_t i2 = 0;
+	uint8_t i = 0;
+	uint8_t a = 0;
+	for (i2=0;i2<3;i2++) {
+		adcAverager();
+		curval = adcAverage[ADC_AVG_BUTTONS];
+		vTaskDelay(1);
+		for (i=0;i<4;i++) {
+			if (curval>button_ranges[i*2]+BUTTON_RANGE_SHRINKER && curval<button_ranges[i*2+1]-BUTTON_RANGE_SHRINKER) {
+				a += (i+1);
+			}
+		}
+	}
+	if (a%3==0) {
+		return (a/3);
+	}
+	else {
+		return 0;
+	}
+}
+
+uint8_t readButtons2(void){
+	uint16_t curval = 0;
 	uint8_t i;
 	adcAverager();
 	curval = adcAverage[ADC_AVG_BUTTONS];
@@ -4785,10 +5068,6 @@ uint8_t readButtons(void){
 		}
 	}
 	return 0;
-}
-
-void adcRegularInit(void){
-
 }
 
 void AdcInit(void)
@@ -4984,57 +5263,7 @@ void setDutyCycle(void){
 	Lcd_clear();
 }
 
-void test_grolly_hw(void){
-	uint32_t i2 = 0;
-	uint32_t i=0;
-	Lcd_clear();
-	Lcd_write_arr("Checking systems", 16);
 
-	for (i=0; i<5;i++){
-		close_valve(i);
-		for (i2=0;i2<200000;i2++) {
-
-		}
-	}
-
-	for (i=0; i<5;i++){
-		open_valve(i);
-		for (i2=0;i2<200000;i2++) {
-
-		}
-	}
-	for (i2=0;i2<1000000;i2++) {
-
-	}
-	for (i=0; i<5;i++){
-		close_valve(i);
-		for (i2=0;i2<1000000;i2++) {
-
-		}
-	}
-	for (i=0; i<5;i++){
-		open_valve(i);
-		for (i2=0;i2<200000;i2++) {
-
-		}
-	}
-
-	for (i=0; i<5;i++){
-		close_valve(i);
-		for (i2=0;i2<200000;i2++) {
-
-		}
-	}
-
-	for (i=0;i<4;i++) {
-		enable_dosing_pump(i,1);	// startup disable dosing pumps
-		for (i2=0;i2<1000000;i2++) {
-
-		}
-		enable_dosing_pump(i,0);	// startup disable dosing pumps
-	}
-
-}
 
 void watchdog_init(void){
 	// WATCHDOG check ###################
@@ -5068,11 +5297,11 @@ void watchdog_init(void){
 
 		  /* Enable IWDG (the LSI oscillator will be enabled by hardware) */
 		  IWDG_Enable();
-
 }
 
 uint8_t main(void)
 {
+
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA |RCC_APB2Periph_AFIO, ENABLE);
 	// VALVE control pins init
 	GPIO_InitTypeDef init_pin;
@@ -5093,9 +5322,10 @@ uint8_t main(void)
 	plugStateSet(2, 0);
 	plugStateSet(3, 0);
 
-
+	auto_failures = 0;
 	uint32_t i;
 	dosing_motor_control_init();
+	psi_motor_init();
 	for (i=0;i<4;i++) {
 		enable_dosing_pump(i,0);	// startup disable dosing pumps
 	}
@@ -5105,7 +5335,8 @@ uint8_t main(void)
 	EE_Init();
 	AdcInit();
 	RtcInit();		//init real time clock
-
+	co2_sens_start = RTC_GetCounter();
+	co2_warmup_end = RTC_GetCounter() + CO2_WARMUP;
 	fup_time = RTC_GetCounter();
 	auto_failures = 0;
 	// SOLENOID VALVE RE-INIT
@@ -5189,6 +5420,9 @@ void loadSettings(void){	// function loads the predefined data
 		EE_ReadVariable(WFM_CAL_OFFSET+i, &wfCalArray[i]);
 	}
 
+	EE_ReadVariable(CO2_TOP, &co2_top);
+	EE_ReadVariable(CO2_BTM, &co2_btm);
+	EE_ReadVariable(CO2_400PPM, &co2_400ppm);
 
 	readButtonRanges();
 }

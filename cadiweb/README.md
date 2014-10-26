@@ -6,6 +6,11 @@ This folder contains Cadiweb server software needed to control the Cadis remotel
 INSTALLATION
 =============
 
+For ArchLinux on Raspberry Pi run in your Pi's terminal session:
+	wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-arclinux0614_pi.sh -O /tmp/install.sh
+	chmod 777 /tmp/install.sh
+	/bin/sh /tmp/install.sh
+
 For Ubuntu 12.04 LTS run the following lines in your Ubuntu terminal:
 	wget https://github.com/plantalog/cadi-gcl/raw/master/cadiweb/install-ubuntu1204.sh -O /tmp/install.sh
 	chmod 777 /tmp/install.sh
@@ -38,3 +43,10 @@ It uses 5 files in it's work:
 
 - btd.conf
 	Config file, containing the CBDaemon settings
+
+Cadi Bluetooth Daemon startup with systemd in ArchLinux
+	While installation of Cadiweb on Raspberry Pi's ArchLinux OS, the CBTDaemon systemd service is enabled to start up with ArchLinux. Its name is cbtd.service and it could be manually run with systemctl
+	systemctl enable cbtd.service
+and to run it manually execute:
+	systemctl start cbtd.service
+
